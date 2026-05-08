@@ -1,7 +1,7 @@
 import { runInvestigation } from "@/lib/orchestrator";
-import { AgentFinding } from "@/types/investigation";
+import { AgentFinding, AgentRole } from "@/types/investigation";
 
-export const maxDuration = 60;
+export const maxDuration = 55;
 
 export async function POST(request: Request) {
   const { subject } = await request.json();
@@ -22,9 +22,15 @@ export async function POST(request: Request) {
       try {
         sendEvent("started", { subject });
 
-        const report = await runInvestigation(subject, (finding: AgentFinding) => {
-          sendEvent("agent_update", finding);
-        });
+        const report = await runInvestigation(
+          subject,
+          (finding: AgentFinding) => {
+            sendEvent("agent_update", finding);
+          },
+          (role: AgentRole) => {
+            sendEvent("agent_started", { role });
+          }
+        );
 
         sendEvent("complete", report);
       } catch (error: unknown) {

@@ -19,10 +19,10 @@ const agentRunners: {
   { role: "historian", run: runHistorian },
 ];
 
-function makeErrorFinding(role: AgentRole, displayName: string): AgentFinding {
+function makeErrorFinding(role: AgentRole): AgentFinding {
   return {
     role,
-    displayName,
+    displayName: role,
     status: "error",
     primaryCause: "Agent encountered an error",
     evidence: [],
@@ -34,29 +34,41 @@ function makeErrorFinding(role: AgentRole, displayName: string): AgentFinding {
 
 export async function runInvestigation(
   subject: string,
-  onAgentUpdate: (finding: AgentFinding) => void
+  onAgentUpdate: (finding: AgentFinding) => void,
+  onAgentStarted?: (role: AgentRole) => void
 ): Promise<PostmortemReport> {
-  // Run all 6 agents in parallel
-  const results = await Promise.allSettled(
-    agentRunners.map((agent) => agent.run(subject))
-  );
-
-  // Process results
-  const findings: AgentFinding[] = [];
-
-  results.forEach((result, i) => {
-    const agent = agentRunners[i];
-    if (result.status === "fulfilled") {
-      onAgentUpdate(result.value);
-      findings.push(result.value);
-    } else {
-      const errorFinding = makeErrorFinding(agent.role, agent.role);
+  async function runWithUpdate(
+    runFn: () => Promise<AgentFinding>,
+    role: AgentRole
+  ): Promise<AgentFinding> {
+    onAgentStarted?.(role);
+    try {
+      const result = await runFn();
+      onAgentUpdate(result);
+      return result;
+    } catch {
+      const errorFinding = makeErrorFinding(role);
       onAgentUpdate(errorFinding);
-      findings.push(errorFinding);
+      return errorFinding;
+    }
+  }
+
+  const results = await Promise.allSettled([
+    runWithUpdate(() => runMarketAnalyst(subject), "market-analyst"),
+    runWithUpdate(() => runOperator(subject), "operator"),
+    runWithUpdate(() => runMoneyTrail(subject), "money-trail"),
+    runWithUpdate(() => runCustomerVoice(subject), "customer-voice"),
+    runWithUpdate(() => runEngineer(subject), "engineer"),
+    runWithUpdate(() => runHistorian(subject), "historian"),
+  ]);
+
+  const findings: AgentFinding[] = [];
+  results.forEach((result) => {
+    if (result.status === "fulfilled") {
+      findings.push(result.value);
     }
   });
 
-  // Synthesize final report
   const report = await runSynthesizer(subject, findings);
   return report;
 }

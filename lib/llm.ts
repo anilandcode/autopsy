@@ -10,9 +10,20 @@ console.log("[LLM] key prefix:", API_KEY.slice(0, 8));
 
 export const MODEL = MODEL_NAME;
 
-export const llm = new OpenAI({
-  baseURL: BASE_URL,
-  apiKey: API_KEY,
+// Lazy client — avoids crashing the build when API_KEY is empty
+let _client: OpenAI | null = null;
+function getClient(): OpenAI {
+  if (!_client) {
+    _client = new OpenAI({ baseURL: BASE_URL, apiKey: API_KEY });
+  }
+  return _client;
+}
+
+// Proxy so `llm.chat.completions.create(...)` still works
+export const llm = new Proxy({} as OpenAI, {
+  get(_, prop) {
+    return Reflect.get(getClient(), prop);
+  },
 });
 
 export async function complete(
@@ -20,7 +31,7 @@ export async function complete(
   userPrompt: string,
   options?: { temperature?: number; maxTokens?: number }
 ): Promise<string> {
-  const response = await llm.chat.completions.create({
+  const response = await getClient().chat.completions.create({
     model: MODEL_NAME,
     messages: [
       { role: "system", content: systemPrompt },
@@ -38,7 +49,7 @@ export async function* streamCompletion(
   userPrompt: string,
   options?: { temperature?: number; maxTokens?: number }
 ) {
-  const stream = await llm.chat.completions.create({
+  const stream = await getClient().chat.completions.create({
     model: MODEL_NAME,
     messages: [
       { role: "system", content: systemPrompt },
