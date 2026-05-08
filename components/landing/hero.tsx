@@ -11,7 +11,7 @@ export function Hero() {
 
   const handleKeyDown = (e: KeyboardEvent<HTMLInputElement>) => {
     if (e.key === "Enter" && subject.trim()) {
-      router.push(`/investigate?q=${encodeURIComponent(subject.trim())}`);
+      router.push(`/investigate?subject=${encodeURIComponent(subject.trim())}`);
     }
   };
 
@@ -30,7 +30,7 @@ export function Hero() {
 
           <div className="flex items-center gap-6">
             <Link
-              href="/cases"
+              href="/investigate"
               className="font-mono text-[11px] font-medium uppercase tracking-[0.1em] text-[#B8B5AE] transition-colors hover:text-[#F4F1EA]"
             >
               CASE FILES

@@ -10,7 +10,7 @@ export function Footer() {
           </span>
 
           <nav className="flex items-center font-mono text-[11px] text-[#B8B5AE]">
-            <Link href="/" className="transition-colors hover:text-[#F4F1EA]">
+            <Link href="/investigate" className="transition-colors hover:text-[#F4F1EA]">
               CASE FILES
             </Link>
             <span className="mx-1.5 text-[#71706B]">/</span>
@@ -38,7 +38,7 @@ export function Footer() {
         </div>
 
         <p className="mt-4 text-center font-mono text-[10px] text-[#5C5852]">
-          Built for AMD Developer Hackathon 2026
+          Built for the AMD MI300X Hackathon — May 2026
         </p>
       </div>
     </footer>
