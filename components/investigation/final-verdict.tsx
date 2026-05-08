@@ -32,6 +32,76 @@ function TypewriterText({ text, speed = 20 }: { text: string; speed?: number }) 
   );
 }
 
+function generatePDF(report: PostmortemReport) {
+  const printWindow = window.open("", "_blank");
+  if (!printWindow) return;
+
+  const html = `<!DOCTYPE html>
+<html>
+<head>
+  <title>Autopsy Report — ${report.subject}</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: 'Georgia', serif; color: #1a1a1a; background: white; padding: 40px; max-width: 800px; margin: 0 auto; }
+    .header { border-bottom: 3px solid #EF4444; padding-bottom: 20px; margin-bottom: 30px; }
+    .brand { font-family: monospace; color: #EF4444; font-size: 12px; letter-spacing: 4px; font-weight: bold; margin-bottom: 8px; }
+    h1 { font-size: 28px; color: #0a0a0a; margin-bottom: 6px; }
+    .date { color: #666; font-size: 12px; }
+    .cause-box { background: #FEF2F2; border: 2px solid #EF4444; border-radius: 8px; padding: 20px; margin: 24px 0; }
+    .cause-label { font-size: 10px; letter-spacing: 3px; color: #EF4444; font-weight: bold; margin-bottom: 8px; }
+    .cause-text { font-size: 18px; font-weight: bold; color: #0a0a0a; }
+    .confidence { margin-top: 10px; font-size: 12px; color: #666; }
+    h2 { font-size: 14px; letter-spacing: 2px; color: #EF4444; margin: 28px 0 12px; text-transform: uppercase; font-family: monospace; }
+    p { font-size: 14px; line-height: 1.7; color: #333; margin-bottom: 12px; }
+    .agent-section { margin: 16px 0; padding: 16px; border: 1px solid #e5e5e5; border-radius: 6px; page-break-inside: avoid; }
+    .agent-name { font-weight: bold; font-size: 13px; color: #0a0a0a; margin-bottom: 4px; }
+    .agent-cause { font-size: 13px; color: #333; margin-bottom: 8px; }
+    .agent-confidence { font-size: 11px; color: #EF4444; font-family: monospace; }
+    .agent-analysis { font-size: 12px; color: #555; line-height: 1.6; margin-top: 8px; border-top: 1px solid #f0f0f0; padding-top: 8px; }
+    ul, ol { padding-left: 20px; }
+    li { font-size: 13px; line-height: 1.8; color: #333; margin-bottom: 4px; }
+    .disagreement { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin: 12px 0; padding: 12px; border: 1px solid #fca5a5; border-radius: 6px; page-break-inside: avoid; }
+    .dis-topic { font-size: 10px; letter-spacing: 2px; color: #EF4444; font-weight: bold; margin-bottom: 8px; grid-column: 1 / -1; }
+    .dis-agent { font-size: 11px; font-weight: bold; margin-bottom: 4px; }
+    .dis-pos { font-size: 12px; color: #444; line-height: 1.5; }
+    .sources { font-size: 11px; color: #888; margin-top: 6px; }
+    .footer { margin-top: 40px; padding-top: 16px; border-top: 1px solid #e5e5e5; font-size: 11px; color: #999; text-align: center; font-family: monospace; }
+    @media print { body { padding: 20px; } .agent-section { page-break-inside: avoid; } }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <div class="brand">AUTOPSY — AI FAILURE INVESTIGATOR</div>
+    <h1>Postmortem: ${report.subject}</h1>
+    <div class="date">Generated ${new Date(report.generatedAt).toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric", hour: "2-digit", minute: "2-digit" })} · Powered by DeepSeek V4 Pro on AMD MI300X</div>
+  </div>
+  <div class="cause-box">
+    <div class="cause-label">PRIMARY CAUSE OF DEATH</div>
+    <div class="cause-text">${report.primaryCauseOfDeath}</div>
+    <div class="confidence">Investigator Confidence: ${Math.round(report.confidenceScore * 100)}%</div>
+  </div>
+  <h2>Executive Summary</h2>
+  <p>${report.executiveSummary}</p>
+  <h2>What Would Have Saved It</h2>
+  <ul>${report.whatWouldHaveSavedIt.map((item: string) => `<li>${item}</li>`).join("")}</ul>
+  <h2>Lessons for Builders</h2>
+  <ol>${report.lessonsForBuilders.map((item: string) => `<li>${item}</li>`).join("")}</ol>
+  <h2>Agent Reports</h2>
+  ${report.agentFindings.filter((f) => f.status === "done").map((f) => `<div class="agent-section"><div class="agent-name">${f.displayName}</div><div class="agent-cause">${f.primaryCause}</div><div class="agent-confidence">Confidence: ${Math.round(f.confidence * 100)}%</div><div class="agent-analysis">${f.fullAnalysis}</div>${f.sources.length > 0 ? `<div class="sources">Sources: ${f.sources.map((s) => s.title).join(" · ")}</div>` : ""}</div>`).join("")}
+  ${report.disagreements && report.disagreements.length > 0 ? `<h2>Agent Disagreements</h2>${report.disagreements.map((d) => `<div class="disagreement"><div class="dis-topic">${d.topic}</div><div><div class="dis-agent">${d.agentA}</div><div class="dis-pos">${d.agentAPosition}</div></div><div><div class="dis-agent">${d.agentB}</div><div class="dis-pos">${d.agentBPosition}</div></div></div>`).join("")}` : ""}
+  <div class="footer">AUTOPSY · 6 AI Agents · 1 Verdict · Built for AMD Developer Hackathon 2026 · autopsy-nine.vercel.app</div>
+</body>
+</html>`;
+
+  printWindow.document.write(html);
+  printWindow.document.close();
+  printWindow.onload = () => {
+    setTimeout(() => {
+      printWindow.print();
+    }, 500);
+  };
+}
+
 export function FinalVerdict({ report }: FinalVerdictProps) {
   return (
     <motion.div
@@ -173,7 +243,10 @@ export function FinalVerdict({ report }: FinalVerdictProps) {
 
       {/* Download button */}
       <div className="flex justify-end">
-        <button className="inline-flex h-10 items-center gap-2 rounded-lg border border-[#222222] bg-[#111111] px-4 text-sm text-[#71717A] transition-colors hover:border-[#EF4444]/30 hover:text-[#FAFAFA]">
+        <button
+          onClick={() => generatePDF(report)}
+          className="inline-flex h-10 items-center gap-2 rounded-lg border border-[#222222] bg-[#111111] px-4 text-sm text-[#71717A] transition-colors hover:border-[#EF4444]/30 hover:text-[#FAFAFA]"
+        >
           <FileDown className="h-4 w-4" />
           Download Report (PDF)
         </button>
