@@ -4,7 +4,7 @@ import { useState, useEffect, useCallback, useRef } from "react";
 import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
-import { ArrowLeft, ArrowRight, Search, X } from "lucide-react";
+import { ArrowLeft, ArrowRight, Search, X, RotateCcw } from "lucide-react";
 import { Corkboard } from "./corkboard";
 import { FinalVerdict } from "./final-verdict";
 import type { AgentFinding, AgentRole, AgentStatus, PostmortemReport } from "@/types/investigation";
@@ -44,6 +44,7 @@ export function InvestigationRoom() {
   const hasAutoTriggered = useRef(false);
   const abortRef = useRef<AbortController | null>(null);
   const logEndRef = useRef<HTMLDivElement | null>(null);
+  const verdictRef = useRef<HTMLDivElement | null>(null);
 
   function addLog(msg: string) {
     setLogs((prev) => [...prev, `${new Date().toLocaleTimeString()} — ${msg}`]);
@@ -53,6 +54,13 @@ export function InvestigationRoom() {
   useEffect(() => {
     logEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [logs]);
+
+  // Scroll to verdict when report arrives
+  useEffect(() => {
+    if (report) {
+      setTimeout(() => verdictRef.current?.scrollIntoView({ behavior: "smooth" }), 300);
+    }
+  }, [report]);
 
   // Pre-fill from URL param
   useEffect(() => {
@@ -80,7 +88,6 @@ export function InvestigationRoom() {
     setReport(null);
     setLogs([]);
 
-    // Set all agents to researching
     setAgentStatuses(
       Object.fromEntries(AGENT_ROLES.map((r) => [r, "researching"])) as Record<AgentRole, AgentStatus>
     );
@@ -113,6 +120,8 @@ export function InvestigationRoom() {
     // Now run the investigation
     addLog("Starting investigation for: " + subj);
     abortRef.current = new AbortController();
+
+    let streamClosedWithoutReport = false;
 
     try {
       const response = await fetch("/api/investigate", {
@@ -194,14 +203,49 @@ export function InvestigationRoom() {
           }
         }
       }
+
+      // Fallback: if stream closed without report but agents are done
+      streamClosedWithoutReport = true;
     } catch (err: unknown) {
       if (err instanceof DOMException && err.name === "AbortError") {
         addLog("Investigation cancelled by user");
+        streamClosedWithoutReport = false;
       } else {
         const msg = err instanceof Error ? err.message : "Network error";
         addLog("CAUGHT ERROR: " + msg);
         setError(msg);
       }
+    }
+
+    // Fallback synthesis
+    if (streamClosedWithoutReport) {
+      setAgentFindings((currentFindings) => {
+        const doneAgents = Object.values(currentFindings).filter(
+          (f): f is AgentFinding => f !== null && f.status === "done"
+        );
+
+        if (doneAgents.length >= 5 && !report) {
+          addLog("Stream closed without synthesis — requesting fallback...");
+          fetch("/api/synthesize", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ subject: subj, findings: doneAgents }),
+          })
+            .then((r) => r.json())
+            .then((fallbackReport: PostmortemReport) => {
+              setReport({
+                ...fallbackReport,
+                confidenceScore: normalizeConfidence(fallbackReport.confidenceScore),
+              });
+              addLog("Fallback synthesis complete");
+            })
+            .catch((e: Error) => {
+              addLog("Fallback synthesis failed: " + e.message);
+              setError("Synthesis failed");
+            });
+        }
+        return currentFindings;
+      });
     }
   }, []);
 
@@ -213,6 +257,19 @@ export function InvestigationRoom() {
     abortRef.current?.abort();
     setIsInvestigating(false);
     addLog("Investigation cancelled by user");
+  }, []);
+
+  const handleNewInvestigation = useCallback(() => {
+    setReport(null);
+    setError(null);
+    setIsInvestigating(false);
+    setLogs([]);
+    setAgentFindings(
+      Object.fromEntries(AGENT_ROLES.map((r) => [r, null])) as Record<AgentRole, AgentFinding | null>
+    );
+    setAgentStatuses(
+      Object.fromEntries(AGENT_ROLES.map((r) => [r, "idle"])) as Record<AgentRole, AgentStatus>
+    );
   }, []);
 
   return (
@@ -310,10 +367,25 @@ export function InvestigationRoom() {
               agentRoles={AGENT_ROLES}
               agentFindings={agentFindings}
               agentStatuses={agentStatuses}
-              onCancel={handleCancel}
+              onCancel={!report ? handleCancel : undefined}
             />
 
-            {report && <FinalVerdict report={report} />}
+            {report && (
+              <div ref={verdictRef}>
+                <FinalVerdict report={report} />
+
+                {/* New Investigation button */}
+                <div className="mx-auto mt-8 flex max-w-5xl justify-center">
+                  <button
+                    onClick={handleNewInvestigation}
+                    className="inline-flex h-12 items-center gap-2 rounded-xl bg-[#EF4444] px-8 text-base font-semibold text-white shadow-lg shadow-[#EF4444]/20 transition-all hover:bg-[#DC2626]"
+                  >
+                    <RotateCcw className="h-5 w-5" />
+                    New Investigation
+                  </button>
+                </div>
+              </div>
+            )}
           </motion.div>
         )}
       </AnimatePresence>
