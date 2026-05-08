@@ -1,127 +1,150 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
 import { ArrowLeft, ArrowRight, Search } from "lucide-react";
 import { Corkboard } from "./corkboard";
 import { FinalVerdict } from "./final-verdict";
-import type { AgentFinding, PostmortemReport } from "@/types/investigation";
+import type { AgentFinding, AgentRole, AgentStatus, PostmortemReport } from "@/types/investigation";
+
+const AGENT_ROLES: AgentRole[] = [
+  "market-analyst",
+  "operator",
+  "money-trail",
+  "customer-voice",
+  "engineer",
+  "historian",
+];
 
 const examples = [
   "Quibi", "Theranos", "Google+", "MoviePass",
   "Juicero", "WeWork", "Vine", "Clubhouse",
 ];
 
-const mockFindings: AgentFinding[] = [
-  {
-    role: "market-analyst",
-    displayName: "Market Analyst",
-    status: "done",
-    primaryCause: "Wrong product-market fit — short-form video was already owned by TikTok",
-    evidence: ["TikTok had 800M users when Quibi launched", "Mobile-only format ignored TV viewing habits"],
-    confidence: 0.91,
-    fullAnalysis:
-      "Quibi attempted to create a new category of premium short-form mobile video, but the market had already consolidated around TikTok for casual short video and Netflix for premium long-form. The 'in-between' slot did not exist. Consumer behavior data showed users either want 15-second dopamine hits or 45-minute narrative arcs. 10-minute episodes on a phone during commutes was a niche that no one asked for.",
-    sources: [{ title: "Quibi Shutdown Announcement", url: "https://variety.com" }],
-  },
-  {
-    role: "operator",
-    displayName: "The Operator",
-    status: "done",
-    primaryCause: "Leadership refused to adapt — doubled down on mobile-only after data showed TV demand",
-    evidence: ["CEO Meg Whitman ignored internal research", "No pivot plan existed after 3 months of flat growth"],
-    confidence: 0.85,
-    fullAnalysis:
-      "Operational rigidity was fatal. The leadership team, led by Hollywood veterans, operated with a movie-studio mentality rather than a tech product mindset. When early engagement metrics showed users wanted TV casting, the product team was forbidden from building it. This locked-in strategy persisted even as daily active users flatlined.",
-    sources: [{ title: "Quibi Postmortem by former PM", url: "https://techcrunch.com" }],
-  },
-  {
-    role: "money-trail",
-    displayName: "Money Trail",
-    status: "analyzing",
-    primaryCause: "",
-    evidence: [],
-    confidence: 0,
-    fullAnalysis: "",
-    sources: [],
-  },
-  {
-    role: "customer-voice",
-    displayName: "Customer Voice",
-    status: "analyzing",
-    primaryCause: "",
-    evidence: [],
-    confidence: 0,
-    fullAnalysis: "",
-    sources: [],
-  },
-  {
-    role: "engineer",
-    displayName: "The Engineer",
-    status: "researching",
-    primaryCause: "",
-    evidence: [],
-    confidence: 0,
-    fullAnalysis: "",
-    sources: [],
-  },
-  {
-    role: "historian",
-    displayName: "The Historian",
-    status: "researching",
-    primaryCause: "",
-    evidence: [],
-    confidence: 0,
-    fullAnalysis: "",
-    sources: [],
-  },
-];
-
-const mockReport: PostmortemReport = {
-  subject: "Quibi",
-  executiveSummary:
-    "Quibi spent $1.75 billion to prove that a market gap between TikTok and Netflix did not exist. The company combined Hollywood production budgets with a product format no consumer asked for, then locked itself into a mobile-only strategy even as usage data screamed for pivot. The leadership operated with movie-studio rigidity in a world that demands tech agility. By the time they allowed TV casting, users had already left and never returned.",
-  primaryCauseOfDeath: "Product-market misfit compounded by leadership rigidity",
-  confidenceScore: 0.88,
-  agentFindings: mockFindings,
-  disagreements: [
-    {
-      agentA: "market-analyst",
-      agentB: "operator",
-      topic: "Was the failure market-driven or leadership-driven?",
-      agentAPosition: "The mobile-only premium short-form slot simply did not exist as a market category.",
-      agentBPosition: "Leadership could have pivoted to TV casting and longer episodes but actively refused.",
-    },
-  ],
-  whatWouldHaveSavedIt: [
-    "Launch with TV casting from day one",
-    "Fund 10 pilots, not 175 full productions — test format before committing $1B",
-    "Hire a tech-native CEO alongside the Hollywood creative lead",
-  ],
-  lessonsForBuilders: [
-    "Never bet a billion dollars on a consumer behavior you haven't validated at small scale",
-    "Format-first, content-second — the container matters as much as what goes in it",
-    "Leadership diversity (tech + creative) prevents single-domain blind spots",
-  ],
-  generatedAt: new Date().toISOString(),
-};
+function normalizeConfidence(val: number): number {
+  if (val > 1) return val / 100;
+  return val;
+}
 
 export function InvestigationRoom() {
   const searchParams = useSearchParams();
   const [subject, setSubject] = useState("");
-  const [investigating, setInvestigating] = useState(false);
+  const [isInvestigating, setIsInvestigating] = useState(false);
+  const [agentFindings, setAgentFindings] = useState<Record<AgentRole, AgentFinding | null>>(
+    () => Object.fromEntries(AGENT_ROLES.map((r) => [r, null])) as Record<AgentRole, AgentFinding | null>
+  );
+  const [agentStatuses, setAgentStatuses] = useState<Record<AgentRole, AgentStatus>>(
+    () => Object.fromEntries(AGENT_ROLES.map((r) => [r, "idle"])) as Record<AgentRole, AgentStatus>
+  );
+  const [report, setReport] = useState<PostmortemReport | null>(null);
+  const [error, setError] = useState<string | null>(null);
+  const hasAutoTriggered = useRef(false);
 
+  // Pre-fill from URL param
   useEffect(() => {
     const s = searchParams.get("subject");
     if (s) setSubject(s);
   }, [searchParams]);
 
+  // Auto-trigger investigation from URL param
+  useEffect(() => {
+    const s = searchParams.get("subject");
+    if (s && !hasAutoTriggered.current) {
+      hasAutoTriggered.current = true;
+      const timer = setTimeout(() => {
+        startInvestigation(s);
+      }, 500);
+      return () => clearTimeout(timer);
+    }
+  }, [searchParams]);
+
+  const startInvestigation = useCallback(async (subj: string) => {
+    if (!subj.trim()) return;
+
+    setIsInvestigating(true);
+    setError(null);
+    setReport(null);
+
+    // Set all agents to researching
+    const researchingStatuses = Object.fromEntries(
+      AGENT_ROLES.map((r) => [r, "researching"])
+    ) as Record<AgentRole, AgentStatus>;
+    setAgentStatuses(researchingStatuses);
+    setAgentFindings(
+      Object.fromEntries(AGENT_ROLES.map((r) => [r, null])) as Record<AgentRole, AgentFinding | null>
+    );
+
+    try {
+      const response = await fetch("/api/investigate", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ subject: subj }),
+      });
+
+      if (!response.ok) {
+        setError(`Server error: ${response.status}`);
+        return;
+      }
+
+      const reader = response.body!.getReader();
+      const decoder = new TextDecoder();
+      let buffer = "";
+
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+
+        buffer += decoder.decode(value, { stream: true });
+        const lines = buffer.split("\n");
+        buffer = lines.pop() || "";
+
+        for (const line of lines) {
+          if (line.startsWith("data: ")) {
+            try {
+              const { type, data } = JSON.parse(line.slice(6));
+
+              if (type === "agent_update" && data?.role) {
+                const finding: AgentFinding = {
+                  ...data,
+                  confidence: normalizeConfidence(data.confidence),
+                };
+                setAgentFindings((prev) => ({
+                  ...prev,
+                  [data.role as AgentRole]: finding,
+                }));
+                setAgentStatuses((prev) => ({
+                  ...prev,
+                  [data.role as AgentRole]: data.status || "done",
+                }));
+              }
+
+              if (type === "complete") {
+                const rpt = data as PostmortemReport;
+                setReport({
+                  ...rpt,
+                  confidenceScore: normalizeConfidence(rpt.confidenceScore),
+                });
+              }
+
+              if (type === "error") {
+                setError(data.message || "Unknown error");
+              }
+            } catch {
+              // skip malformed lines
+            }
+          }
+        }
+      }
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : "Network error");
+    }
+  }, []);
+
   const handleStart = useCallback(() => {
-    if (!subject.trim()) return;
-    setInvestigating(true);
-  }, [subject]);
+    startInvestigation(subject);
+  }, [subject, startInvestigation]);
 
   return (
     <main className="min-h-dvh bg-[#0A0A0A] text-[#FAFAFA]">
@@ -143,7 +166,7 @@ export function InvestigationRoom() {
       </nav>
 
       <AnimatePresence mode="wait">
-        {!investigating ? (
+        {!isInvestigating ? (
           <motion.div
             key="input"
             initial={{ opacity: 0 }}
@@ -206,8 +229,21 @@ export function InvestigationRoom() {
             animate={{ opacity: 1 }}
             className="px-6 py-10 sm:px-12"
           >
-            <Corkboard subject={subject} findings={mockFindings} />
-            <FinalVerdict report={mockReport} />
+            {/* Error banner */}
+            {error && (
+              <div className="mx-auto mb-6 max-w-5xl rounded-xl border border-[#EF4444]/30 bg-[#EF4444]/5 px-5 py-4 text-sm text-[#EF4444]">
+                Error: {error}
+              </div>
+            )}
+
+            <Corkboard
+              subject={subject}
+              agentRoles={AGENT_ROLES}
+              agentFindings={agentFindings}
+              agentStatuses={agentStatuses}
+            />
+
+            {report && <FinalVerdict report={report} />}
           </motion.div>
         )}
       </AnimatePresence>

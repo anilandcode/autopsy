@@ -2,14 +2,14 @@
 
 import { motion } from "framer-motion";
 import { useEffect, useState } from "react";
-import { CheckCircle2, FileDown } from "lucide-react";
+import { CheckCircle2, FileDown, Swords } from "lucide-react";
 import type { PostmortemReport } from "@/types/investigation";
 
 interface FinalVerdictProps {
   report: PostmortemReport;
 }
 
-function TypewriterText({ text, speed = 30 }: { text: string; speed?: number }) {
+function TypewriterText({ text, speed = 20 }: { text: string; speed?: number }) {
   const [displayed, setDisplayed] = useState("");
 
   useEffect(() => {
@@ -25,7 +25,9 @@ function TypewriterText({ text, speed = 30 }: { text: string; speed?: number }) 
   return (
     <span>
       {displayed}
-      <span className="animate-pulse text-[#EF4444]">|</span>
+      {displayed.length < text.length && (
+        <span className="animate-pulse text-[#EF4444]">|</span>
+      )}
     </span>
   );
 }
@@ -78,7 +80,7 @@ export function FinalVerdict({ report }: FinalVerdictProps) {
           Executive Summary
         </h4>
         <p className="text-sm leading-7 text-[#A1A1AA]">
-          <TypewriterText text={report.executiveSummary} speed={20} />
+          <TypewriterText text={report.executiveSummary} speed={15} />
         </p>
       </div>
 
@@ -109,7 +111,7 @@ export function FinalVerdict({ report }: FinalVerdictProps) {
           <h4 className="mb-4 font-mono text-sm font-medium uppercase tracking-wider text-[#3B82F6]">
             Lessons for Builders
           </h4>
-          <ul className="space-y-3">
+          <ol className="space-y-3">
             {report.lessonsForBuilders.map((item, i) => (
               <motion.li
                 key={i}
@@ -118,13 +120,56 @@ export function FinalVerdict({ report }: FinalVerdictProps) {
                 transition={{ delay: 0.5 + i * 0.15 }}
                 className="flex items-start gap-2 text-sm text-[#A1A1AA]"
               >
-                <span className="mt-1 h-1.5 w-1.5 shrink-0 rounded-full bg-[#3B82F6]" />
+                <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-[#3B82F6]/10 text-[10px] font-bold text-[#3B82F6]">
+                  {i + 1}
+                </span>
                 {item}
               </motion.li>
             ))}
-          </ul>
+          </ol>
         </div>
       </div>
+
+      {/* Disagreements */}
+      {report.disagreements.length > 0 && (
+        <div className="space-y-4">
+          <div className="flex items-center gap-3">
+            <div className="flex h-8 w-8 items-center justify-center rounded-md bg-[#F97316]/10 text-[#F97316]">
+              <Swords className="h-4 w-4" />
+            </div>
+            <h3 className="text-lg font-semibold text-[#FAFAFA]">
+              Agent Disagreements
+            </h3>
+          </div>
+          {report.disagreements.map((d, i) => (
+            <motion.div
+              key={i}
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.8 + i * 0.2 }}
+              className="rounded-xl border border-[#F97316]/20 bg-[#111111] p-5"
+            >
+              <p className="mb-4 font-mono text-xs font-medium uppercase tracking-wider text-[#F97316]">
+                {d.topic}
+              </p>
+              <div className="grid gap-4 sm:grid-cols-2">
+                <div className="rounded-lg bg-[#0A0A0A] p-4">
+                  <p className="mb-1 text-xs font-semibold text-[#71717A]">
+                    {d.agentA}
+                  </p>
+                  <p className="text-sm text-[#A1A1AA]">{d.agentAPosition}</p>
+                </div>
+                <div className="rounded-lg bg-[#0A0A0A] p-4">
+                  <p className="mb-1 text-xs font-semibold text-[#71717A]">
+                    {d.agentB}
+                  </p>
+                  <p className="text-sm text-[#A1A1AA]">{d.agentBPosition}</p>
+                </div>
+              </div>
+            </motion.div>
+          ))}
+        </div>
+      )}
 
       {/* Download button */}
       <div className="flex justify-end">

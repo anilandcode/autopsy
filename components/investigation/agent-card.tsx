@@ -13,8 +13,9 @@ import {
   AlertCircle,
   CircleDot,
   Search,
+  ExternalLink,
 } from "lucide-react";
-import type { AgentRole, AgentStatus } from "@/types/investigation";
+import type { AgentRole, AgentStatus, AgentFinding } from "@/types/investigation";
 
 const agentConfig: Record<
   AgentRole,
@@ -53,23 +54,19 @@ const statusConfig: Record<
 interface AgentCardProps {
   role: AgentRole;
   status: AgentStatus;
-  primaryCause?: string;
-  confidence?: number;
-  analysis?: string;
+  finding: AgentFinding | null;
   index: number;
 }
 
-export function AgentCard({
-  role,
-  status,
-  primaryCause,
-  confidence,
-  analysis,
-  index,
-}: AgentCardProps) {
+export function AgentCard({ role, status, finding, index }: AgentCardProps) {
   const config = agentConfig[role];
   const StatusIcon = statusConfig[status].icon;
   const Icon = config.icon;
+
+  const confidence = finding?.confidence;
+  const primaryCause = finding?.primaryCause;
+  const analysis = finding?.fullAnalysis;
+  const sources = finding?.sources;
 
   return (
     <motion.div
@@ -100,7 +97,7 @@ export function AgentCard({
         </div>
       </div>
 
-      {status === "researching" && (
+      {status === "researching" && !finding && (
         <div className="mt-2 space-y-2">
           <div className="h-3 w-3/4 animate-pulse rounded bg-[#222222]" />
           <div className="h-3 w-1/2 animate-pulse rounded bg-[#222222]" />
@@ -108,21 +105,21 @@ export function AgentCard({
         </div>
       )}
 
-      {status === "analyzing" && (
+      {status === "analyzing" && !finding && (
         <div className="mt-2 space-y-2">
           <div className="h-3 w-full animate-pulse rounded bg-[#222222]" />
           <div className="h-3 w-4/5 animate-pulse rounded bg-[#222222]" />
         </div>
       )}
 
-      {(status === "done" || status === "error") && (
+      {(status === "done" || status === "error") && finding && (
         <>
           {primaryCause && (
             <div className="mb-2 text-sm font-medium text-[#FAFAFA]">
               {primaryCause}
             </div>
           )}
-          {typeof confidence === "number" && (
+          {typeof confidence === "number" && confidence > 0 && (
             <div className="mb-3">
               <div className="mb-1 flex items-center justify-between text-xs text-[#71717A]">
                 <span>Confidence</span>
@@ -151,7 +148,30 @@ export function AgentCard({
               {analysis}
             </p>
           )}
+          {sources && sources.length > 0 && (
+            <div className="mt-3 border-t border-[#222222] pt-3">
+              <p className="mb-1.5 text-[10px] font-medium uppercase tracking-wider text-[#52525B]">
+                Sources
+              </p>
+              {sources.slice(0, 2).map((src, i) => (
+                <a
+                  key={i}
+                  href={src.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center gap-1 text-[10px] text-[#71717A] transition-colors hover:text-[#FAFAFA]"
+                >
+                  <ExternalLink className="h-2.5 w-2.5" />
+                  {src.title}
+                </a>
+              ))}
+            </div>
+          )}
         </>
+      )}
+
+      {status === "error" && !finding && (
+        <p className="text-xs text-[#EF4444]">Agent encountered an error.</p>
       )}
 
       {status === "idle" && (

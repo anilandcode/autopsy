@@ -2,14 +2,21 @@
 
 import { motion } from "framer-motion";
 import { AgentCard } from "./agent-card";
-import type { AgentFinding } from "@/types/investigation";
+import type { AgentRole, AgentStatus, AgentFinding } from "@/types/investigation";
 
 interface CorkboardProps {
   subject: string;
-  findings: AgentFinding[];
+  agentRoles: AgentRole[];
+  agentFindings: Record<AgentRole, AgentFinding | null>;
+  agentStatuses: Record<AgentRole, AgentStatus>;
 }
 
-export function Corkboard({ subject, findings }: CorkboardProps) {
+export function Corkboard({
+  subject,
+  agentRoles,
+  agentFindings,
+  agentStatuses,
+}: CorkboardProps) {
   return (
     <div className="mx-auto max-w-5xl">
       <motion.div
@@ -27,14 +34,12 @@ export function Corkboard({ subject, findings }: CorkboardProps) {
       </motion.div>
 
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-        {findings.map((finding, i) => (
+        {agentRoles.map((role, i) => (
           <AgentCard
-            key={finding.role}
-            role={finding.role}
-            status={finding.status}
-            primaryCause={finding.primaryCause}
-            confidence={finding.confidence}
-            analysis={finding.fullAnalysis}
+            key={role}
+            role={role}
+            status={agentStatuses[role]}
+            finding={agentFindings[role]}
             index={i}
           />
         ))}
