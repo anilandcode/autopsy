@@ -1,0 +1,93 @@
+@import "tailwindcss";
+
+:root {
+  /* Tavily-inspired light design tokens */
+  --bg-base: #FEFCF5;
+  --bg-surface: #FFFFFF;
+  --bg-elevated: #EDE6DB;
+  --bg-secondary: #C6DACC;
+  --border-subtle: #E5E2DD;
+  --border-strong: #D1CEC8;
+  --text-primary: #3C3A39;
+  --text-secondary: #6B6A69;
+  --text-muted: #A0A09E;
+  --accent-primary: #81B09A;
+  --accent-primary-dim: #6A9580;
+  --accent-cream: #EDE6DB;
+  --accent-verified: #4A9B7F;
+  --font-display: var(--font-inter);
+  --font-mono: var(--font-jetbrains-mono);
+
+  /* Tailwind compat */
+  --background: #FEFCF5;
+  --foreground: #3C3A39;
+  --surface: #FFFFFF;
+  --surface-border: #E5E2DD;
+  --surface-secondary: #C6DACC;
+  --accent: #81B09A;
+  --accent-secondary: #EDE6DB;
+  --verified: #4A9B7F;
+  --muted: #6B6A69;
+  --muted-dark: #A0A09E;
+  --radius: 20px;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-surface: var(--surface);
+  --color-surface-border: var(--surface-border);
+  --color-surface-secondary: var(--surface-secondary);
+  --color-accent: var(--accent);
+  --color-accent-secondary: var(--accent-secondary);
+  --color-verified: var(--verified);
+  --color-muted: var(--muted);
+  --color-muted-dark: var(--muted-dark);
+  --font-sans: var(--font-inter);
+  --font-mono: var(--font-jetbrains-mono);
+  --radius-lg: var(--radius);
+  --radius-md: 12px;
+  --radius-sm: 8px;
+}
+
+html {
+  background: #FEFCF5;
+  color: #3C3A39;
+}
+
+body {
+  background: #FEFCF5;
+  color: #3C3A39;
+  font-family: var(--font-inter), "Inter", system-ui, -apple-system, sans-serif;
+  position: relative;
+}
+
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: #D1CEC8;
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #A0A09E;
+}
+
+::selection {
+  background: #C6DACC;
+  color: #3C3A39;
+}
+
+@media print {
+  body {
+    background: #FFFFFF !important;
+    color: #3C3A39 !important;
+  }
+  .no-print {
+    display: none !important;
+  }
+}
