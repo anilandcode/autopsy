@@ -1,63 +1,55 @@
 import OpenAI from "openai";
 
-const baseURL = process.env.LLM_BASE_URL || "https://api.openai.com/v1";
-const apiKey = process.env.LLM_API_KEY || "";
-const MODEL = process.env.LLM_MODEL || "gpt-4o-mini";
+const BASE_URL = process.env.LLM_BASE_URL ?? "https://api.fireworks.ai/inference/v1";
+const API_KEY = process.env.LLM_API_KEY ?? "";
+const MODEL_NAME = process.env.LLM_MODEL ?? "accounts/fireworks/models/deepseek-v4-pro";
 
-// Lazy client — avoids crashing the dev server at boot when keys are empty
-function getClient(): OpenAI {
-  return new OpenAI({ apiKey, baseURL });
-}
+console.log("[LLM] baseURL:", BASE_URL);
+console.log("[LLM] model:", MODEL_NAME);
+console.log("[LLM] key prefix:", API_KEY.slice(0, 8));
 
-export const llm = new Proxy({} as OpenAI, {
-  get(_, prop) {
-    return Reflect.get(getClient(), prop);
-  },
+export const MODEL = MODEL_NAME;
+
+export const llm = new OpenAI({
+  baseURL: BASE_URL,
+  apiKey: API_KEY,
 });
-
-export { MODEL };
-
-type CompletionOptions = {
-  temperature?: number;
-  maxTokens?: number;
-};
-
-export async function* streamCompletion(
-  systemPrompt: string,
-  userPrompt: string,
-  options?: CompletionOptions
-): AsyncGenerator<string> {
-  const stream = await getClient().chat.completions.create({
-    model: MODEL,
-    messages: [
-      { role: "system", content: systemPrompt },
-      { role: "user", content: userPrompt },
-    ],
-    temperature: options?.temperature ?? 0.7,
-    max_tokens: options?.maxTokens ?? 2000,
-    stream: true,
-  });
-
-  for await (const chunk of stream) {
-    const content = chunk.choices[0]?.delta?.content;
-    if (content) yield content;
-  }
-}
 
 export async function complete(
   systemPrompt: string,
   userPrompt: string,
-  options?: CompletionOptions
+  options?: { temperature?: number; maxTokens?: number }
 ): Promise<string> {
-  const res = await getClient().chat.completions.create({
-    model: MODEL,
+  const response = await llm.chat.completions.create({
+    model: MODEL_NAME,
     messages: [
       { role: "system", content: systemPrompt },
       { role: "user", content: userPrompt },
     ],
     temperature: options?.temperature ?? 0.7,
-    max_tokens: options?.maxTokens ?? 2000,
+    max_tokens: options?.maxTokens ?? 1500,
+    stream: false,
   });
+  return response.choices[0]?.message?.content ?? "";
+}
 
-  return res.choices[0]?.message?.content?.trim() ?? "";
+export async function* streamCompletion(
+  systemPrompt: string,
+  userPrompt: string,
+  options?: { temperature?: number; maxTokens?: number }
+) {
+  const stream = await llm.chat.completions.create({
+    model: MODEL_NAME,
+    messages: [
+      { role: "system", content: systemPrompt },
+      { role: "user", content: userPrompt },
+    ],
+    temperature: options?.temperature ?? 0.7,
+    max_tokens: options?.maxTokens ?? 1500,
+    stream: true,
+  });
+  for await (const chunk of stream) {
+    const content = chunk.choices[0]?.delta?.content;
+    if (content) yield content;
+  }
 }
