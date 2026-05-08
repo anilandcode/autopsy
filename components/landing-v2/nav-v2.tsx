@@ -8,7 +8,7 @@ export function NavV2() {
   const [mobileOpen, setMobileOpen] = useState(false);
 
   return (
-    <nav className="sticky top-0 z-50 border-b border-[#E5E2DD] bg-[#FEFCF5]/80 backdrop-blur-md">
+    <nav className="sticky top-0 z-50 bg-[#FEFCF5]">
       <div className="mx-auto flex max-w-6xl items-center justify-between px-6 py-4 sm:px-12">
         <Link
           href="/v2"
@@ -40,7 +40,7 @@ export function NavV2() {
           </Link>
           <Link
             href="/v2/investigate"
-            className="rounded-[20px] bg-[#81B09A] px-5 py-2 text-sm font-semibold text-white transition-colors hover:bg-[#6A9580]"
+            className="rounded-full bg-[#3C3A39] px-5 py-2 text-sm font-medium text-white transition-transform hover:scale-[1.02]"
           >
             Launch
           </Link>
@@ -87,7 +87,7 @@ export function NavV2() {
             </Link>
             <Link
               href="/v2/investigate"
-              className="rounded-[20px] bg-[#81B09A] px-5 py-2 text-center text-sm font-semibold text-white"
+              className="rounded-full bg-[#3C3A39] px-5 py-2 text-center text-sm font-medium text-white"
               onClick={() => setMobileOpen(false)}
             >
               Launch
