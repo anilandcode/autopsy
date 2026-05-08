@@ -1,10 +1,14 @@
 import { complete } from "@/lib/llm";
-import { AgentFinding, Disagreement, PostmortemReport } from "@/types/investigation";
+import { AgentFinding, AgentRole, AgentDebateOutput, ConsequentialDisagreement, Disagreement, PostmortemReport } from "@/types/investigation";
 
 const SYSTEM_PROMPT = `You are the Lead Investigator synthesizing a 6-agent postmortem.
 Your job: find truth by weighing evidence, not averaging opinions.
 If 5 agents agree and 1 disagrees with strong evidence, the 1 might be right.
 Always identify the real primary cause of death — the ROOT cause, not symptoms.
+
+You have 6 agent findings AND a debate round where agents explicitly disagreed.
+Use the disagreements to find truth — the dissenting agent might be onto something the majority missed.
+Identify which debate point is most consequential.
 
 Respond ONLY with valid JSON in this exact format:
 {
@@ -20,6 +24,12 @@ Respond ONLY with valid JSON in this exact format:
       "agentBPosition": "what operator says"
     }
   ],
+  "mostConsequentialDisagreement": {
+    "agentA": "role",
+    "agentB": "role",
+    "topic": "the debate point that matters most",
+    "whoseRightAndWhy": "One sharp sentence: [agent] is right because..."
+  },
   "whatWouldHaveSavedIt": [
     "Specific actionable thing 1",
     "Specific actionable thing 2",
@@ -37,7 +47,8 @@ Respond ONLY with the JSON object. No preamble, no explanation outside JSON.`;
 
 export async function runSynthesizer(
   subject: string,
-  findings: AgentFinding[]
+  findings: AgentFinding[],
+  debateOutputs: AgentDebateOutput[] = []
 ): Promise<PostmortemReport> {
   const findingsJson = JSON.stringify(
     findings.map((f) => ({
@@ -52,17 +63,22 @@ export async function runSynthesizer(
     2
   );
 
+  const debateSection = debateOutputs.length > 0
+    ? `\n\nHere is the DEBATE ROUND — agents explicitly critiqued each other:\n${JSON.stringify(debateOutputs, null, 2)}\n\nUse these disagreements to sharpen your synthesis. The dissenting agent may be right.`
+    : "";
+
   const userPrompt = `Investigate: ${subject}
 
 Here are the findings from all 6 specialist agents:
 
 ${findingsJson}
+${debateSection}
 
 Synthesize these into a final verdict. Return JSON.`;
 
   const rawOutput = await complete(SYSTEM_PROMPT, userPrompt, {
     temperature: 0.5,
-    maxTokens: 2000,
+    maxTokens: 2500,
   });
 
   let parsed: Record<string, unknown> = {};
@@ -81,6 +97,19 @@ Synthesize these into a final verdict. Return JSON.`;
     ? (parsed.disagreements as Disagreement[])
     : [];
 
+  let mostConsequentialDisagreement: ConsequentialDisagreement | null = null;
+  if (parsed.mostConsequentialDisagreement && typeof parsed.mostConsequentialDisagreement === "object") {
+    const mcd = parsed.mostConsequentialDisagreement as Record<string, unknown>;
+    if (mcd.agentA && mcd.agentB && mcd.topic) {
+      mostConsequentialDisagreement = {
+        agentA: mcd.agentA as AgentRole,
+        agentB: mcd.agentB as AgentRole,
+        topic: mcd.topic as string,
+        whoseRightAndWhy: (mcd.whoseRightAndWhy as string) || "",
+      };
+    }
+  }
+
   return {
     subject,
     executiveSummary: (parsed.executiveSummary as string) || rawOutput,
@@ -89,6 +118,8 @@ Synthesize these into a final verdict. Return JSON.`;
     confidenceScore: Math.min(1, Math.max(0, confidenceScore)),
     agentFindings: findings,
     disagreements,
+    debateRound: debateOutputs,
+    mostConsequentialDisagreement,
     whatWouldHaveSavedIt: Array.isArray(parsed.whatWouldHaveSavedIt)
       ? (parsed.whatWouldHaveSavedIt as string[])
       : [],

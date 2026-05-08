@@ -1,213 +1,254 @@
+"use client";
+
+import { motion } from "framer-motion";
 import Link from "next/link";
-import {
-  BarChart3,
-  UserCog,
-  DollarSign,
-  MessageSquareQuote,
-  Code2,
-  History,
-} from "lucide-react";
 
 const agents = [
   {
+    num: "01",
     name: "Market Analyst",
-    icon: BarChart3,
-    color: "#EF4444",
     methodology:
-      "Searches for market timing, competitive dynamics, demand signals, and TAM/SAM misalignments. Looks for category-killers that entered the same space.",
+      "Searches for market timing, competitive dynamics, demand signals, and TAM/SAM misalignments.",
     bias: "Tends to over-weight timing and under-weight execution quality.",
   },
   {
+    num: "02",
     name: "The Operator",
-    icon: UserCog,
-    color: "#F97316",
     methodology:
-      "Investigates team decisions, hiring patterns, pivots that didn't happen, and execution velocity. Reads Glassdoor, LinkedIn, and ex-employee interviews.",
+      "Investigates team decisions, hiring patterns, pivots that didn't happen, and execution velocity.",
     bias: "Often blames leadership before acknowledging market headwinds.",
   },
   {
+    num: "03",
     name: "Money Trail",
-    icon: DollarSign,
-    color: "#22C55E",
     methodology:
-      "Traces burn rate, funding history, unit economics, runway math, and whether the business model was ever viable at scale.",
-    bias: "Will flag a broken unit economics model even when traction is strong.",
+      "Traces burn rate, funding history, unit economics, runway math, and business model viability.",
+    bias: "Will flag broken unit economics even when traction is strong.",
   },
   {
+    num: "04",
     name: "Customer Voice",
-    icon: MessageSquareQuote,
-    color: "#3B82F6",
     methodology:
-      "Scrapes reviews, Reddit threads, social sentiment, and churn signals. Builds a composite voice-of-customer from first-principles complaints.",
-    bias: "Can overweight early-adopter complaints and miss mainstream adoption curves.",
+      "Scrapes reviews, Reddit threads, social sentiment, and churn signals.",
+    bias: "Can overweight early-adopter complaints and miss mainstream adoption.",
   },
   {
+    num: "05",
     name: "The Engineer",
-    icon: Code2,
-    color: "#A855F7",
     methodology:
-      "Analyzes technical architecture, scalability decisions, product trade-offs, and tech debt accumulation. Checks GitHub activity and engineering blog posts.",
-    bias: "Frequently concludes 'the tech was fine, the market was wrong.'",
+      "Analyzes technical architecture, scalability decisions, product trade-offs, and tech debt accumulation.",
+    bias: 'Frequently concludes "the tech was fine, the market was wrong."',
   },
   {
+    num: "06",
     name: "The Historian",
-    icon: History,
-    color: "#EAB308",
     methodology:
-      "Pattern-matches against historical failures with similar DNA. Draws from case studies, academic research, and longitudinal industry data.",
+      "Pattern-matches against historical failures with similar DNA. Draws from case studies and longitudinal data.",
     bias: "May over-fit to historical analogies and miss novel category risks.",
   },
 ];
 
 const techStack = [
-  { name: "Next.js", description: "React framework for the UI" },
-  { name: "DeepSeek V4 Pro", description: "LLM running on Fireworks AI" },
-  { name: "AMD MI300X", description: "GPU inference on day 3 (planned)" },
-  { name: "Tavily", description: "Real-time web search for evidence" },
-  { name: "LangGraph", description: "Agent orchestration and state machine" },
-  { name: "Vercel", description: "Deployment and edge hosting" },
+  { name: "Next.js 15", description: "App Router + Turbopack" },
+  { name: "DeepSeek V4 Pro 1.6T MoE", description: "via Fireworks AI" },
+  { name: "AMD MI300X", description: "192GB HBM3 — planned migration" },
+  { name: "Tavily", description: "Real-time web search" },
+  { name: "Server-Sent Events", description: "Streaming agent updates" },
+  { name: "Vercel", description: "Edge deployment" },
 ];
 
 export default function AboutPage() {
   return (
-    <main className="min-h-dvh bg-[#0A0A0A] text-[#FAFAFA]">
+    <main className="min-h-dvh bg-[#0E0E0E] text-[#F4F1EA]">
       {/* Nav */}
-      <nav className="flex items-center justify-between px-6 py-5 sm:px-12">
+      <nav className="border-b border-[#2A2A2A] flex items-center justify-between px-6 py-4 sm:px-12">
         <Link
           href="/"
-          className="text-sm text-[#71717A] transition-colors hover:text-[#FAFAFA]"
+          className="font-mono text-sm text-[#71706B] transition-colors hover:text-[#F4F1EA]"
         >
-          Home
+          &larr; BACK
         </Link>
-        <span className="font-mono text-lg font-bold tracking-wider text-[#EF4444]">
+        <span className="font-mono text-lg font-bold tracking-wider text-[#D62828]">
           AUTOPSY
         </span>
         <Link
           href="/investigate"
-          className="inline-flex h-9 items-center justify-center rounded-full bg-[#EF4444] px-5 text-sm font-medium text-white hover:bg-[#DC2626]"
+          className="font-mono text-sm border-2 border-[#D62828] text-[#D62828] px-4 py-1.5 hover:bg-[#D62828] hover:text-[#0E0E0E] transition-colors"
         >
-          Launch App
+          [ LAUNCH &#9656; ]
         </Link>
       </nav>
 
-      <div className="mx-auto max-w-4xl px-6 py-16 sm:px-12">
-        <h1 className="mb-12 text-4xl font-bold tracking-tight text-[#FAFAFA] sm:text-5xl">
-          About Autopsy
+      <div className="mx-auto max-w-4xl px-6 py-20 sm:px-12">
+        {/* Page Header */}
+        <h1 className="mb-20 text-5xl sm:text-7xl font-serif text-[#F4F1EA] tracking-tight">
+          ABOUT THIS INVESTIGATION
         </h1>
 
-        {/* What is Autopsy */}
-        <section className="mb-20">
-          <h2 className="mb-6 font-mono text-sm font-medium uppercase tracking-wider text-[#EF4444]">
-            What is Autopsy?
-          </h2>
-          <div className="space-y-4 text-base leading-8 text-[#A1A1AA]">
-            <p>
-              Autopsy is a forensic AI tool that investigates why startups,
-              products, and companies failed. Instead of a single chatbot
-              guessing at a postmortem, Autopsy deploys six specialist agents
-              — each with a distinct investigative lens — who research in
-              parallel, debate their findings, and produce a synthesized verdict
-              backed by live web sources.
-            </p>
-            <p>
-              The result is not an opinion. It is a structured forensic report
-              with a primary cause of death, an evidence trail, counterfactual
-              analysis (what would have saved it), and actionable lessons for
-              builders. Every claim is sourced. Every agent has a known bias.
-              The disagreements are surfaced, not hidden.
-            </p>
-          </div>
-        </section>
+        {/* §01 — WHAT IS AUTOPSY? */}
+        <motion.section
+          className="mb-24"
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.4 }}
+        >
+          <span className="font-mono text-xs font-bold uppercase tracking-[0.2em] text-[#71706B]">
+            &sect;01 &mdash; WHAT IS AUTOPSY?
+          </span>
 
-        {/* The 6 Agents */}
-        <section className="mb-20">
-          <h2 className="mb-8 font-mono text-sm font-medium uppercase tracking-wider text-[#EF4444]">
-            The 6 Agents
-          </h2>
-          <div className="grid gap-4 sm:grid-cols-2">
-            {agents.map((agent) => {
-              const Icon = agent.icon;
-              return (
-                <div
-                  key={agent.name}
-                  className="rounded-xl border border-[#222222] bg-[#111111] p-6"
-                >
-                  <div className="mb-3 flex items-center gap-2.5">
-                    <div
-                      className="flex h-8 w-8 items-center justify-center rounded-md"
-                      style={{
-                        backgroundColor: `${agent.color}15`,
-                        color: agent.color,
-                      }}
-                    >
-                      <Icon className="h-4 w-4" />
-                    </div>
-                    <span className="text-base font-semibold text-[#FAFAFA]">
-                      {agent.name}
-                    </span>
-                  </div>
-                  <p className="mb-3 text-sm leading-6 text-[#A1A1AA]">
-                    {agent.methodology}
-                  </p>
-                  <p className="text-xs italic text-[#52525B]">
-                    Bias: {agent.bias}
-                  </p>
-                </div>
-              );
-            })}
-          </div>
-        </section>
+          <div className="mt-8 flex flex-col lg:flex-row gap-8 lg:gap-12">
+            {/* Main content — 70% */}
+            <div className="lg:w-[70%] space-y-6 font-serif text-base leading-8 text-[#B8B5AE]">
+              <p>
+                Autopsy is a forensic AI tool that investigates why startups, products, and companies failed.
+                Instead of a single chatbot guessing at a postmortem, Autopsy deploys six specialist agents
+                — each with a distinct investigative lens — who research in parallel, debate their findings,
+                and produce a synthesized verdict backed by live web sources.
+              </p>
+              <p>
+                The result is not an opinion. It is a structured forensic report with a primary cause of
+                death, an evidence trail, counterfactual analysis (what would have saved it), and actionable
+                lessons for builders. Every claim is sourced. Every agent has a known bias. The disagreements
+                are surfaced, not hidden.
+              </p>
+              <p>
+                Most postmortems are written by the people who failed — retrospective rationalization dressed
+                up as insight. Autopsy is different. Six agents with six biases, forced to argue, forced to
+                confront each other&apos;s blind spots. The truth lives in the disagreement.
+              </p>
+            </div>
 
-        {/* Built With */}
-        <section className="mb-20">
-          <h2 className="mb-8 font-mono text-sm font-medium uppercase tracking-wider text-[#EF4444]">
-            Built With
-          </h2>
-          <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-            {techStack.map((tech) => (
+            {/* Margin notes — 30% */}
+            <div className="lg:w-[30%] space-y-8 font-mono text-xs text-[#D62828] leading-6">
+              <div>
+                <span className="text-[#5C5852]">NOTE //</span><br />
+                No single agent produces the verdict. The output is always a synthesis.
+              </div>
+              <div>
+                <span className="text-[#5C5852]">NOTE //</span><br />
+                Every bias is documented. Every blind spot is declared upfront.
+              </div>
+              <div>
+                <span className="text-[#5C5852]">NOTE //</span><br />
+                The disagreement IS the feature. Consensus without debate is just groupthink.
+              </div>
+            </div>
+          </div>
+        </motion.section>
+
+        {/* §02 — THE 6 AGENTS */}
+        <motion.section
+          className="mb-24"
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.4, delay: 0.1 }}
+        >
+          <span className="font-mono text-xs font-bold uppercase tracking-[0.2em] text-[#71706B]">
+            &sect;02 &mdash; THE 6 AGENTS
+          </span>
+
+          <div className="mt-8 border-t border-[#2A2A2A]">
+            {agents.map((agent, i) => (
               <div
-                key={tech.name}
-                className="rounded-lg border border-[#222222] bg-[#111111] px-5 py-4"
+                key={agent.num}
+                className="border-b border-[#2A2A2A] py-6"
               >
-                <div className="text-sm font-semibold text-[#FAFAFA]">
-                  {tech.name}
+                <div className="flex flex-col sm:flex-row sm:items-baseline gap-2 sm:gap-6">
+                  <span className="font-mono text-sm text-[#D62828] tabular-nums">
+                    {agent.num}
+                  </span>
+                  <span className="font-serif text-xl text-[#F4F1EA]">
+                    {agent.name}
+                  </span>
                 </div>
-                <div className="mt-0.5 text-xs text-[#71717A]">
-                  {tech.description}
-                </div>
+                <p className="mt-2 sm:ml-12 text-base leading-7 text-[#B8B5AE]">
+                  {agent.methodology}
+                </p>
+                <p className="mt-2 sm:ml-12 text-sm italic text-[#71706B]">
+                  KNOWN BIAS: {agent.bias}
+                </p>
               </div>
             ))}
           </div>
-        </section>
+        </motion.section>
 
-        {/* Hackathon */}
-        <section className="mb-20">
-          <h2 className="mb-6 font-mono text-sm font-medium uppercase tracking-wider text-[#EF4444]">
-            AMD Developer Hackathon 2026
-          </h2>
-          <p className="text-base leading-8 text-[#A1A1AA]">
-            Autopsy was built for the AMD Developer Hackathon 2026, a global
-            competition focused on leveraging AMD hardware for AI-driven
-            applications. The project uses DeepSeek V4 Pro via Fireworks AI for
-            agent reasoning and plans a day-3 migration to self-hosted inference
-            on AMD MI300X GPUs for cost-efficient, high-throughput postmortem
-            generation.
-          </p>
-        </section>
+        {/* §03 — BUILT WITH */}
+        <motion.section
+          className="mb-24"
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.4, delay: 0.2 }}
+        >
+          <span className="font-mono text-xs font-bold uppercase tracking-[0.2em] text-[#71706B]">
+            &sect;03 &mdash; BUILT WITH
+          </span>
+
+          <div className="mt-8 border-t border-[#2A2A2A]">
+            {techStack.map((tech, i) => (
+              <div
+                key={tech.name}
+                className="border-b border-[#2A2A2A] py-4 flex items-baseline justify-between gap-4"
+              >
+                <span className="font-mono text-sm text-[#F4F1EA]">
+                  {tech.name}
+                </span>
+                <span className="font-mono text-xs text-[#71706B] text-right">
+                  {tech.description}
+                </span>
+              </div>
+            ))}
+          </div>
+        </motion.section>
+
+        {/* §04 — AMD DEVELOPER HACKATHON 2026 */}
+        <motion.section
+          className="mb-12"
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.4, delay: 0.3 }}
+        >
+          <span className="font-mono text-xs font-bold uppercase tracking-[0.2em] text-[#71706B]">
+            &sect;04 &mdash; AMD DEVELOPER HACKATHON 2026
+          </span>
+
+          <div className="mt-8 flex flex-col lg:flex-row gap-8 lg:gap-12">
+            <div className="lg:w-[70%] space-y-6 font-serif text-base leading-8 text-[#B8B5AE]">
+              <p>
+                Autopsy was built for the AMD Developer Hackathon 2026, a global competition focused on
+                leveraging AMD hardware for AI-driven applications. The project uses DeepSeek V4 Pro via
+                Fireworks AI for agent reasoning and plans a migration to self-hosted inference on AMD MI300X
+                GPUs for cost-efficient, high-throughput postmortem generation.
+              </p>
+              <p>
+                The MI300X advantage is real: 192GB of HBM3 memory enables all six agents to run in parallel
+                on a single GPU. On an H100 (80GB), you&apos;d need three sequential rounds. On the MI300X, the
+                agents debate in real time. The hardware doesn&apos;t just make it faster — it makes the debate
+                architecture possible.
+              </p>
+            </div>
+
+            <div className="lg:w-[30%] font-mono text-xs text-[#D62828] leading-6">
+              <div>
+                <span className="text-[#5C5852]">NOTE //</span><br />
+                192GB HBM3 &mdash; 6 agents loaded simultaneously. No sequential batching. No compromise.
+              </div>
+            </div>
+          </div>
+        </motion.section>
       </div>
 
       {/* Footer */}
-      <footer className="border-t border-[#222222] px-6 py-12 sm:px-12">
-        <div className="mx-auto max-w-4xl text-center">
-          <span className="font-mono text-lg font-bold tracking-wider text-[#EF4444]">
-            AUTOPSY
+      <footer className="border-t border-[#2A2A2A] px-6 py-8 sm:px-12">
+        <div className="mx-auto max-w-4xl flex flex-col sm:flex-row items-center justify-between gap-4">
+          <span className="font-mono text-xs text-[#71706B]">
+            AUTOPSY / 2026 / OPEN SOURCE
           </span>
-          <p className="mt-2 text-sm text-[#71717A]">
-            6 agents. 1 verdict. No survivors.
-          </p>
-          <p className="mt-4 text-xs text-[#52525B]">
+          <span className="font-mono text-xs text-[#5C5852]">
             Built for AMD Developer Hackathon 2026
-          </p>
+          </span>
+          <span className="font-mono text-xs text-[#71706B]">
+            CASE #2026-0113
+          </span>
         </div>
       </footer>
     </main>

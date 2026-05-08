@@ -3,13 +3,16 @@
 import { motion } from "framer-motion";
 import { X } from "lucide-react";
 import { AgentCard } from "./agent-card";
-import type { AgentRole, AgentStatus, AgentFinding } from "@/types/investigation";
+import type { AgentRole, AgentStatus, AgentFinding, PremortemFinding, FounderFinding, InvestigationMode } from "@/types/investigation";
 
 interface CorkboardProps {
   subject: string;
   agentRoles: AgentRole[];
   agentFindings: Record<AgentRole, AgentFinding | null>;
+  premortemFindings: Record<AgentRole, PremortemFinding | null>;
+  founderFindings: Record<AgentRole, FounderFinding | null>;
   agentStatuses: Record<AgentRole, AgentStatus>;
+  mode: InvestigationMode;
   onCancel?: () => void;
 }
 
@@ -17,32 +20,38 @@ export function Corkboard({
   subject,
   agentRoles,
   agentFindings,
+  premortemFindings,
+  founderFindings,
   agentStatuses,
+  mode,
   onCancel,
 }: CorkboardProps) {
   return (
     <div className="mx-auto max-w-5xl">
       <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.25, ease: "linear" }}
         className="mb-8 flex items-center justify-between"
       >
         <div className="flex items-center gap-3">
           <span className="relative flex h-3 w-3">
-            <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-[#EF4444] opacity-75" />
-            <span className="relative inline-flex h-3 w-3 rounded-full bg-[#EF4444]" />
+            <span className="absolute inline-flex h-full w-full animate-ping rounded-none bg-[#D62828] opacity-75" />
+            <span className="relative inline-flex h-3 w-3 rounded-none bg-[#D62828]" />
           </span>
-          <h2 className="text-lg font-semibold text-[#FAFAFA]">
-            Investigating: <span className="text-[#EF4444]">{subject}</span>
-          </h2>
+          <h3 className="font-mono text-lg uppercase tracking-[0.1em] text-[#F4F1EA]">
+            &sect;01 &mdash;{" "}
+            {mode === "founder" ? "FOUNDER MODE:" : mode === "premortem" ? "PRE-MORTEM:" : "INVESTIGATING:"}{" "}
+            <span className={mode === "founder" ? "text-[#06D6A0]" : mode === "premortem" ? "text-[#FFD60A]" : "text-[#D62828]"}>{subject}</span>
+          </h3>
         </div>
         {onCancel && (
           <button
             onClick={onCancel}
-            className="inline-flex h-8 items-center gap-1.5 rounded-lg border border-[#EF4444]/30 px-3 text-xs font-medium text-[#EF4444] transition-colors hover:bg-[#EF4444]/10"
+            className="inline-flex h-8 items-center gap-1.5 border border-[#D62828]/30 px-3 font-mono text-[10px] font-bold uppercase tracking-[0.1em] text-[#D62828] transition-colors hover:bg-[#D62828]/10"
           >
             <X className="h-3.5 w-3.5" />
-            Cancel
+            CANCEL
           </button>
         )}
       </motion.div>
@@ -54,7 +63,10 @@ export function Corkboard({
             role={role}
             status={agentStatuses[role]}
             finding={agentFindings[role]}
+            premortemFinding={premortemFindings[role]}
+            founderFinding={founderFindings[role]}
             index={i}
+            mode={mode}
           />
         ))}
       </div>

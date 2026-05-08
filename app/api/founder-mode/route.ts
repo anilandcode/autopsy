@@ -1,14 +1,22 @@
-import { runInvestigation } from "@/lib/orchestrator";
-import { AgentFinding, AgentRole, AgentDebateOutput } from "@/types/investigation";
+import { runFounderMode } from "@/lib/orchestrator";
+import { FounderFinding, AgentRole, FounderModeInput } from "@/types/investigation";
 
 export const maxDuration = 55;
 
 export async function POST(request: Request) {
-  const { subject } = await request.json();
+  const body = await request.json();
+  const { name, description, stage, targetCustomer } = body;
 
-  if (!subject?.trim()) {
-    return new Response("Missing subject", { status: 400 });
+  if (!name?.trim() || !description?.trim() || !stage) {
+    return new Response("Missing required fields: name, description, stage", { status: 400 });
   }
+
+  const input: FounderModeInput = {
+    name: name.trim(),
+    description: description.trim(),
+    stage,
+    targetCustomer: targetCustomer?.trim() || undefined,
+  };
 
   const encoder = new TextEncoder();
 
@@ -20,21 +28,15 @@ export async function POST(request: Request) {
       }
 
       try {
-        sendEvent("started", { subject });
+        sendEvent("started", { name: input.name });
 
-        const report = await runInvestigation(
-          subject,
-          (finding: AgentFinding) => {
+        const report = await runFounderMode(
+          input,
+          (finding: FounderFinding) => {
             sendEvent("agent_update", finding);
           },
           (role: AgentRole) => {
             sendEvent("agent_started", { role });
-          },
-          () => {
-            sendEvent("debate_started", {});
-          },
-          (debate: AgentDebateOutput[]) => {
-            sendEvent("debate_complete", debate);
           }
         );
 

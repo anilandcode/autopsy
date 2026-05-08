@@ -1,5 +1,5 @@
-import { runInvestigation } from "@/lib/orchestrator";
-import { AgentFinding, AgentRole, AgentDebateOutput } from "@/types/investigation";
+import { runPremortem } from "@/lib/orchestrator";
+import { PremortemFinding, AgentRole } from "@/types/investigation";
 
 export const maxDuration = 55;
 
@@ -22,19 +22,13 @@ export async function POST(request: Request) {
       try {
         sendEvent("started", { subject });
 
-        const report = await runInvestigation(
+        const report = await runPremortem(
           subject,
-          (finding: AgentFinding) => {
+          (finding: PremortemFinding) => {
             sendEvent("agent_update", finding);
           },
           (role: AgentRole) => {
             sendEvent("agent_started", { role });
-          },
-          () => {
-            sendEvent("debate_started", {});
-          },
-          (debate: AgentDebateOutput[]) => {
-            sendEvent("debate_complete", debate);
           }
         );
 

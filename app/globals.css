@@ -1,13 +1,32 @@
 @import "tailwindcss";
 
 :root {
-  --background: #0a0a0a;
-  --foreground: #fafafa;
-  --surface: #111111;
-  --surface-border: #222222;
-  --accent: #ef4444;
-  --accent-secondary: #f97316;
-  --muted: #71717a;
+  --bg-base: #0E0E0E;
+  --bg-surface: #161616;
+  --bg-elevated: #1F1F1F;
+  --border-subtle: #2A2A2A;
+  --border-strong: #3F3F3F;
+  --text-primary: #F4F1EA;
+  --text-secondary: #B8B5AE;
+  --text-muted: #71706B;
+  --accent-blood: #D62828;
+  --accent-blood-dim: #8B1A1A;
+  --accent-bone: #F4F1EA;
+  --accent-yellow: #FFD60A;
+  --accent-verified: #06D6A0;
+  --font-display: var(--font-instrument-serif);
+  --font-mono: var(--font-jetbrains-mono);
+
+  /* Tailwind compat */
+  --background: #0E0E0E;
+  --foreground: #F4F1EA;
+  --surface: #161616;
+  --surface-border: #2A2A2A;
+  --accent: #D62828;
+  --accent-secondary: #FFD60A;
+  --verified: #06D6A0;
+  --muted: #B8B5AE;
+  --muted-dark: #71706B;
 }
 
 @theme inline {
@@ -17,18 +36,31 @@
   --color-surface-border: var(--surface-border);
   --color-accent: var(--accent);
   --color-accent-secondary: var(--accent-secondary);
+  --color-verified: var(--verified);
   --color-muted: var(--muted);
-  --font-sans: var(--font-inter);
+  --color-muted-dark: var(--muted-dark);
+  --font-sans: var(--font-instrument-serif);
   --font-mono: var(--font-jetbrains-mono);
 }
 
 html {
-  background: #0a0a0a;
-  color: #fafafa;
+  background: #0E0E0E;
+  color: #F4F1EA;
 }
 
 body {
-  background: #0a0a0a;
-  color: #fafafa;
-  font-family: var(--font-inter), system-ui, sans-serif;
+  background: #0E0E0E;
+  color: #F4F1EA;
+  font-family: var(--font-instrument-serif), Georgia, serif;
+  position: relative;
+}
+
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0.03;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+  z-index: 1;
 }

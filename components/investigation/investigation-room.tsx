@@ -4,10 +4,13 @@ import { useState, useEffect, useCallback, useRef } from "react";
 import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
-import { ArrowLeft, ArrowRight, Search, X, RotateCcw } from "lucide-react";
+import { RotateCcw, ChevronDown, ChevronUp } from "lucide-react";
 import { Corkboard } from "./corkboard";
 import { FinalVerdict } from "./final-verdict";
-import type { AgentFinding, AgentRole, AgentStatus, PostmortemReport } from "@/types/investigation";
+import { PremortemVerdict } from "./premortem-verdict";
+import { FounderVerdict } from "./founder-verdict";
+import { DebateRoom } from "./debate-room";
+import type { AgentFinding, AgentRole, AgentStatus, PostmortemReport, PremortemFinding, PremortemReport, FounderFinding, FounderReport, InvestigationMode, AgentDebateOutput } from "@/types/investigation";
 
 const AGENT_ROLES: AgentRole[] = [
   "market-analyst",
@@ -18,29 +21,70 @@ const AGENT_ROLES: AgentRole[] = [
   "historian",
 ];
 
-const examples = [
+const postmortemExamples = [
   "Quibi", "Theranos", "Google+", "MoviePass",
   "Juicero", "WeWork", "Vine", "Clubhouse",
 ];
+
+const premortemExamples = [
+  "Cursor", "Anthropic", "Perplexity", "Vercel",
+  "Linear", "Notion", "Stripe", "Figma",
+  "Replit", "Cohere", "Character.AI", "Hugging Face",
+];
+
+const STAGES = ["Pre-launch", "MVP", "Product-Market Fit", "Scaling", "Growth"];
+
+function generateCaseNumber() {
+  const num = Math.floor(1000 + Math.random() * 9000);
+  return `2026-${num}`;
+}
 
 function normalizeConfidence(val: number): number {
   if (val > 1) return val / 100;
   return val;
 }
 
+function makeEmptyFindings(): Record<AgentRole, AgentFinding | null> {
+  return Object.fromEntries(AGENT_ROLES.map((r) => [r, null])) as Record<AgentRole, AgentFinding | null>;
+}
+
+function makeEmptyPremortemFindings(): Record<AgentRole, PremortemFinding | null> {
+  return Object.fromEntries(AGENT_ROLES.map((r) => [r, null])) as Record<AgentRole, PremortemFinding | null>;
+}
+
+function makeEmptyFounderFindings(): Record<AgentRole, FounderFinding | null> {
+  return Object.fromEntries(AGENT_ROLES.map((r) => [r, null])) as Record<AgentRole, FounderFinding | null>;
+}
+
+function makeEmptyStatuses(): Record<AgentRole, AgentStatus> {
+  return Object.fromEntries(AGENT_ROLES.map((r) => [r, "idle"])) as Record<AgentRole, AgentStatus>;
+}
+
 export function InvestigationRoom() {
   const searchParams = useSearchParams();
+  const [mode, setMode] = useState<InvestigationMode>("postmortem");
   const [subject, setSubject] = useState("");
   const [isInvestigating, setIsInvestigating] = useState(false);
-  const [agentFindings, setAgentFindings] = useState<Record<AgentRole, AgentFinding | null>>(
-    () => Object.fromEntries(AGENT_ROLES.map((r) => [r, null])) as Record<AgentRole, AgentFinding | null>
-  );
-  const [agentStatuses, setAgentStatuses] = useState<Record<AgentRole, AgentStatus>>(
-    () => Object.fromEntries(AGENT_ROLES.map((r) => [r, "idle"])) as Record<AgentRole, AgentStatus>
-  );
+  const [agentFindings, setAgentFindings] = useState<Record<AgentRole, AgentFinding | null>>(makeEmptyFindings);
+  const [premortemFindings, setPremortemFindings] = useState<Record<AgentRole, PremortemFinding | null>>(makeEmptyPremortemFindings);
+  const [founderFindings, setFounderFindings] = useState<Record<AgentRole, FounderFinding | null>>(makeEmptyFounderFindings);
+  const [agentStatuses, setAgentStatuses] = useState<Record<AgentRole, AgentStatus>>(makeEmptyStatuses);
   const [report, setReport] = useState<PostmortemReport | null>(null);
+  const [premortemReport, setPremortemReport] = useState<PremortemReport | null>(null);
+  const [founderReport, setFounderReport] = useState<FounderReport | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [logs, setLogs] = useState<string[]>([]);
+  const [debateOutputs, setDebateOutputs] = useState<AgentDebateOutput[]>([]);
+  const [debateStarted, setDebateStarted] = useState(false);
+  const [logOpen, setLogOpen] = useState(false);
+  const [caseNumber] = useState(generateCaseNumber);
+
+  // Founder form fields
+  const [founderName, setFounderName] = useState("");
+  const [founderDescription, setFounderDescription] = useState("");
+  const [founderStage, setFounderStage] = useState("MVP");
+  const [founderTargetCustomer, setFounderTargetCustomer] = useState("");
+
   const hasAutoTriggered = useRef(false);
   const abortRef = useRef<AbortController | null>(null);
   const logEndRef = useRef<HTMLDivElement | null>(null);
@@ -50,25 +94,21 @@ export function InvestigationRoom() {
     setLogs((prev) => [...prev, `${new Date().toLocaleTimeString()} — ${msg}`]);
   }
 
-  // Auto-scroll logs
   useEffect(() => {
-    logEndRef.current?.scrollIntoView({ behavior: "smooth" });
-  }, [logs]);
+    if (logOpen) logEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  }, [logs, logOpen]);
 
-  // Scroll to verdict when report arrives
   useEffect(() => {
-    if (report) {
+    if (report || premortemReport || founderReport) {
       setTimeout(() => verdictRef.current?.scrollIntoView({ behavior: "smooth" }), 300);
     }
-  }, [report]);
+  }, [report, premortemReport, founderReport]);
 
-  // Pre-fill from URL param
   useEffect(() => {
     const s = searchParams.get("subject");
     if (s) setSubject(s);
   }, [searchParams]);
 
-  // Auto-trigger investigation from URL param
   useEffect(() => {
     const s = searchParams.get("subject");
     if (s && !hasAutoTriggered.current) {
@@ -83,26 +123,29 @@ export function InvestigationRoom() {
   const startInvestigation = useCallback(async (subj: string) => {
     if (!subj.trim()) return;
 
+    const currentMode = mode;
     setIsInvestigating(true);
     setError(null);
     setReport(null);
+    setPremortemReport(null);
+    setFounderReport(null);
     setLogs([]);
+    setDebateOutputs([]);
+    setDebateStarted(false);
 
     setAgentStatuses(
       Object.fromEntries(AGENT_ROLES.map((r) => [r, "researching"])) as Record<AgentRole, AgentStatus>
     );
-    setAgentFindings(
-      Object.fromEntries(AGENT_ROLES.map((r) => [r, null])) as Record<AgentRole, AgentFinding | null>
-    );
+    setAgentFindings(makeEmptyFindings());
+    setPremortemFindings(makeEmptyPremortemFindings());
+    setFounderFindings(makeEmptyFounderFindings());
 
-    // Health check first
     addLog("Checking API connection...");
     try {
       const healthRes = await fetch("/api/test");
       const healthData = await healthRes.json();
       if (healthData.error) {
         addLog("API ERROR: " + healthData.error);
-        addLog("ENV: baseURL=" + healthData.env?.baseURL);
         setError("API connection failed: " + healthData.error);
         setIsInvestigating(false);
         return;
@@ -117,17 +160,32 @@ export function InvestigationRoom() {
       return;
     }
 
-    // Now run the investigation
-    addLog("Starting investigation for: " + subj);
+    let apiEndpoint: string;
+    let requestBody: Record<string, unknown>;
+
+    if (currentMode === "founder") {
+      apiEndpoint = "/api/founder-mode";
+      requestBody = {
+        name: founderName.trim(),
+        description: founderDescription.trim(),
+        stage: founderStage,
+        targetCustomer: founderTargetCustomer.trim() || undefined,
+      };
+    } else {
+      apiEndpoint = currentMode === "premortem" ? "/api/premortem" : "/api/investigate";
+      requestBody = { subject: subj };
+    }
+
+    addLog(`Starting ${currentMode} for: ${subj}`);
     abortRef.current = new AbortController();
 
     let streamClosedWithoutReport = false;
 
     try {
-      const response = await fetch("/api/investigate", {
+      const response = await fetch(apiEndpoint, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ subject: subj }),
+        body: JSON.stringify(requestBody),
         signal: abortRef.current.signal,
       });
 
@@ -169,27 +227,85 @@ export function InvestigationRoom() {
               }
 
               if (type === "agent_update" && data?.role) {
-                const finding: AgentFinding = {
-                  ...data,
-                  confidence: normalizeConfidence(data.confidence),
-                };
-                addLog("Agent done: " + data.displayName + " | Confidence: " + Math.round(finding.confidence * 100) + "%");
-                setAgentFindings((prev) => ({
-                  ...prev,
-                  [data.role as AgentRole]: finding,
-                }));
-                setAgentStatuses((prev) => ({
-                  ...prev,
-                  [data.role as AgentRole]: data.status || "done",
-                }));
+                if (currentMode === "founder") {
+                  const fFinding = {
+                    role: data.role,
+                    displayName: data.displayName,
+                    status: data.status || "done",
+                    topFailureMode: data.topFailureMode || "Risk identified",
+                    severity: data.severity || "medium",
+                    evidence: data.evidence || [],
+                    fullAnalysis: data.fullAnalysis || "",
+                    mitigations: data.mitigations || [],
+                    sources: data.sources || [],
+                  };
+                  addLog("Agent done: " + fFinding.displayName + " | Severity: " + fFinding.severity.toUpperCase());
+                  setFounderFindings((prev) => ({ ...prev, [data.role as AgentRole]: fFinding }));
+                  setAgentFindings((prev) => ({
+                    ...prev,
+                    [data.role as AgentRole]: {
+                      role: data.role, displayName: data.displayName, status: data.status || "done",
+                      primaryCause: fFinding.topFailureMode, evidence: fFinding.evidence,
+                      confidence: 0.5, fullAnalysis: fFinding.fullAnalysis, sources: fFinding.sources,
+                    },
+                  }));
+                } else if (currentMode === "premortem") {
+                  const pmFinding = {
+                    ...data,
+                    riskLevel: data.riskLevel || "medium",
+                    topRisk: data.topRisk || data.primaryCause || "Risk identified",
+                    earlyWarnings: data.earlyWarnings || [],
+                  };
+                  addLog("Agent done: " + data.displayName + " | Risk: " + pmFinding.riskLevel.toUpperCase());
+                  setPremortemFindings((prev) => ({ ...prev, [data.role as AgentRole]: pmFinding }));
+                  setAgentFindings((prev) => ({
+                    ...prev,
+                    [data.role as AgentRole]: {
+                      role: data.role, displayName: data.displayName, status: data.status || "done",
+                      primaryCause: pmFinding.topRisk, evidence: pmFinding.evidence || [],
+                      confidence: 0.5, fullAnalysis: pmFinding.fullAnalysis || "", sources: pmFinding.sources || [],
+                    },
+                  }));
+                } else {
+                  const finding = { ...data, confidence: normalizeConfidence(data.confidence) };
+                  addLog("Agent done: " + data.displayName + " | Confidence: " + Math.round(finding.confidence * 100) + "%");
+                  setAgentFindings((prev) => ({ ...prev, [data.role as AgentRole]: finding }));
+                }
+                setAgentStatuses((prev) => ({ ...prev, [data.role as AgentRole]: data.status || "done" }));
+              }
+
+              if (type === "debate_started") {
+                addLog("Debate round started — agents challenge each other");
+                setDebateStarted(true);
+              }
+
+              if (type === "debate_complete" && Array.isArray(data)) {
+                const debate = data as AgentDebateOutput[];
+                addLog("Debate round complete — " + debate.length + " rebuttals");
+                setDebateOutputs(debate);
               }
 
               if (type === "complete") {
-                const rpt = data as PostmortemReport;
-                setReport({
-                  ...rpt,
-                  confidenceScore: normalizeConfidence(rpt.confidenceScore),
-                });
+                if (currentMode === "founder") {
+                  const fRpt = data as FounderReport;
+                  setFounderReport(fRpt);
+                  if (fRpt.agentFindings) {
+                    const fMap = {} as Record<AgentRole, FounderFinding | null>;
+                    for (const af of fRpt.agentFindings) fMap[af.role as AgentRole] = af;
+                    setFounderFindings((prev) => ({ ...prev, ...fMap }));
+                  }
+                } else if (currentMode === "premortem") {
+                  const pmRpt = data as PremortemReport;
+                  setPremortemReport(pmRpt);
+                  if (pmRpt.agentFindings) {
+                    const pmMap = {} as Record<AgentRole, PremortemFinding | null>;
+                    for (const af of pmRpt.agentFindings) pmMap[af.role as AgentRole] = af;
+                    setPremortemFindings((prev) => ({ ...prev, ...pmMap }));
+                  }
+                } else {
+                  const rpt = data as PostmortemReport;
+                  setReport({ ...rpt, confidenceScore: normalizeConfidence(rpt.confidenceScore) });
+                }
                 addLog("Synthesis complete — report ready");
               }
 
@@ -204,7 +320,6 @@ export function InvestigationRoom() {
         }
       }
 
-      // Fallback: if stream closed without report but agents are done
       streamClosedWithoutReport = true;
     } catch (err: unknown) {
       if (err instanceof DOMException && err.name === "AbortError") {
@@ -217,13 +332,12 @@ export function InvestigationRoom() {
       }
     }
 
-    // Fallback synthesis
-    if (streamClosedWithoutReport) {
+    // Fallback synthesis for postmortem
+    if (streamClosedWithoutReport && currentMode === "postmortem") {
       setAgentFindings((currentFindings) => {
         const doneAgents = Object.values(currentFindings).filter(
           (f): f is AgentFinding => f !== null && f.status === "done"
         );
-
         if (doneAgents.length >= 5 && !report) {
           addLog("Stream closed without synthesis — requesting fallback...");
           fetch("/api/synthesize", {
@@ -233,10 +347,7 @@ export function InvestigationRoom() {
           })
             .then((r) => r.json())
             .then((fallbackReport: PostmortemReport) => {
-              setReport({
-                ...fallbackReport,
-                confidenceScore: normalizeConfidence(fallbackReport.confidenceScore),
-              });
+              setReport({ ...fallbackReport, confidenceScore: normalizeConfidence(fallbackReport.confidenceScore) });
               addLog("Fallback synthesis complete");
             })
             .catch((e: Error) => {
@@ -247,11 +358,17 @@ export function InvestigationRoom() {
         return currentFindings;
       });
     }
-  }, []);
+  }, [mode, founderName, founderDescription, founderStage, founderTargetCustomer]);
 
   const handleStart = useCallback(() => {
     startInvestigation(subject);
   }, [subject, startInvestigation]);
+
+  const handleFounderStart = useCallback(() => {
+    if (!founderName.trim() || !founderDescription.trim()) return;
+    setSubject(founderName);
+    startInvestigation(founderName);
+  }, [founderName, founderDescription, startInvestigation]);
 
   const handleCancel = useCallback(() => {
     abortRef.current?.abort();
@@ -261,35 +378,74 @@ export function InvestigationRoom() {
 
   const handleNewInvestigation = useCallback(() => {
     setReport(null);
+    setPremortemReport(null);
+    setFounderReport(null);
     setError(null);
     setIsInvestigating(false);
     setLogs([]);
-    setAgentFindings(
-      Object.fromEntries(AGENT_ROLES.map((r) => [r, null])) as Record<AgentRole, AgentFinding | null>
-    );
-    setAgentStatuses(
-      Object.fromEntries(AGENT_ROLES.map((r) => [r, "idle"])) as Record<AgentRole, AgentStatus>
-    );
+    setDebateOutputs([]);
+    setDebateStarted(false);
+    setAgentFindings(makeEmptyFindings());
+    setPremortemFindings(makeEmptyPremortemFindings());
+    setFounderFindings(makeEmptyFounderFindings());
+    setAgentStatuses(makeEmptyStatuses());
   }, []);
 
+  const activeExamples = mode === "founder" ? [] : mode === "premortem" ? premortemExamples : postmortemExamples;
+  const placeholder = mode === "founder"
+    ? ""
+    : mode === "premortem"
+      ? "Cursor, Notion, Linear, Anthropic, your startup..."
+      : "e.g. Quibi, Theranos, Google Glass, your startup...";
+  const logLabel = mode === "founder"
+    ? "FOUNDER MODE LOG"
+    : mode === "premortem"
+      ? "PRE-MORTEM LOG"
+      : "INVESTIGATION LOG";
+
+  const founderFormValid = founderName.trim() && founderDescription.trim();
+
   return (
-    <main className="min-h-dvh bg-[#0A0A0A] text-[#FAFAFA] pb-[180px]">
-      {/* Nav */}
-      <nav className="flex items-center justify-between px-6 py-5 sm:px-12">
-        <div className="flex items-center gap-4">
-          <Link
-            href="/"
-            className="flex items-center gap-1.5 text-[#71717A] transition-colors hover:text-[#FAFAFA]"
-          >
-            <ArrowLeft className="h-4 w-4" />
-            <span className="text-sm">Back</span>
-          </Link>
+    <main className="min-h-dvh bg-[#0E0E0E] text-[#F4F1EA]">
+      {/* Yellow case header stripe */}
+      {isInvestigating && (
+        <div className="bg-[#FFD60A] px-6 py-2 sm:px-12">
+          <p className="font-mono text-[11px] font-bold uppercase tracking-[0.15em] text-[#0E0E0E]">
+            CASE FILE / INVESTIGATION IN PROGRESS
+          </p>
         </div>
-        <span className="font-mono text-lg font-bold tracking-wider text-[#EF4444]">
+      )}
+
+      {/* Nav */}
+      <nav className="flex items-center justify-between border-b border-[#2A2A2A] px-6 py-4 sm:px-12">
+        <Link
+          href="/"
+          className="font-mono text-[11px] uppercase tracking-wider text-[#71706B] transition-colors hover:text-[#F4F1EA]"
+        >
+          ← BACK
+        </Link>
+        <span className="font-mono text-lg font-bold tracking-wider text-[#D62828]">
           AUTOPSY
         </span>
-        <div className="w-20" />
+        <Link
+          href="/investigate"
+          className="font-mono text-[11px] uppercase tracking-wider border border-[#D62828] px-3 py-1.5 text-[#D62828] transition-colors hover:bg-[#D62828] hover:text-white"
+        >
+          LAUNCH ▸
+        </Link>
       </nav>
+
+      {/* Case metadata strip (when investigating) */}
+      {isInvestigating && (
+        <div className="border-b border-[#2A2A2A] bg-[#0E0E0E] px-6 py-3 sm:px-12">
+          <div className="mx-auto flex max-w-5xl flex-wrap items-center gap-x-8 gap-y-1 font-mono text-[11px] uppercase tracking-wider">
+            <span className="text-[#71706B]">CASE #: <span className="text-[#F4F1EA]">{caseNumber}</span></span>
+            <span className="text-[#71706B]">SUBJECT: <span className="text-[#D62828]">{subject}</span></span>
+            <span className="text-[#71706B]">INVESTIGATORS: <span className="text-[#F4F1EA]">6 / DEPLOYED</span></span>
+            <span className="text-[#71706B]">OPENED: <span className="text-[#F4F1EA]">{new Date().toLocaleTimeString()}</span></span>
+          </div>
+        </div>
+      )}
 
       <AnimatePresence mode="wait">
         {!isInvestigating ? (
@@ -298,55 +454,156 @@ export function InvestigationRoom() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="mx-auto flex max-w-2xl flex-col items-center px-6 pt-20 pb-20 sm:px-12 sm:pt-28"
+            className="mx-auto flex max-w-2xl flex-col items-center px-6 pt-16 pb-20 sm:px-12 sm:pt-24"
           >
-            <h1 className="mb-3 text-center text-3xl font-bold tracking-tight text-[#FAFAFA] sm:text-5xl">
-              What failed?
-            </h1>
-            <p className="mb-10 text-center text-[#71717A]">
-              6 agents will research and debate in parallel
-            </p>
-
-            <div className="w-full">
-              <div className="relative">
-                <Search className="pointer-events-none absolute top-1/2 left-4 h-5 w-5 -translate-y-1/2 text-[#52525B]" />
-                <input
-                  type="text"
-                  value={subject}
-                  onChange={(e) => setSubject(e.target.value)}
-                  onKeyDown={(e) => e.key === "Enter" && handleStart()}
-                  placeholder="e.g. Quibi, Theranos, Google Glass, your startup..."
-                  className="h-14 w-full rounded-xl border border-[#222222] bg-[#111111] pl-12 pr-5 text-[#FAFAFA] placeholder-[#52525B] outline-none transition-colors focus:border-[#EF4444]/50"
-                />
-              </div>
-
+            {/* Mode toggle — 3 segments */}
+            <div className="mb-12 flex w-full max-w-lg">
               <button
-                onClick={handleStart}
-                disabled={!subject.trim()}
-                className="mt-4 inline-flex h-14 w-full items-center justify-center gap-2 rounded-xl bg-[#EF4444] px-8 text-base font-semibold text-white shadow-lg shadow-[#EF4444]/20 transition-all hover:bg-[#DC2626] hover:shadow-[#EF4444]/30 disabled:cursor-not-allowed disabled:opacity-40"
+                onClick={() => setMode("postmortem")}
+                className={`flex-1 border-2 py-3 text-center font-mono text-[10px] font-bold uppercase tracking-[0.15em] transition-colors ${
+                  mode === "postmortem"
+                    ? "border-[#D62828] bg-[#0E0E0E] text-[#F4F1EA]"
+                    : "border-[#2A2A2A] bg-[#161616] text-[#71706B] hover:text-[#B8B5AE]"
+                }`}
               >
-                Begin Investigation
-                <ArrowRight className="h-5 w-5" />
+                Postmortem
+              </button>
+              <button
+                onClick={() => setMode("premortem")}
+                className={`flex-1 border-2 border-l-0 py-3 text-center font-mono text-[10px] font-bold uppercase tracking-[0.15em] transition-colors ${
+                  mode === "premortem"
+                    ? "border-[#FFD60A] bg-[#0E0E0E] text-[#FFD60A]"
+                    : "border-[#2A2A2A] bg-[#161616] text-[#71706B] hover:text-[#B8B5AE]"
+                }`}
+              >
+                Pre-Mortem
+              </button>
+              <button
+                onClick={() => setMode("founder")}
+                className={`flex-1 border-2 border-l-0 py-3 text-center font-mono text-[10px] font-bold uppercase tracking-[0.15em] transition-colors ${
+                  mode === "founder"
+                    ? "border-[#06D6A0] bg-[#0E0E0E] text-[#06D6A0]"
+                    : "border-[#2A2A2A] bg-[#161616] text-[#71706B] hover:text-[#B8B5AE]"
+                }`}
+              >
+                Founder Mode
               </button>
             </div>
 
-            {/* Example chips */}
-            <div className="mt-10 w-full">
-              <p className="mb-3 text-sm text-[#71717A]">
-                or choose a famous failure:
-              </p>
-              <div className="flex flex-wrap gap-2">
-                {examples.map((ex) => (
-                  <button
-                    key={ex}
-                    onClick={() => setSubject(ex)}
-                    className="rounded-full border border-[#222222] bg-[#111111] px-4 py-2 text-sm text-[#A1A1AA] transition-all hover:border-[#EF4444]/30 hover:text-[#FAFAFA]"
-                  >
-                    {ex}
-                  </button>
+            <h1 className="mb-4 text-center text-3xl font-bold tracking-tight text-[#F4F1EA] sm:text-5xl" style={{ fontFamily: "var(--font-instrument-serif), Georgia, serif" }}>
+              {mode === "founder" ? "Will your idea survive?" : mode === "premortem" ? "What could kill it?" : "What failed?"}
+            </h1>
+            <p className="mb-12 text-center text-[#B8B5AE]">
+              {mode === "founder"
+                ? "6 agents stress-test your startup idea before you quit your day job"
+                : mode === "premortem"
+                  ? "6 agents assess risks and predict what could go wrong"
+                  : "6 agents will research and debate in parallel"}
+            </p>
+
+            {mode === "founder" ? (
+              /* Founder Mode — structured form */
+              <div className="w-full space-y-5">
+                {[
+                  { label: "IDEA NAME", value: founderName, set: setFounderName, placeholder: "e.g. 'AI Pet Therapist'", type: "input" },
+                  { label: "WHAT DOES IT DO?", value: founderDescription, set: setFounderDescription, placeholder: "Describe your idea in 2-3 sentences. What problem does it solve? How?", type: "textarea" },
+                ].map((field) => (
+                  <div key={field.label}>
+                    <label className="mb-1.5 block font-mono text-[10px] font-bold uppercase tracking-[0.1em] text-[#71706B]">
+                      {field.label}
+                    </label>
+                    {field.type === "textarea" ? (
+                      <textarea
+                        value={field.value}
+                        onChange={(e) => field.set(e.target.value)}
+                        placeholder={field.placeholder}
+                        rows={3}
+                        className="w-full border-b-2 border-[#3F3F3F] bg-transparent px-1 py-3 font-mono text-sm text-[#F4F1EA] placeholder-[#5C5852] outline-none transition-colors focus:border-[#06D6A0]"
+                      />
+                    ) : (
+                      <input
+                        type="text"
+                        value={field.value}
+                        onChange={(e) => field.set(e.target.value)}
+                        placeholder={field.placeholder}
+                        className="h-12 w-full border-b-2 border-[#3F3F3F] bg-transparent px-1 font-mono text-sm text-[#F4F1EA] placeholder-[#5C5852] outline-none transition-colors focus:border-[#06D6A0]"
+                      />
+                    )}
+                  </div>
                 ))}
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <label className="mb-1.5 block font-mono text-[10px] font-bold uppercase tracking-[0.1em] text-[#71706B]">
+                      STAGE
+                    </label>
+                    <select
+                      value={founderStage}
+                      onChange={(e) => setFounderStage(e.target.value)}
+                      className="h-12 w-full border-b-2 border-[#3F3F3F] bg-transparent px-1 font-mono text-sm text-[#F4F1EA] outline-none transition-colors focus:border-[#06D6A0]"
+                    >
+                      {STAGES.map((s) => <option key={s} value={s} className="bg-[#161616]">{s}</option>)}
+                    </select>
+                  </div>
+                  <div>
+                    <label className="mb-1.5 block font-mono text-[10px] font-bold uppercase tracking-[0.1em] text-[#71706B]">
+                      TARGET CUSTOMER (OPTIONAL)
+                    </label>
+                    <input
+                      type="text"
+                      value={founderTargetCustomer}
+                      onChange={(e) => setFounderTargetCustomer(e.target.value)}
+                      placeholder="e.g. 'SMB owners'"
+                      className="h-12 w-full border-b-2 border-[#3F3F3F] bg-transparent px-1 font-mono text-sm text-[#F4F1EA] placeholder-[#5C5852] outline-none transition-colors focus:border-[#06D6A0]"
+                    />
+                  </div>
+                </div>
+                <button
+                  onClick={handleFounderStart}
+                  disabled={!founderFormValid}
+                  className="mt-4 inline-flex h-14 w-full items-center justify-center gap-2 border-2 border-[#06D6A0] bg-[#06D6A0] px-8 font-mono text-sm font-bold uppercase tracking-wider text-[#0E0E0E] transition-colors hover:bg-[#05B88A] disabled:cursor-not-allowed disabled:opacity-40"
+                >
+                  RUN FOUNDER MODE ▸
+                </button>
               </div>
-            </div>
+            ) : (
+              /* Postmortem / Premortem — terminal-style input */
+              <div className="w-full">
+                <div className="border-2 border-[#3F3F3F] bg-[#161616] p-1">
+                  <div className="flex items-center">
+                    <span className="px-3 font-mono text-sm text-[#D62828]">▸</span>
+                    <input
+                      type="text"
+                      value={subject}
+                      onChange={(e) => setSubject(e.target.value)}
+                      onKeyDown={(e) => e.key === "Enter" && handleStart()}
+                      placeholder={placeholder}
+                      className="h-14 flex-1 bg-transparent font-mono text-sm text-[#F4F1EA] placeholder-[#5C5852] outline-none"
+                    />
+                  </div>
+                </div>
+                <p className="mt-2 font-mono text-[10px] uppercase tracking-wider text-[#71706B]">
+                  Press Enter to begin
+                </p>
+
+                {/* Example cases */}
+                <div className="mt-10">
+                  <p className="mb-3 font-mono text-[10px] font-bold uppercase tracking-[0.1em] text-[#71706B]">
+                    EXAMPLE CASES:
+                  </p>
+                  <div className="flex flex-wrap gap-2">
+                    {activeExamples.map((ex) => (
+                      <button
+                        key={ex}
+                        onClick={() => setSubject(ex)}
+                        className="border border-[#3F3F3F] bg-[#161616] px-3 py-1.5 font-mono text-xs text-[#B8B5AE] transition-colors hover:border-[#D62828]/50 hover:text-[#F4F1EA]"
+                      >
+                        {ex}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            )}
           </motion.div>
         ) : (
           <motion.div
@@ -355,10 +612,9 @@ export function InvestigationRoom() {
             animate={{ opacity: 1 }}
             className="px-6 py-10 sm:px-12"
           >
-            {/* Error banner */}
             {error && (
-              <div className="mx-auto mb-6 max-w-5xl rounded-xl border border-[#EF4444]/30 bg-[#EF4444]/5 px-5 py-4 text-sm text-[#EF4444]">
-                Error: {error}
+              <div className="mx-auto mb-6 max-w-5xl border border-[#D62828]/30 bg-[#D62828]/5 px-5 py-4 font-mono text-sm text-[#D62828]">
+                ERROR: {error}
               </div>
             )}
 
@@ -366,22 +622,58 @@ export function InvestigationRoom() {
               subject={subject}
               agentRoles={AGENT_ROLES}
               agentFindings={agentFindings}
+              premortemFindings={premortemFindings}
+              founderFindings={founderFindings}
               agentStatuses={agentStatuses}
-              onCancel={!report ? handleCancel : undefined}
+              mode={mode}
+              onCancel={!report && !premortemReport && !founderReport ? handleCancel : undefined}
             />
 
-            {report && (
+            {/* Debate Room — appears after debate_complete for postmortem mode */}
+            {mode === "postmortem" && (debateOutputs.length > 0 || debateStarted) && !report && (
+              <DebateRoom debate={debateOutputs} />
+            )}
+
+            {report && mode === "postmortem" && (
               <div ref={verdictRef}>
                 <FinalVerdict report={report} />
-
-                {/* New Investigation button */}
                 <div className="mx-auto mt-8 flex max-w-5xl justify-center">
                   <button
                     onClick={handleNewInvestigation}
-                    className="inline-flex h-12 items-center gap-2 rounded-xl bg-[#EF4444] px-8 text-base font-semibold text-white shadow-lg shadow-[#EF4444]/20 transition-all hover:bg-[#DC2626]"
+                    className="inline-flex h-12 items-center gap-2 border-2 border-[#D62828] bg-[#D62828] px-8 font-mono text-sm font-bold uppercase tracking-wider text-white transition-colors hover:bg-[#B91C1C]"
                   >
-                    <RotateCcw className="h-5 w-5" />
-                    New Investigation
+                    <RotateCcw className="h-4 w-4" />
+                    NEW INVESTIGATION
+                  </button>
+                </div>
+              </div>
+            )}
+
+            {premortemReport && mode === "premortem" && (
+              <div ref={verdictRef}>
+                <PremortemVerdict report={premortemReport} />
+                <div className="mx-auto mt-8 flex max-w-5xl justify-center">
+                  <button
+                    onClick={handleNewInvestigation}
+                    className="inline-flex h-12 items-center gap-2 border-2 border-[#FFD60A] bg-[#FFD60A] px-8 font-mono text-sm font-bold uppercase tracking-wider text-[#0E0E0E] transition-colors hover:bg-[#E6C000]"
+                  >
+                    <RotateCcw className="h-4 w-4" />
+                    NEW PRE-MORTEM
+                  </button>
+                </div>
+              </div>
+            )}
+
+            {founderReport && mode === "founder" && (
+              <div ref={verdictRef}>
+                <FounderVerdict report={founderReport} />
+                <div className="mx-auto mt-8 flex max-w-5xl justify-center">
+                  <button
+                    onClick={handleNewInvestigation}
+                    className="inline-flex h-12 items-center gap-2 border-2 border-[#06D6A0] bg-[#06D6A0] px-8 font-mono text-sm font-bold uppercase tracking-wider text-[#0E0E0E] transition-colors hover:bg-[#05B88A]"
+                  >
+                    <RotateCcw className="h-4 w-4" />
+                    NEW FOUNDER ANALYSIS
                   </button>
                 </div>
               </div>
@@ -390,17 +682,25 @@ export function InvestigationRoom() {
         )}
       </AnimatePresence>
 
-      {/* Log panel — fixed bottom */}
-      <div className="fixed bottom-0 left-0 right-0 z-50 max-h-[180px] overflow-y-auto border-t border-red-900/50 bg-[#0D0D0D] px-3 py-3 font-mono text-[11px] text-[#71717A]">
-        <div className="mb-2 text-xs font-bold text-[#EF4444]">
-          ▶ INVESTIGATION LOG
-        </div>
-        {logs.map((log, i) => (
-          <div key={i} className="leading-5 text-[#52525B]">
-            {log}
+      {/* Investigation log — collapsible drawer on right side */}
+      <div className="fixed bottom-0 right-0 z-50 w-80 max-w-[90vw]">
+        <button
+          onClick={() => setLogOpen(!logOpen)}
+          className="flex w-full items-center justify-between border-t border-l border-[#2A2A2A] bg-[#0E0E0E] px-4 py-2 font-mono text-[10px] font-bold uppercase tracking-wider text-[#D62828] transition-colors hover:text-[#F4F1EA]"
+        >
+          <span>▸ {logLabel}</span>
+          {logOpen ? <ChevronUp className="h-3 w-3" /> : <ChevronDown className="h-3 w-3" />}
+        </button>
+        {logOpen && (
+          <div className="max-h-[250px] overflow-y-auto border-l border-t border-[#2A2A2A] bg-[#0E0E0E] px-4 py-3 font-mono text-[11px]">
+            {logs.map((log, i) => (
+              <div key={i} className="leading-5 text-[#5C5852]">
+                {log}
+              </div>
+            ))}
+            <div ref={logEndRef} />
           </div>
-        ))}
-        <div ref={logEndRef} />
+        )}
       </div>
     </main>
   );

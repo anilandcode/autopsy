@@ -1,5 +1,6 @@
 import { runAgent } from "./base";
-import { AgentFinding } from "@/types/investigation";
+import { runPremortemAgent } from "./base-premortem";
+import { AgentFinding, PremortemFinding } from "@/types/investigation";
 
 const SYSTEM_PROMPT = `You are the Customer Voice agent in a startup postmortem investigation team. Your lens is exclusively the user: reviews, complaints, churn signals, unmet needs, broken promises, and the gap between marketing and reality.
 
@@ -19,6 +20,31 @@ You ALWAYS respond with valid JSON in this exact format:
 
 Respond ONLY with the JSON object. No preamble, no explanation outside JSON.`;
 
+const PREMORTEM_SYSTEM_PROMPT = `You are the Customer Voice agent performing a PRE-MORTEM risk analysis on a LIVING company. Your lens is exclusively the user: reviews, complaints, churn signals, unmet needs, and the gap between marketing and reality.
+
+You are empathetic and listen deeply. You believe companies die when they stop listening to real customer pain. The customer always sees problems before the company admits them.
+
+You MUST assess RISKS, not confirmed causes. What COULD kill this company from a customer perspective?
+
+You ALWAYS respond with valid JSON in this exact format:
+{
+  "topRisk": "One sharp sentence — the biggest customer-side risk this company faces",
+  "riskLevel": "low" | "medium" | "high" | "critical",
+  "evidence": [
+    "Evidence point 1: current customer sentiment or complaint pattern",
+    "Evidence point 2: unmet need or competitor advantage from user perspective",
+    "Evidence point 3: churn risk or retention vulnerability signal"
+  ],
+  "fullAnalysis": "3-4 paragraph forward-looking risk analysis from a customer perspective. Where is the company vulnerable to user defection? What customer need is underserved? Quote real sentiments when possible.",
+  "earlyWarnings": [
+    "Specific signal 1 to watch for — e.g., 'App store rating drops below X'",
+    "Specific signal 2 to watch for",
+    "Specific signal 3 to watch for"
+  ]
+}
+
+Respond ONLY with the JSON object. No preamble, no explanation outside JSON.`;
+
 export async function runCustomerVoice(
   subject: string
 ): Promise<AgentFinding> {
@@ -33,6 +59,25 @@ export async function runCustomerVoice(
       systemPrompt: SYSTEM_PROMPT,
       userPrompt: (s, ctx) =>
         `Investigate why ${s} failed from a CUSTOMER perspective only.\n\nSearch evidence gathered:\n${ctx}\n\nAnalyze and return JSON.`,
+    },
+    subject
+  );
+}
+
+export async function runCustomerVoicePremortem(
+  subject: string
+): Promise<PremortemFinding> {
+  return runPremortemAgent(
+    {
+      role: "customer-voice",
+      displayName: "Customer Voice",
+      searchQueries: (s) => [
+        `${s} user complaints problems reviews 2024 2025`,
+        `${s} customer satisfaction churn risk alternatives`,
+      ],
+      systemPrompt: PREMORTEM_SYSTEM_PROMPT,
+      userPrompt: (s, ctx) =>
+        `Assess what COULD kill ${s} from a CUSTOMER perspective.\n\nSearch evidence gathered:\n${ctx}\n\nAnalyze and return JSON.`,
     },
     subject
   );

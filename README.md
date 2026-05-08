@@ -1,36 +1,65 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# AUTOPSY
+## Forensic Postmortem Intelligence — 6 AI Agents, 1 Verdict
 
-## Getting Started
+![Autopsy](https://autopsy-nine.vercel.app/opengraph-image)
 
-First, run the development server:
+### What it is
+
+Autopsy investigates why companies fail. Six specialized AI agents — Market Analyst, Operator, Money Trail, Customer Voice, Engineer, Historian — research in parallel, debate each other's findings, and produce a forensic postmortem in 90 seconds.
+
+Three modes:
+- **Postmortem** — investigate why a company failed
+- **Pre-Mortem** — predict what could kill a living company
+- **Founder Mode** — analyze your own startup before it fails
+
+### Why AMD MI300X
+
+192GB HBM3 lets us load all 6 agents (each ~70B parameters) simultaneously. On a single H100 (80GB), this requires 3 sequential rounds. On MI300X, it runs in one parallel pass — enabling real-time agent debate that wasn't possible before.
+
+| | H100 | MI300X |
+|---|---|---|
+| Memory | 80 GB HBM3 | 192 GB HBM3 |
+| Agents | 3 sequential rounds | 1 parallel pass |
+| Debate | Impossible | Real-time |
+| Time | ~75s | ~22s |
+
+### Architecture
+
+[See the full architecture breakdown →](https://autopsy-nine.vercel.app/architecture)
+
+### Tech Stack
+- Next.js 15 + TypeScript + Tailwind v4
+- DeepSeek V4 Pro (development) / Llama 3.3 70B on AMD MI300X (production)
+- Tavily Search API for evidence gathering
+- Server-Sent Events for streaming agent updates
+- Vercel edge deployment
+
+### Local Development
 
 ```bash
+# Clone
+git clone https://github.com/anilandcode/autopsy.git
+cd autopsy
+
+# Install
+npm install
+
+# Environment
+cp .env.example .env.local
+# Add your API keys:
+# FIREWORKS_API_KEY=     (for DeepSeek V4 Pro via Fireworks AI)
+# TAVILY_API_KEY=        (for web search)
+
+# Run
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open [http://localhost:3000](http://localhost:3000).
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+### License
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+MIT
 
-## Learn More
+### Built for
 
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+AMD Developer Hackathon 2026 by lablab.ai
