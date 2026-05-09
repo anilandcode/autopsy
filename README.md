@@ -1,16 +1,35 @@
 # AUTOPSY
-## Forensic Postmortem Intelligence — 6 AI Agents, 1 Verdict
+## Forensic Intelligence — 4 Modes, 24 Agents, 1 Verdict
 
 ![Autopsy](https://autopsy-nine.vercel.app/opengraph-image)
 
 ### What it is
 
-Autopsy investigates why companies fail. Six specialized AI agents — Market Analyst, Operator, Money Trail, Customer Voice, Engineer, Historian — research in parallel, debate each other's findings, and produce a forensic postmortem in 90 seconds.
+Autopsy investigates why companies fail — and what could have saved them. Six specialized AI agents per mode research in parallel, debate each other's findings, and produce a forensic verdict in ~22 seconds.
 
-Three modes:
+Four modes:
 - **Postmortem** — investigate why a company failed
 - **Pre-Mortem** — predict what could kill a living company
 - **Founder Mode** — analyze your own startup before it fails
+- **Counterfactual** — explore alternate histories: "What if they made a different decision?"
+
+### Counterfactual Mode
+
+The 4th mode asks: **What if [company] had made a different decision?**
+
+Six counterfactual agents reason about what *didn't* happen:
+- **CF Market Analyst** — skeptical about internal decisions changing external market realities
+- **CF Operator** — assesses whether the alternate decision could actually be executed
+- **CF Money Trail** — models the financial impact of the alternate path
+- **CF Customer Voice** — evaluates whether users would have responded differently
+- **CF Engineer** — honest about technical complexity vs. leadership beliefs
+- **CF Historian** — finds real precedents (requires 2+ historical cases as evidence)
+
+Each agent must: understand the actual causal chain, identify the decision point, model the alternate chain, find real precedents, and assess second-order consequences (butterfly effects).
+
+The synthesizer renders one of five verdicts: *would have survived*, *would have delayed failure*, *would have failed differently*, *would have made no difference*, or *could have transformed the company*.
+
+Preset scenarios: Blockbuster/Netflix, Kodak/Digital, Yahoo/Google, Quibi/TV, Theranos/Real Science, MySpace/Better Tech.
 
 ### Why AMD MI300X
 

@@ -2,7 +2,7 @@ import { ImageResponse } from "next/og";
 
 export const runtime = "edge";
 
-export const alt = "Autopsy — Forensic Postmortem Intelligence";
+export const alt = "Autopsy — Forensic Intelligence. Postmortems, Pre-Mortems & Counterfactuals.";
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
 
@@ -51,7 +51,7 @@ export default async function Image() {
               color: "#000",
             }}
           >
-            AUTOPSY / FORENSIC POSTMORTEM INTELLIGENCE
+            AUTOPSY / FORENSIC INTELLIGENCE / 4 MODES / 24 AGENTS
           </span>
         </div>
 
@@ -80,7 +80,21 @@ export default async function Image() {
             textTransform: "uppercase",
           }}
         >
-          6 AGENTS &middot; PARALLEL RESEARCH &middot; CROSS-AGENT DEBATE &middot; 1 VERDICT
+          4 MODES &middot; 24 AGENTS &middot; PARALLEL RESEARCH &middot; 1 VERDICT
+        </div>
+
+        {/* Mode chips */}
+        <div
+          style={{
+            display: "flex",
+            gap: "16px",
+            marginTop: "20px",
+          }}
+        >
+          <span style={{ fontFamily: "monospace", fontSize: "14px", color: "#D62828", letterSpacing: "0.05em" }}>POSTMORTEM</span>
+          <span style={{ fontFamily: "monospace", fontSize: "14px", color: "#FFD60A", letterSpacing: "0.05em" }}>PRE-MORTEM</span>
+          <span style={{ fontFamily: "monospace", fontSize: "14px", color: "#06D6A0", letterSpacing: "0.05em" }}>FOUNDER</span>
+          <span style={{ fontFamily: "monospace", fontSize: "14px", color: "#FACC15", letterSpacing: "0.05em" }}>COUNTERFACTUAL</span>
         </div>
 
         {/* Divider */}
