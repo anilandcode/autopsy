@@ -62,6 +62,8 @@ export default function HeroVideoBackground() {
         }}
         src="/hero-bg.mp4"
       />
+      <div className="overlay-solid" />
+      <div className="overlay-gradient" />
     </>
   );
 }

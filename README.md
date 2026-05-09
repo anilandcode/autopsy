@@ -46,9 +46,16 @@ Preset scenarios: Blockbuster/Netflix, Kodak/Digital, Yahoo/Google, Quibi/TV, Th
 
 [See the full architecture breakdown →](https://autopsy-nine.vercel.app/architecture)
 
+### Design System
+
+- **Palette**: Indigo (`#4B4BA0`) and violet (`#8F47AE`) accents on near-black (`#0F1110`) surfaces
+- **Typography**: Newsreader serif for display, Inter for UI, JetBrains Mono for data
+- **Surface language**: Bordered cards with `border-white/5`, gradient glow shells, and subtle corner brackets
+- **Background**: Three.js data-wave mesh with dual-layer crossfading video, overlaid with solid tint + bottom-to-top gradient for text legibility
+
 ### Tech Stack
 - Next.js 15 + TypeScript + Tailwind v4
-- DeepSeek V4 Pro (development) / Llama 3.3 70B on AMD MI300X (production)
+- Kimi K2.6 via Fireworks AI (262K context window)
 - Tavily Search API for evidence gathering
 - Server-Sent Events for streaming agent updates
 - Vercel edge deployment
@@ -66,7 +73,7 @@ npm install
 # Environment
 cp .env.example .env.local
 # Add your API keys:
-# FIREWORKS_API_KEY=     (for DeepSeek V4 Pro via Fireworks AI)
+# FIREWORKS_API_KEY=     (for Kimi K2.6 via Fireworks AI)
 # TAVILY_API_KEY=        (for web search)
 
 # Run

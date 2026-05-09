@@ -253,6 +253,34 @@ export default function Home() {
         </motion.div>
       </motion.div>
 
+      {/* Development Context */}
+      <section className="flex flex-col gap-6 mt-6">
+        <div className="text-[12px] font-[300] uppercase tracking-widest text-[#8F47AE] border-b border-white/5 pb-2">
+          Development Context
+        </div>
+        <div className="p-[1px] rounded-[16px] bg-gradient-to-b from-white/20 via-white/5 to-transparent">
+          <div className="bg-[#0F1110] rounded-[15px] p-12 flex flex-col gap-6">
+            <h2 className="text-[48px] font-serif font-[200] leading-[48px] tracking-tight text-white">
+              AMD Developer Hackathon 2026
+            </h2>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-12 text-[14px] font-[200] leading-[22.75px] text-[#A1A1AA]">
+              <p>
+                Autopsy was built for the AMD Developer Hackathon 2026, a global competition focused on
+                leveraging AMD hardware for AI-driven applications. The project uses Kimi K2.6 via
+                Fireworks AI for agent reasoning and plans a migration to self-hosted inference on AMD MI300X
+                GPUs for cost-efficient, high-throughput postmortem generation.
+              </p>
+              <p>
+                The MI300X advantage is real: 192GB of HBM3 memory enables all six agents to run in parallel
+                on a single GPU. On an H100 (80GB), you&apos;d need three sequential rounds. On the MI300X, the
+                agents debate in real time. The hardware doesn&apos;t just make it faster — it makes the debate
+                architecture possible.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
     </motion.div>
   );
 }

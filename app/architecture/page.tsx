@@ -141,146 +141,169 @@ function ArchitectureDiagram() {
 
 export default function ArchitecturePage() {
   return (
-    <main className="min-h-dvh bg-[#0F1110] text-[white]">
+    <main className="min-h-dvh bg-[#0F1110] text-white flex flex-col">
       {/* Nav */}
-      <nav className="border-b border-[rgba(255,255,255,0.1)] flex items-center px-6 py-4 sm:px-12">
+      <nav className="border-b border-white/5 flex items-center px-6 py-4 sm:px-12">
         <Link
           href="/"
-          className="font-mono text-sm text-[#A1A1AA] transition-colors hover:text-[white]"
+          className="font-mono text-sm text-[#A1A1AA] transition-colors hover:text-white"
         >
           &larr; BACK
         </Link>
       </nav>
 
-      <div className="mx-auto max-w-5xl px-6 py-16 sm:px-12">
+      <div className="flex-1 mx-auto max-w-5xl w-full px-6 py-16 sm:px-12">
 
-        {/* §01 — Hero */}
-        <section className="mb-24">
-          <span className="font-mono text-xs font-bold uppercase tracking-[0.2em] text-[#A1A1AA]">
-            &sect;01 &mdash; Execution Architecture
-          </span>
-          <h1 className="mt-6 font-serif text-4xl sm:text-6xl leading-tight text-[white]">
+        {/* Hero */}
+        <motion.section
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.4 }}
+          className="mb-16"
+        >
+          <div className="text-[12px] font-[300] uppercase tracking-widest text-[#8F47AE] border-b border-white/5 pb-2 mb-8">
+            &sect;01 — Execution Architecture
+          </div>
+          <h1 className="font-serif text-4xl sm:text-6xl leading-tight text-white font-[200]">
             4 Modes. 24 Agents. 1 GPU.{" "}
             <span className="text-[#4B4BA0]">Kimi K2.6.</span>
           </h1>
           <p className="mt-8 max-w-2xl font-serif text-base leading-8 text-[#A1A1AA]">
             How Autopsy uses AMD MI300X&apos;s 192GB HBM3 memory to run 24 specialized agents across 4 investigation modes — enabling real-time cross-agent debate that&apos;s impossible on smaller GPUs.
           </p>
-        </section>
+        </motion.section>
 
-        {/* §02 — Architecture Diagram */}
-        <section className="mb-24">
-          <span className="font-mono text-xs font-bold uppercase tracking-[0.2em] text-[#A1A1AA]">
-            &sect;02 &mdash; Live Architecture
-          </span>
-          <h2 className="mt-6 mb-8 font-mono text-sm text-[white] uppercase tracking-wider">
-            Pipeline: Mode Select &#8594; Parallel Agents &#8594; Synthesis &#8594; Verdict
-          </h2>
-          <div className="border border-[rgba(255,255,255,0.1)] bg-[#0F1110] p-6">
-            <ArchitectureDiagram />
+        {/* Architecture Diagram */}
+        <motion.section
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.4, delay: 0.1 }}
+          className="mb-16"
+        >
+          <div className="text-[12px] font-[300] uppercase tracking-widest text-[#A1A1AA] border-b border-white/5 pb-2 mb-6">
+            &sect;02 — Live Architecture
           </div>
-        </section>
+          <div className="p-[1px] rounded-[16px] bg-gradient-to-b from-white/10 via-white/5 to-transparent">
+            <div className="bg-[#0F1110] rounded-[15px] p-6">
+              <ArchitectureDiagram />
+            </div>
+          </div>
+        </motion.section>
 
-        {/* §03 — Why AMD MI300X */}
-        <section className="mb-24">
-          <span className="font-mono text-xs font-bold uppercase tracking-[0.2em] text-[#A1A1AA]">
-            &sect;03 &mdash; H100 vs MI300X
-          </span>
-          <h2 className="mt-6 mb-8 font-mono text-sm text-[white] uppercase tracking-wider">
-            The hardware advantage that makes debate possible
-          </h2>
-          <div className="grid gap-0 sm:grid-cols-2">
-            <div className="border border-[rgba(255,255,255,0.1)] bg-[#0F1110] p-8">
+        {/* H100 vs MI300X */}
+        <motion.section
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.4, delay: 0.2 }}
+          className="mb-16"
+        >
+          <div className="text-[12px] font-[300] uppercase tracking-widest text-[#A1A1AA] border-b border-white/5 pb-2 mb-6">
+            &sect;03 — H100 vs MI300X
+          </div>
+          <div className="grid gap-0 sm:grid-cols-2 border border-white/5 rounded-[16px] overflow-hidden">
+            <div className="bg-[#0F1110] p-8 sm:border-r border-white/5">
               <p className="mb-1 font-mono text-xs font-bold uppercase tracking-wider text-[#A1A1AA]">
                 ON A SINGLE H100
               </p>
               <p className="mb-6 font-mono text-sm text-[#A1A1AA]">80GB HBM3</p>
               <ul className="space-y-4">
                 <li className="flex items-start gap-3 text-sm text-[#A1A1AA]">
-                  <span className="font-mono text-[rgba(255,255,255,0.1)] mt-0.5">[&mdash;]</span>
+                  <span className="font-mono text-white/10 mt-0.5">[&mdash;]</span>
                   Cannot hold 6 x 70B agents in memory
                 </li>
                 <li className="flex items-start gap-3 text-sm text-[#A1A1AA]">
-                  <span className="font-mono text-[rgba(255,255,255,0.1)] mt-0.5">[&mdash;]</span>
+                  <span className="font-mono text-white/10 mt-0.5">[&mdash;]</span>
                   Must run in 3 sequential rounds
                 </li>
                 <li className="flex items-start gap-3 text-sm text-[#A1A1AA]">
-                  <span className="font-mono text-[rgba(255,255,255,0.1)] mt-0.5">[&mdash;]</span>
+                  <span className="font-mono text-white/10 mt-0.5">[&mdash;]</span>
                   Total time: ~75 seconds
                 </li>
                 <li className="flex items-start gap-3 text-sm font-medium text-[#A1A1AA]">
-                  <span className="font-mono text-[rgba(255,255,255,0.1)] mt-0.5">[&mdash;]</span>
+                  <span className="font-mono text-white/10 mt-0.5">[&mdash;]</span>
                   Lost: real-time agent debate impossible
                 </li>
               </ul>
             </div>
-            <div className="border-2 border-[#4B4BA0] bg-[#0F1110] p-8">
+            <div className="bg-[#0F1110] p-8 border-2 border-[#4B4BA0] rounded-[16px]">
               <p className="mb-1 font-mono text-xs font-bold uppercase tracking-wider text-[#4B4BA0]">
                 ON AMD MI300X
               </p>
               <p className="mb-6 font-mono text-sm text-[#4B4BA0]">192GB HBM3</p>
               <ul className="space-y-4">
-                <li className="flex items-start gap-3 text-sm text-[white]">
+                <li className="flex items-start gap-3 text-sm text-white">
                   <span className="font-mono text-[#00A67E] mt-0.5">[+]</span>
                   All 6 agents loaded simultaneously
                 </li>
-                <li className="flex items-start gap-3 text-sm text-[white]">
+                <li className="flex items-start gap-3 text-sm text-white">
                   <span className="font-mono text-[#00A67E] mt-0.5">[+]</span>
                   Single parallel pass
                 </li>
-                <li className="flex items-start gap-3 text-sm text-[white]">
+                <li className="flex items-start gap-3 text-sm text-white">
                   <span className="font-mono text-[#00A67E] mt-0.5">[+]</span>
                   Total time: ~15 seconds
                 </li>
-                <li className="flex items-start gap-3 text-sm font-medium text-[white]">
+                <li className="flex items-start gap-3 text-sm font-medium text-white">
                   <span className="font-mono text-[#8F47AE] mt-0.5">[*]</span>
                   Enabled: real-time agent debate, cross-rebuttal
                 </li>
               </ul>
             </div>
           </div>
-        </section>
+        </motion.section>
 
-        {/* §04 — Performance Stats */}
-        <section className="mb-24">
-          <span className="font-mono text-xs font-bold uppercase tracking-[0.2em] text-[#A1A1AA]">
-            &sect;04 &mdash; By The Numbers
-          </span>
-          <div className="mt-6 grid grid-cols-2 gap-4 sm:grid-cols-4 lg:grid-cols-8">
+        {/* Performance Stats */}
+        <motion.section
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.4, delay: 0.3 }}
+          className="mb-16"
+        >
+          <div className="text-[12px] font-[300] uppercase tracking-widest text-[#A1A1AA] border-b border-white/5 pb-2 mb-6">
+            &sect;04 — By The Numbers
+          </div>
+          <div className="grid grid-cols-2 gap-0 sm:grid-cols-4 lg:grid-cols-8 border border-white/5 rounded-[16px] overflow-hidden">
             {STATS.map((stat, i) => (
               <motion.div
                 key={stat.label}
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: i * 0.06, duration: 0.25, ease: "linear" }}
-                className="border-2 border-[rgba(255,255,255,0.1)] bg-[#0F1110] p-4 text-center"
+                className="bg-[#0F1110] p-4 text-center border-white/5 flex flex-col items-center justify-center"
               >
-                <span className="font-mono text-2xl font-bold text-[#4B4BA0]">
-                  {stat.value}
-                </span>
-                <span className="font-mono text-sm text-[#A1A1AA]">
-                  {stat.unit}
-                </span>
+                <div>
+                  <span className="font-mono text-2xl font-bold text-[#4B4BA0]">
+                    {stat.value}
+                  </span>
+                  <span className="font-mono text-sm text-[#A1A1AA]">
+                    {stat.unit}
+                  </span>
+                </div>
                 <p className="mt-2 font-mono text-[8px] uppercase tracking-wider text-[#A1A1AA]">
                   {stat.label}
                 </p>
               </motion.div>
             ))}
           </div>
-        </section>
+        </motion.section>
 
-        {/* §05 — Counterfactual Architecture */}
-        <section className="mb-24">
-          <span className="font-mono text-xs font-bold uppercase tracking-[0.2em] text-[#8F47AE]">
-            &sect;05 &mdash; Counterfactual Architecture
-          </span>
-          <h2 className="mt-6 mb-4 font-serif text-2xl sm:text-3xl text-[white]">
+        {/* Counterfactual Architecture */}
+        <motion.section
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.4, delay: 0.4 }}
+          className="mb-16"
+        >
+          <div className="text-[12px] font-[300] uppercase tracking-widest text-[#8F47AE] border-b border-white/5 pb-2 mb-6">
+            &sect;05 — Counterfactual Architecture
+          </div>
+          <h2 className="mb-4 font-serif text-2xl sm:text-3xl text-white font-[200]">
             Reasoning about what <span className="text-[#8F47AE]">didn&apos;t</span> happen
           </h2>
           <p className="mb-8 max-w-2xl text-sm leading-7 text-[#A1A1AA]">
             Standard agents analyze what happened. Counterfactual agents must reason about what DIDN&apos;T happen. This requires agents to:
           </p>
-          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          <div className="grid gap-0 sm:grid-cols-2 lg:grid-cols-3 border border-white/5 rounded-[16px] overflow-hidden">
             {[
               { num: "01", title: "Understand the actual causal chain", desc: "Each agent maps what actually led to failure before reasoning about alternatives." },
               { num: "02", title: "Identify the decision point", desc: "Pinpoint the specific decision that created the divergence between actual and alternate timelines." },
@@ -294,95 +317,101 @@ export default function ArchitecturePage() {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ delay: i * 0.08 }}
-                className="border border-[#8F47AE]/20 bg-[#0F1110] p-5"
+                className={`bg-[#0F1110] p-5 ${
+                  i < 5 ? 'border-b lg:border-b-0 border-white/5' : ''
+                } ${i === 0 || i === 1 ? 'sm:border-r border-white/5' : ''} ${i === 3 ? 'sm:border-r border-white/5' : ''} ${i === 0 || i === 3 ? 'lg:border-r border-white/5' : ''}`}
               >
                 <span className="font-mono text-xs text-[#8F47AE]">{step.num}</span>
-                <h3 className="mt-2 font-mono text-sm font-bold uppercase tracking-wider text-[white]">
+                <h3 className="mt-2 font-mono text-sm font-bold uppercase tracking-wider text-white">
                   {step.title}
                 </h3>
                 <p className="mt-2 text-xs leading-5 text-[#A1A1AA]">{step.desc}</p>
               </motion.div>
             ))}
           </div>
-        </section>
+        </motion.section>
 
-        {/* §06 — Active Model */}
-        <section className="mb-24">
-          <span className="font-mono text-xs font-bold uppercase tracking-[0.2em] text-[#4B4BA0]">
-            &sect;06 &mdash; Active Model
-          </span>
-          <div className="mt-6 border border-[rgba(255,255,255,0.1)] bg-[#0F1110] p-6">
-            <p className="font-mono text-xs text-[#A1A1AA]">Currently running</p>
-            <p className="mt-2 text-xl text-[white]" style={{ fontFamily: "var(--font-serif), Georgia, serif" }}>
-              {process.env.NEXT_PUBLIC_LLM_MODEL || "accounts/fireworks/models/kimi-k2p6"}
-            </p>
-            <p className="mt-2 font-mono text-xs text-[#A1A1AA]">
-              Configure via LLM_MODEL in .env.local — see model options there.
-            </p>
+        {/* Active Model */}
+        <motion.section
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.4, delay: 0.5 }}
+          className="mb-16"
+        >
+          <div className="text-[12px] font-[300] uppercase tracking-widest text-[#4B4BA0] border-b border-white/5 pb-2 mb-6">
+            &sect;06 — Active Model
           </div>
-        </section>
+          <div className="p-[1px] rounded-[16px] bg-gradient-to-b from-white/10 via-white/5 to-transparent">
+            <div className="bg-[#0F1110] rounded-[15px] p-6">
+              <p className="font-mono text-xs text-[#A1A1AA]">Currently running</p>
+              <p className="mt-2 text-xl text-white" style={{ fontFamily: "var(--font-serif), Georgia, serif" }}>
+                {process.env.NEXT_PUBLIC_LLM_MODEL || "accounts/fireworks/models/kimi-k2p6"}
+              </p>
+              <p className="mt-2 font-mono text-xs text-[#A1A1AA]">
+                Configure via LLM_MODEL in .env.local — see model options there.
+              </p>
+            </div>
+          </div>
+        </motion.section>
 
-        {/* §07 — Tech Stack */}
-        <section className="mb-24">
-          <span className="font-mono text-xs font-bold uppercase tracking-[0.2em] text-[#A1A1AA]">
-            &sect;07 &mdash; Tech Stack
-          </span>
-          <div className="mt-6 border-t border-[rgba(255,255,255,0.1)]">
-            {TECH_STACK.map((tech) => (
-              <div
-                key={tech.name}
-                className="border-b border-[rgba(255,255,255,0.1)] py-4 flex items-baseline justify-between gap-4"
-              >
-                <span className="font-mono text-sm text-[white]">
-                  {tech.name}
-                </span>
-                <span className="font-mono text-xs text-[#A1A1AA] text-right">
-                  {tech.detail}
-                </span>
+        {/* Tech Stack */}
+        <motion.section
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.4, delay: 0.6 }}
+          className="mb-16"
+        >
+          <div className="text-[12px] font-[300] uppercase tracking-widest text-[#A1A1AA] border-b border-white/5 pb-2 mb-6">
+            &sect;07 — Tech Stack
+          </div>
+          <div className="p-[1px] rounded-[16px] bg-gradient-to-b from-white/10 via-white/5 to-transparent">
+            <div className="bg-[#0F1110] rounded-[15px] overflow-hidden">
+              {TECH_STACK.map((tech, i) => (
+                <div
+                  key={tech.name}
+                  className={`py-4 px-8 flex items-baseline justify-between gap-4 ${
+                    i < TECH_STACK.length - 1 ? 'border-b border-white/5' : ''
+                  }`}
+                >
+                  <span className="font-mono text-sm text-white">
+                    {tech.name}
+                  </span>
+                  <span className="font-mono text-xs text-[#A1A1AA] text-right">
+                    {tech.detail}
+                  </span>
+                </div>
+              ))}
+            </div>
+          </div>
+        </motion.section>
+
+        {/* Open Source Note */}
+        <motion.section
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.4, delay: 0.7 }}
+          className="mb-12"
+        >
+          <div className="p-[1px] rounded-[16px] bg-gradient-to-b from-[#8F47AE]/20 via-[#8F47AE]/5 to-transparent">
+            <div className="bg-[#0F1110] rounded-[15px] p-8 md:p-12">
+              <div className="text-[12px] font-[300] uppercase tracking-widest text-[#8F47AE] border-b border-white/5 pb-2 mb-6">
+                &sect;08 — Open Source
               </div>
-            ))}
+              <p className="mb-6 font-serif text-lg leading-8 text-[#A1A1AA]">
+                Autopsy is open source. The agent prompts, orchestration logic, and debate methodology are all public. We believe better agent systems come from shared methodology, not closed walls.
+              </p>
+              <a
+                href="https://github.com/anilandcode/autopsy"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex h-10 items-center gap-2 bg-[#8F47AE] px-5 text-sm font-bold font-mono text-[#0F1110] transition-colors hover:bg-[#E6C000] rounded-full"
+              >
+                [ VIEW ON GITHUB ]
+              </a>
+            </div>
           </div>
-        </section>
-
-        {/* §07 — Open Source Note */}
-        <section className="mb-12">
-          <span className="font-mono text-xs font-bold uppercase tracking-[0.2em] text-[#A1A1AA]">
-            &sect;08 &mdash; Open Source
-          </span>
-          <div className="mt-6 border-2 border-[#8F47AE] bg-[#0F1110] p-8">
-            <p className="mb-6 font-serif text-lg leading-8 text-[#A1A1AA]">
-              Autopsy is open source. The agent prompts, orchestration logic, and debate methodology are all public. We believe better agent systems come from shared methodology, not closed walls.
-            </p>
-            <a
-              href="https://github.com/anilandcode/autopsy"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex h-10 items-center gap-2 bg-[#8F47AE] px-5 text-sm font-bold font-mono text-[#0F1110] transition-colors hover:bg-[#E6C000]"
-            >
-              [ VIEW ON GITHUB ]
-            </a>
-          </div>
-        </section>
+        </motion.section>
       </div>
-
-      {/* Footer */}
-      <footer className="border-t border-[rgba(255,255,255,0.1)] px-6 py-8 sm:px-12">
-        <div className="mx-auto max-w-5xl flex flex-col items-center gap-4 sm:flex-row sm:justify-between">
-          <span className="font-mono text-xs text-[#A1A1AA]">
-            AUTOPSY / 2026 / OPEN SOURCE
-          </span>
-          <span className="flex items-center gap-1 font-mono text-[10px] uppercase tracking-wider text-[#A1A1AA]">
-            MODES:
-            <span className="text-[#4B4BA0]">POSTMORTEM</span> /
-            <span className="text-[#8F47AE]">PRE-MORTEM</span> /
-            <span className="text-[#00A67E]">FOUNDER</span> /
-            <span className="text-[#8F47AE]">COUNTERFACTUAL</span>
-          </span>
-          <span className="font-mono text-xs text-[#A1A1AA]">
-            Built for AMD Developer Hackathon 2026
-          </span>
-        </div>
-      </footer>
     </main>
   );
 }

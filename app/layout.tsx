@@ -99,8 +99,8 @@ export default function RootLayout({
 
             {/* Global Footer */}
             <footer className="relative z-10 grid grid-cols-1 md:grid-cols-2 border-t border-white/5 text-[12px] font-[300] text-[#A1A1AA]">
-              <div className="p-6 md:px-12 md:py-8 col-span-1 flex items-center justify-center md:justify-start">
-                 Designed & Developed by anilpervaiz.com & flowmarc.com
+              <div className="p-6 md:px-12 md:py-8 col-span-1 flex items-center justify-center md:justify-start gap-1">
+                 Designed & Developed by <a href="https://anilpervaiz.com" target="_blank" rel="noopener noreferrer" className="hover:text-white transition-colors">anilpervaiz.com</a> & <a href="https://flowmarc.com" target="_blank" rel="noopener noreferrer" className="hover:text-white transition-colors">flowmarc.com</a>
               </div>
               <div className="p-6 md:px-12 md:py-8 col-span-1 md:border-l border-white/5 flex items-center justify-center md:justify-end gap-8">
                  <Link href="#" className="hover:text-white transition-colors tracking-wide">Privacy Directive</Link>

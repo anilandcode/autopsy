@@ -50,198 +50,210 @@ const agents = [
 
 const techStack = [
   { name: "Next.js 15", description: "App Router + Turbopack" },
-  { name: "DeepSeek V4 Pro 1.6T MoE", description: "via Fireworks AI" },
+  { name: "Kimi K2.6", description: "1T params, 262K context via Fireworks AI" },
   { name: "AMD MI300X", description: "192GB HBM3 — planned migration" },
   { name: "Tavily", description: "Real-time web search" },
   { name: "Server-Sent Events", description: "Streaming agent updates" },
   { name: "Vercel", description: "Edge deployment" },
 ];
 
+const STAGGER_CHILD = {
+  hidden: { opacity: 0, y: 20 },
+  show: { opacity: 1, y: 0, transition: { duration: 0.5, ease: [0.16, 1, 0.3, 1] as const } }
+};
+
 export default function AboutPage() {
   return (
-    <main className="min-h-dvh bg-[#0F1110] text-[white]">
+    <main className="min-h-dvh bg-[#0F1110] text-white flex flex-col">
       {/* Nav */}
-      <nav className="border-b border-[rgba(255,255,255,0.1)] flex items-center px-6 py-4 sm:px-12">
+      <nav className="border-b border-white/5 flex items-center px-6 py-4 sm:px-12">
         <Link
           href="/"
-          className="font-mono text-sm text-[#A1A1AA] transition-colors hover:text-[white]"
+          className="font-mono text-sm text-[#A1A1AA] transition-colors hover:text-white"
         >
           &larr; BACK
         </Link>
       </nav>
 
-      <div className="mx-auto max-w-4xl px-6 py-20 sm:px-12">
+      <div className="flex-1 mx-auto max-w-4xl w-full px-6 py-20 sm:px-12">
         {/* Page Header */}
-        <h1 className="mb-20 text-5xl sm:text-7xl font-serif text-[white] tracking-tight">
-          ABOUT THIS INVESTIGATION
-        </h1>
-
-        {/* §01 — WHAT IS AUTOPSY? */}
-        <motion.section
-          className="mb-24"
+        <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.4 }}
+          className="mb-20"
         >
-          <span className="font-mono text-xs font-bold uppercase tracking-[0.2em] text-[#A1A1AA]">
-            &sect;01 &mdash; WHAT IS AUTOPSY?
-          </span>
+          <div className="text-[12px] font-[300] uppercase tracking-widest text-[#8F47AE] border-b border-white/5 pb-2 mb-8">
+            About This Investigation
+          </div>
+          <h1 className="text-5xl sm:text-7xl font-serif text-white tracking-tight font-[200]">
+            What is Autopsy?
+          </h1>
+        </motion.div>
 
-          <div className="mt-8 flex flex-col lg:flex-row gap-8 lg:gap-12">
-            {/* Main content — 70% */}
-            <div className="lg:w-[70%] space-y-6 font-serif text-base leading-8 text-[#A1A1AA]">
-              <p>
-                Autopsy is a forensic AI tool that investigates why startups, products, and companies failed.
-                Instead of a single chatbot guessing at a postmortem, Autopsy deploys six specialist agents
-                — each with a distinct investigative lens — who research in parallel, debate their findings,
-                and produce a synthesized verdict backed by live web sources.
-              </p>
-              <p>
-                The result is not an opinion. It is a structured forensic report with a primary cause of
-                death, an evidence trail, counterfactual analysis (what would have saved it), and actionable
-                lessons for builders. Every claim is sourced. Every agent has a known bias. The disagreements
-                are surfaced, not hidden.
-              </p>
-              <p>
-                Most postmortems are written by the people who failed — retrospective rationalization dressed
-                up as insight. Autopsy is different. Six agents with six biases, forced to argue, forced to
-                confront each other&apos;s blind spots. The truth lives in the disagreement.
-              </p>
-            </div>
-
-            {/* Margin notes — 30% */}
-            <div className="lg:w-[30%] space-y-8 font-mono text-xs text-[#4B4BA0] leading-6">
-              <div>
-                <span className="text-[#A1A1AA]">NOTE //</span><br />
-                No single agent produces the verdict. The output is always a synthesis.
+        {/* What is Autopsy */}
+        <motion.section
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.4 }}
+          className="mb-16"
+        >
+          <div className="p-[1px] rounded-[16px] bg-gradient-to-b from-white/10 via-white/5 to-transparent">
+            <div className="bg-[#0F1110] rounded-[15px] p-8 md:p-12 flex flex-col gap-6">
+              <div className="text-[12px] font-[300] uppercase tracking-widest text-[#A1A1AA] border-b border-white/5 pb-2">
+                &sect;01 — Overview
               </div>
-              <div>
-                <span className="text-[#A1A1AA]">NOTE //</span><br />
-                Every bias is documented. Every blind spot is declared upfront.
-              </div>
-              <div>
-                <span className="text-[#A1A1AA]">NOTE //</span><br />
-                The disagreement IS the feature. Consensus without debate is just groupthink.
+              <div className="flex flex-col lg:flex-row gap-8 lg:gap-12">
+                <div className="lg:w-[70%] space-y-6 font-serif text-base leading-8 text-[#A1A1AA]">
+                  <p>
+                    Autopsy is a forensic AI tool that investigates why startups, products, and companies failed.
+                    Instead of a single chatbot guessing at a postmortem, Autopsy deploys six specialist agents
+                    — each with a distinct investigative lens — who research in parallel, debate their findings,
+                    and produce a synthesized verdict backed by live web sources.
+                  </p>
+                  <p>
+                    The result is not an opinion. It is a structured forensic report with a primary cause of
+                    death, an evidence trail, counterfactual analysis (what would have saved it), and actionable
+                    lessons for builders. Every claim is sourced. Every agent has a known bias. The disagreements
+                    are surfaced, not hidden.
+                  </p>
+                  <p>
+                    Most postmortems are written by the people who failed — retrospective rationalization dressed
+                    up as insight. Autopsy is different. Six agents with six biases, forced to argue, forced to
+                    confront each other&apos;s blind spots. The truth lives in the disagreement.
+                  </p>
+                </div>
+                <div className="lg:w-[30%] space-y-8 font-mono text-xs text-[#4B4BA0] leading-6">
+                  <div>
+                    <span className="text-[#A1A1AA]">NOTE //</span><br />
+                    No single agent produces the verdict. The output is always a synthesis.
+                  </div>
+                  <div>
+                    <span className="text-[#A1A1AA]">NOTE //</span><br />
+                    Every bias is documented. Every blind spot is declared upfront.
+                  </div>
+                  <div>
+                    <span className="text-[#A1A1AA]">NOTE //</span><br />
+                    The disagreement IS the feature. Consensus without debate is just groupthink.
+                  </div>
+                </div>
               </div>
             </div>
           </div>
         </motion.section>
 
-        {/* §02 — THE 6 AGENTS */}
+        {/* The 6 Agents */}
         <motion.section
-          className="mb-24"
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.4, delay: 0.1 }}
+          className="mb-16"
         >
-          <span className="font-mono text-xs font-bold uppercase tracking-[0.2em] text-[#A1A1AA]">
-            &sect;02 &mdash; THE 6 AGENTS
-          </span>
-
-          <div className="mt-8 border-t border-[rgba(255,255,255,0.1)]">
-            {agents.map((agent, i) => (
-              <div
-                key={agent.num}
-                className="border-b border-[rgba(255,255,255,0.1)] py-6"
-              >
-                <div className="flex flex-col sm:flex-row sm:items-baseline gap-2 sm:gap-6">
-                  <span className="font-mono text-sm text-[#4B4BA0] tabular-nums">
-                    {agent.num}
-                  </span>
-                  <span className="font-serif text-xl text-[white]">
-                    {agent.name}
-                  </span>
-                </div>
-                <p className="mt-2 sm:ml-12 text-base leading-7 text-[#A1A1AA]">
-                  {agent.methodology}
-                </p>
-                <p className="mt-2 sm:ml-12 text-sm italic text-[#A1A1AA]">
-                  KNOWN BIAS: {agent.bias}
-                </p>
-              </div>
-            ))}
+          <div className="text-[12px] font-[300] uppercase tracking-widest text-[#A1A1AA] border-b border-white/5 pb-2 mb-6">
+            &sect;02 — The 6 Agents
           </div>
+          <motion.div
+            initial="hidden"
+            whileInView="show"
+            viewport={{ once: true, amount: 0.1 }}
+            variants={{ hidden: { opacity: 0 }, show: { opacity: 1, transition: { staggerChildren: 0.1 } } }}
+            className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-0 border border-white/5 rounded-[16px] overflow-hidden"
+          >
+            {agents.map((agent, i) => (
+              <motion.div
+                variants={STAGGER_CHILD}
+                key={agent.num}
+                className={`p-8 flex flex-col gap-4 hover:bg-white/[0.02] transition-colors cursor-default relative overflow-hidden ${
+                  i < agents.length - 1 ? 'border-b md:border-b-0 md:border-r border-white/5' : ''
+                } ${i === 4 ? 'md:border-b lg:border-b-0 lg:border-r border-white/5' : ''} ${i === 3 ? 'lg:border-b border-white/5' : ''}`}
+              >
+                <div className="absolute inset-0 bg-gradient-to-br from-[#4B4BA0]/0 to-[#4B4BA0]/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+                <div className="w-12 h-12 rounded-[12px] bg-[#4B4BA0]/10 border border-[#4B4BA0]/20 flex items-center justify-center relative z-10">
+                  <div className="text-[18px] text-[#4B4BA0]">{agent.num}</div>
+                </div>
+                <div className="relative z-10">
+                  <h3 className="text-[18px] text-white font-[400] mb-1">{agent.name}</h3>
+                  <p className="text-[14px] leading-relaxed text-[#A1A1AA] font-[300]">
+                    {agent.methodology}
+                  </p>
+                  <p className="mt-3 text-[12px] italic text-[#A1A1AA]/70">
+                    Known bias: {agent.bias}
+                  </p>
+                </div>
+              </motion.div>
+            ))}
+          </motion.div>
         </motion.section>
 
-        {/* §03 — BUILT WITH */}
+        {/* Built With */}
         <motion.section
-          className="mb-24"
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.4, delay: 0.2 }}
+          className="mb-16"
         >
-          <span className="font-mono text-xs font-bold uppercase tracking-[0.2em] text-[#A1A1AA]">
-            &sect;03 &mdash; BUILT WITH
-          </span>
-
-          <div className="mt-8 border-t border-[rgba(255,255,255,0.1)]">
-            {techStack.map((tech, i) => (
-              <div
-                key={tech.name}
-                className="border-b border-[rgba(255,255,255,0.1)] py-4 flex items-baseline justify-between gap-4"
-              >
-                <span className="font-mono text-sm text-[white]">
-                  {tech.name}
-                </span>
-                <span className="font-mono text-xs text-[#A1A1AA] text-right">
-                  {tech.description}
-                </span>
-              </div>
-            ))}
+          <div className="text-[12px] font-[300] uppercase tracking-widest text-[#A1A1AA] border-b border-white/5 pb-2 mb-6">
+            &sect;03 — Built With
+          </div>
+          <div className="p-[1px] rounded-[16px] bg-gradient-to-b from-white/10 via-white/5 to-transparent">
+            <div className="bg-[#0F1110] rounded-[15px] overflow-hidden">
+              {techStack.map((tech, i) => (
+                <div
+                  key={tech.name}
+                  className={`py-4 px-8 flex items-baseline justify-between gap-4 ${
+                    i < techStack.length - 1 ? 'border-b border-white/5' : ''
+                  }`}
+                >
+                  <span className="font-mono text-sm text-white">
+                    {tech.name}
+                  </span>
+                  <span className="font-mono text-xs text-[#A1A1AA] text-right">
+                    {tech.description}
+                  </span>
+                </div>
+              ))}
+            </div>
           </div>
         </motion.section>
 
-        {/* §04 — AMD DEVELOPER HACKATHON 2026 */}
+        {/* AMD Developer Hackathon 2026 */}
         <motion.section
-          className="mb-12"
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.4, delay: 0.3 }}
+          className="mb-12"
         >
-          <span className="font-mono text-xs font-bold uppercase tracking-[0.2em] text-[#A1A1AA]">
-            &sect;04 &mdash; AMD DEVELOPER HACKATHON 2026
-          </span>
-
-          <div className="mt-8 flex flex-col lg:flex-row gap-8 lg:gap-12">
-            <div className="lg:w-[70%] space-y-6 font-serif text-base leading-8 text-[#A1A1AA]">
-              <p>
-                Autopsy was built for the AMD Developer Hackathon 2026, a global competition focused on
-                leveraging AMD hardware for AI-driven applications. The project uses DeepSeek V4 Pro via
-                Fireworks AI for agent reasoning and plans a migration to self-hosted inference on AMD MI300X
-                GPUs for cost-efficient, high-throughput postmortem generation.
-              </p>
-              <p>
-                The MI300X advantage is real: 192GB of HBM3 memory enables all six agents to run in parallel
-                on a single GPU. On an H100 (80GB), you&apos;d need three sequential rounds. On the MI300X, the
-                agents debate in real time. The hardware doesn&apos;t just make it faster — it makes the debate
-                architecture possible.
-              </p>
-            </div>
-
-            <div className="lg:w-[30%] font-mono text-xs text-[#4B4BA0] leading-6">
-              <div>
-                <span className="text-[#A1A1AA]">NOTE //</span><br />
-                192GB HBM3 &mdash; 6 agents loaded simultaneously. No sequential batching. No compromise.
+          <div className="p-[1px] rounded-[16px] bg-gradient-to-b from-white/20 via-white/5 to-transparent">
+            <div className="bg-[#0F1110] rounded-[15px] p-8 md:p-12 flex flex-col gap-6">
+              <div className="text-[12px] font-[300] uppercase tracking-widest text-[#8F47AE] border-b border-white/5 pb-2">
+                &sect;04 — AMD Developer Hackathon 2026
+              </div>
+              <div className="flex flex-col lg:flex-row gap-8 lg:gap-12">
+                <div className="lg:w-[70%] space-y-6 font-serif text-base leading-8 text-[#A1A1AA]">
+                  <p>
+                    Autopsy was built for the AMD Developer Hackathon 2026, a global competition focused on
+                    leveraging AMD hardware for AI-driven applications. The project uses Kimi K2.6 via
+                    Fireworks AI for agent reasoning and plans a migration to self-hosted inference on AMD MI300X
+                    GPUs for cost-efficient, high-throughput postmortem generation.
+                  </p>
+                  <p>
+                    The MI300X advantage is real: 192GB of HBM3 memory enables all six agents to run in parallel
+                    on a single GPU. On an H100 (80GB), you&apos;d need three sequential rounds. On the MI300X, the
+                    agents debate in real time. The hardware doesn&apos;t just make it faster — it makes the debate
+                    architecture possible.
+                  </p>
+                </div>
+                <div className="lg:w-[30%] font-mono text-xs text-[#4B4BA0] leading-6">
+                  <div>
+                    <span className="text-[#A1A1AA]">NOTE //</span><br />
+                    192GB HBM3 &mdash; 6 agents loaded simultaneously. No sequential batching. No compromise.
+                  </div>
+                </div>
               </div>
             </div>
           </div>
         </motion.section>
       </div>
-
-      {/* Footer */}
-      <footer className="border-t border-[rgba(255,255,255,0.1)] px-6 py-8 sm:px-12">
-        <div className="mx-auto max-w-4xl flex flex-col sm:flex-row items-center justify-between gap-4">
-          <span className="font-mono text-xs text-[#A1A1AA]">
-            AUTOPSY / 2026 / OPEN SOURCE
-          </span>
-          <span className="font-mono text-xs text-[#A1A1AA]">
-            Built for AMD Developer Hackathon 2026
-          </span>
-          <span className="font-mono text-xs text-[#A1A1AA]">
-            CASE #2026-0113
-          </span>
-        </div>
-      </footer>
     </main>
   );
 }
