@@ -1,4 +1,4 @@
-import { complete } from "@/lib/llm";
+import { complete, extractJSON } from "@/lib/llm";
 import { webSearch, formatSearchResults } from "@/lib/search";
 import { FounderFinding, AgentRole, RiskLevel, FounderModeInput } from "@/types/investigation";
 
@@ -15,7 +15,7 @@ export async function runFounderAgent(
   input: FounderModeInput,
   deep = false
 ): Promise<FounderFinding> {
-  const TIMEOUT_MS = deep ? 45000 : 25000;
+  const TIMEOUT_MS = 40000;
 
   const timeoutPromise = new Promise<never>((_, reject) =>
     setTimeout(
@@ -26,28 +26,24 @@ export async function runFounderAgent(
 
   const agentPromise = async (): Promise<FounderFinding> => {
     const queries = config.searchQueries(input);
-    const allResults = await Promise.all(
-      queries.map((q) =>
-        webSearch(q, {
-          maxResults: deep ? 5 : 3,
-          searchDepth: deep ? "advanced" : "basic",
-        })
-      )
-    );
-    const flatResults = allResults.flat();
-    const searchContext = formatSearchResults(flatResults);
+    const allResults = await webSearch(queries[0], {
+      maxResults: deep ? 4 : 2,
+      searchDepth: deep ? "advanced" : "basic",
+    });
+    const searchContext = formatSearchResults(allResults);
 
     const userPrompt = config.userPrompt(input, searchContext);
     const rawOutput = await complete(config.systemPrompt, userPrompt, {
       temperature: 0.7,
-      maxTokens: deep ? 2500 : 1500,
+      maxTokens: deep ? 1500 : 1000,
     });
 
     let parsed: Record<string, unknown> = {};
     try {
-      const jsonMatch = rawOutput.match(/\{[\s\S]*\}/);
-      if (jsonMatch) parsed = JSON.parse(jsonMatch[0]);
+      const cleanJSON = extractJSON(rawOutput);
+      parsed = JSON.parse(cleanJSON);
     } catch {
+      console.error(`[${config.role}] JSON parse failed:`, rawOutput.slice(0, 200));
       parsed = {};
     }
 
@@ -66,7 +62,7 @@ export async function runFounderAgent(
       evidence: Array.isArray(parsed.evidence) ? (parsed.evidence as string[]) : [],
       fullAnalysis: (parsed.fullAnalysis as string) || rawOutput,
       mitigations: Array.isArray(parsed.mitigations) ? (parsed.mitigations as string[]) : [],
-      sources: flatResults.slice(0, deep ? 5 : 3).map((r) => ({ title: r.title, url: r.url })),
+      sources: allResults.slice(0, deep ? 4 : 2).map((r) => ({ title: r.title, url: r.url })),
     };
   };
 

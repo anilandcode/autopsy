@@ -1,4 +1,4 @@
-import { complete } from "@/lib/llm";
+import { complete, extractJSON } from "@/lib/llm";
 import { PremortemFinding, PremortemReport } from "@/types/investigation";
 
 const SYSTEM_PROMPT = `You are the Lead Investigator synthesizing a 6-agent PRE-MORTEM risk analysis.
@@ -67,9 +67,10 @@ Synthesize these into a final pre-mortem risk assessment. Return JSON.`;
 
   let parsed: Record<string, unknown> = {};
   try {
-    const jsonMatch = rawOutput.match(/\{[\s\S]*\}/);
-    if (jsonMatch) parsed = JSON.parse(jsonMatch[0]);
+    const cleanJSON = extractJSON(rawOutput);
+    parsed = JSON.parse(cleanJSON);
   } catch {
+    console.error("[premortem-synthesizer] JSON parse failed:", rawOutput.slice(0, 200));
     parsed = {};
   }
 

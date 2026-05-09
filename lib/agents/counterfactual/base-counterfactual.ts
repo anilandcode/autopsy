@@ -1,4 +1,4 @@
-import { complete } from "@/lib/llm";
+import { complete, extractJSON } from "@/lib/llm";
 import { webSearch, formatSearchResults } from "@/lib/search";
 import { CounterfactualAgentFinding, AgentRole, CounterfactualInput } from "@/types/investigation";
 
@@ -15,29 +15,33 @@ export async function runCounterfactualAgent(
   input: CounterfactualInput,
   deep = false
 ): Promise<CounterfactualAgentFinding> {
-  const TIMEOUT_MS = deep ? 45000 : 28000;
+  const TIMEOUT_MS = 40000;
 
   const agentWork = async (): Promise<CounterfactualAgentFinding> => {
-    // Search for evidence
+    // Search for evidence — run first query only, maxResults: 2
     const queries = config.searchQueries(input);
-    const allResults = await Promise.all(
-      queries.map(q => webSearch(q, { maxResults: deep ? 5 : 3, searchDepth: deep ? "advanced" : "basic" }))
-    );
-    const searchContext = formatSearchResults(allResults.flat());
+    const allResults = await webSearch(queries[0], {
+      maxResults: deep ? 4 : 2,
+      searchDepth: deep ? "advanced" : "basic",
+    });
+    const searchContext = formatSearchResults(allResults);
 
     // LLM call
     const raw = await complete(
       config.systemPrompt,
       config.userPrompt(input, searchContext),
-      { temperature: 0.8, maxTokens: deep ? 2500 : 1500 }
+      { temperature: 0.8, maxTokens: deep ? 1500 : 1000 }
     );
 
     // Parse JSON
     let parsed: Record<string, unknown> = {};
     try {
-      const match = raw.match(/\{[\s\S]*\}/);
-      if (match) parsed = JSON.parse(match[0]);
-    } catch { parsed = {}; }
+      const cleanJSON = extractJSON(raw);
+      parsed = JSON.parse(cleanJSON);
+    } catch {
+      console.error(`[${config.role}] JSON parse failed:`, raw.slice(0, 200));
+      parsed = {};
+    }
 
     return {
       role: config.role,
@@ -49,7 +53,7 @@ export async function runCounterfactualAgent(
       confidenceInAlterate: Math.min(100, Math.max(0, (parsed.confidence as number) || 70)),
       reasoning: (parsed.reasoning as string) || raw,
       historicalPrecedents: (parsed.historicalPrecedents as string[]) || [],
-      sources: allResults.flat().slice(0, 3).map(r => ({
+      sources: allResults.slice(0, 2).map(r => ({
         title: r.title,
         url: r.url
       })),

@@ -1,4 +1,4 @@
-import { complete } from "@/lib/llm";
+import { complete, extractJSON } from "@/lib/llm";
 import { AgentFinding, AgentRole, AgentDebateOutput } from "@/types/investigation";
 
 const DEBATE_SYSTEM_PROMPT = `You are a specialist agent reviewing the findings of 5 other AI investigators.
@@ -34,8 +34,8 @@ async function runAgentDebate(
 
   let parsed: Record<string, unknown> = {};
   try {
-    const jsonMatch = rawOutput.match(/\{[\s\S]*\}/);
-    if (jsonMatch) parsed = JSON.parse(jsonMatch[0]);
+    const cleanJSON = extractJSON(rawOutput);
+    parsed = JSON.parse(cleanJSON);
   } catch {
     parsed = {};
   }

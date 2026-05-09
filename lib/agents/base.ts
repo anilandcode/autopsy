@@ -1,4 +1,4 @@
-import { complete } from "@/lib/llm";
+import { complete, extractJSON } from "@/lib/llm";
 import { webSearch, formatSearchResults } from "@/lib/search";
 import { AgentFinding, AgentRole } from "@/types/investigation";
 
@@ -15,7 +15,7 @@ export async function runAgent(
   subject: string,
   deep = false
 ): Promise<AgentFinding> {
-  const TIMEOUT_MS = deep ? 45000 : 25000;
+  const TIMEOUT_MS = 40000;
 
   const timeoutPromise = new Promise<never>((_, reject) =>
     setTimeout(
@@ -25,32 +25,28 @@ export async function runAgent(
   );
 
   const agentPromise = async (): Promise<AgentFinding> => {
-    // Step 1: web search
+    // Step 1: web search — run first query only, maxResults: 2
     const queries = config.searchQueries(subject);
-    const allResults = await Promise.all(
-      queries.map((q) =>
-        webSearch(q, {
-          maxResults: deep ? 5 : 3,
-          searchDepth: deep ? "advanced" : "basic",
-        })
-      )
-    );
-    const flatResults = allResults.flat();
-    const searchContext = formatSearchResults(flatResults);
+    const allResults = await webSearch(queries[0], {
+      maxResults: deep ? 4 : 2,
+      searchDepth: deep ? "advanced" : "basic",
+    });
+    const searchContext = formatSearchResults(allResults);
 
     // Step 2: LLM analysis
     const userPrompt = config.userPrompt(subject, searchContext);
     const rawOutput = await complete(config.systemPrompt, userPrompt, {
       temperature: 0.7,
-      maxTokens: deep ? 2500 : 1500,
+      maxTokens: deep ? 1500 : 1000,
     });
 
     // Step 3: parse structured output
     let parsed: Record<string, unknown> = {};
     try {
-      const jsonMatch = rawOutput.match(/\{[\s\S]*\}/);
-      if (jsonMatch) parsed = JSON.parse(jsonMatch[0]);
+      const cleanJSON = extractJSON(rawOutput);
+      parsed = JSON.parse(cleanJSON);
     } catch {
+      console.error(`[${config.role}] JSON parse failed:`, rawOutput.slice(0, 200));
       parsed = {};
     }
 
@@ -67,8 +63,8 @@ export async function runAgent(
         return Math.min(1, Math.max(0, raw > 1 ? raw / 100 : raw));
       })(),
       fullAnalysis: (parsed.fullAnalysis as string) || rawOutput,
-      sources: flatResults
-        .slice(0, deep ? 5 : 3)
+      sources: allResults
+        .slice(0, deep ? 4 : 2)
         .map((r) => ({ title: r.title, url: r.url })),
     };
   };

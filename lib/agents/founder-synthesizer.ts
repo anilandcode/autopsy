@@ -1,4 +1,4 @@
-import { complete } from "@/lib/llm";
+import { complete, extractJSON } from "@/lib/llm";
 import { FounderFinding, FounderReport, FounderModeInput } from "@/types/investigation";
 import { FAILURE_DATABASE, findSimilarFailures } from "@/lib/failure-database";
 
@@ -97,9 +97,10 @@ Synthesize these into a founder mode report. Be specific to this idea, not gener
 
   let parsed: Record<string, unknown> = {};
   try {
-    const jsonMatch = rawOutput.match(/\{[\s\S]*\}/);
-    if (jsonMatch) parsed = JSON.parse(jsonMatch[0]);
+    const cleanJSON = extractJSON(rawOutput);
+    parsed = JSON.parse(cleanJSON);
   } catch {
+    console.error("[founder-synthesizer] JSON parse failed:", rawOutput.slice(0, 200));
     parsed = {};
   }
 

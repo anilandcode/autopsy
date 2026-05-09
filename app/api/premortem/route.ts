@@ -1,7 +1,7 @@
 import { runPremortem } from "@/lib/orchestrator";
 import { PremortemFinding, AgentRole } from "@/types/investigation";
 
-export const maxDuration = 55;
+export const maxDuration = 60;
 
 export async function POST(request: Request) {
   const { subject, deep } = await request.json();

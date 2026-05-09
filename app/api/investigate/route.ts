@@ -1,7 +1,7 @@
 import { runInvestigation } from "@/lib/orchestrator";
 import { AgentFinding, AgentRole, AgentDebateOutput } from "@/types/investigation";
 
-export const maxDuration = 55;
+export const maxDuration = 60;
 
 export async function POST(request: Request) {
   const { subject, deep } = await request.json();

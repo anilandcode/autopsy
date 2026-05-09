@@ -1,4 +1,4 @@
-import { complete } from "@/lib/llm";
+import { complete, extractJSON } from "@/lib/llm";
 import { AgentFinding, AgentRole, AgentDebateOutput, ConsequentialDisagreement, Disagreement, PostmortemReport } from "@/types/investigation";
 
 const SYSTEM_PROMPT = `You are the Lead Investigator synthesizing a 6-agent postmortem.
@@ -83,9 +83,10 @@ Synthesize these into a final verdict. Return JSON.`;
 
   let parsed: Record<string, unknown> = {};
   try {
-    const jsonMatch = rawOutput.match(/\{[\s\S]*\}/);
-    if (jsonMatch) parsed = JSON.parse(jsonMatch[0]);
+    const cleanJSON = extractJSON(rawOutput);
+    parsed = JSON.parse(cleanJSON);
   } catch {
+    console.error("[synthesizer] JSON parse failed:", rawOutput.slice(0, 200));
     parsed = {};
   }
 

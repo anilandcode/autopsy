@@ -4,12 +4,12 @@ import { motion } from "framer-motion";
 import Link from "next/link";
 
 const AGENTS = [
-  { name: "Market Analyst", role: "market-analyst", model: "DeepSeek V4 Pro", mem: "~28 GB" },
-  { name: "The Operator", role: "operator", model: "DeepSeek V4 Pro", mem: "~28 GB" },
-  { name: "Money Trail", role: "money-trail", model: "DeepSeek V4 Pro", mem: "~28 GB" },
-  { name: "Customer Voice", role: "customer-voice", model: "DeepSeek V4 Pro", mem: "~28 GB" },
-  { name: "The Engineer", role: "engineer", model: "DeepSeek V4 Pro", mem: "~28 GB" },
-  { name: "The Historian", role: "historian", model: "DeepSeek V4 Pro", mem: "~28 GB" },
+  { name: "Market Analyst", role: "market-analyst", model: "Kimi K2.6", mem: "~28 GB" },
+  { name: "The Operator", role: "operator", model: "Kimi K2.6", mem: "~28 GB" },
+  { name: "Money Trail", role: "money-trail", model: "Kimi K2.6", mem: "~28 GB" },
+  { name: "Customer Voice", role: "customer-voice", model: "Kimi K2.6", mem: "~28 GB" },
+  { name: "The Engineer", role: "engineer", model: "Kimi K2.6", mem: "~28 GB" },
+  { name: "The Historian", role: "historian", model: "Kimi K2.6", mem: "~28 GB" },
 ];
 
 const MODES = [
@@ -23,10 +23,10 @@ const STATS = [
   { value: "4", unit: "", label: "Investigation Modes" },
   { value: "24", unit: "", label: "Specialized Agents" },
   { value: "192", unit: "GB", label: "HBM3 Memory" },
-  { value: "1M", unit: "", label: "Token Context Window" },
+  { value: "262", unit: "K", label: "Token Context Window" },
   { value: "5.3", unit: "TB/s", label: "Memory Bandwidth" },
-  { value: "22", unit: "s", label: "Avg Investigation" },
-  { value: "70", unit: "B", label: "Params / Agent" },
+  { value: "0.7", unit: "s", label: "Time to First Token" },
+  { value: "1", unit: "T", label: "Params / Agent" },
   { value: "30", unit: "", label: "Historical Cases in DB" },
 ];
 
@@ -35,7 +35,7 @@ const TECH_STACK = [
   { name: "TypeScript 5.x", detail: "Full type safety" },
   { name: "Tailwind v4", detail: "Utility-first CSS" },
   { name: "Framer Motion", detail: "Animation primitives" },
-  { name: "DeepSeek V4 Pro (1.6T MoE)", detail: "via Fireworks AI -> Migrating to Llama 3.3 70B on AMD MI300X" },
+  { name: "Kimi K2.6 (1T params, 262K context)", detail: "Moonshot AI via Fireworks" },
   { name: "Tavily Search API", detail: "Real-time web research" },
   { name: "Server-Sent Events", detail: "Streaming agent updates" },
   { name: "Vercel", detail: "Edge deployment" },
@@ -170,7 +170,7 @@ export default function ArchitecturePage() {
           </span>
           <h1 className="mt-6 font-serif text-4xl sm:text-6xl leading-tight text-[#F4F1EA]">
             4 Modes. 24 Agents. 1 GPU.{" "}
-            <span className="text-[#D62828]">Parallel Execution.</span>
+            <span className="text-[#D62828]">Kimi K2.6.</span>
           </h1>
           <p className="mt-8 max-w-2xl font-serif text-base leading-8 text-[#B8B5AE]">
             How Autopsy uses AMD MI300X&apos;s 192GB HBM3 memory to run 24 specialized agents across 4 investigation modes — enabling real-time cross-agent debate that&apos;s impossible on smaller GPUs.
@@ -239,7 +239,7 @@ export default function ArchitecturePage() {
                 </li>
                 <li className="flex items-start gap-3 text-sm text-[#F4F1EA]">
                   <span className="font-mono text-[#06D6A0] mt-0.5">[+]</span>
-                  Total time: ~22 seconds
+                  Total time: ~15 seconds
                 </li>
                 <li className="flex items-start gap-3 text-sm font-medium text-[#F4F1EA]">
                   <span className="font-mono text-[#FFD60A] mt-0.5">[*]</span>

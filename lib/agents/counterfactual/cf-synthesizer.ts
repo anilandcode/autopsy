@@ -1,4 +1,4 @@
-import { complete } from "@/lib/llm";
+import { complete, extractJSON } from "@/lib/llm";
 import {
   CounterfactualInput,
   CounterfactualAgentFinding,
@@ -90,9 +90,10 @@ Render a definitive verdict. Be bold, not hedging. Respond with JSON only.`;
 
   let parsed: Record<string, unknown> = {};
   try {
-    const match = raw.match(/\{[\s\S]*\}/);
-    if (match) parsed = JSON.parse(match[0]);
+    const cleanJSON = extractJSON(raw);
+    parsed = JSON.parse(cleanJSON);
   } catch {
+    console.error("[cf-synthesizer] JSON parse failed:", raw.slice(0, 200));
     parsed = {};
   }
 
