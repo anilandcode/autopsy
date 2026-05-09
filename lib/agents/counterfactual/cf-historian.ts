@@ -58,6 +58,6 @@ ${searchContext}
 Find REAL HISTORICAL PRECEDENTS for this alternate decision. Which companies made similar pivots? What were their outcomes? Your analysis must be grounded in real history, not speculation. Provide at least 2 historical precedents with YEAR, COMPANY, and OUTCOME. Respond with JSON only.`,
 };
 
-export async function runCFHistorian(input: CounterfactualInput): Promise<CounterfactualAgentFinding> {
+export async function runCFHistorian(input: CounterfactualInput, deep = false): Promise<CounterfactualAgentFinding> {
   return runCounterfactualAgent(cfHistorianConfig, input);
 }

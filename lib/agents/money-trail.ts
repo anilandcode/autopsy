@@ -46,7 +46,8 @@ You ALWAYS respond with valid JSON in this exact format:
 Respond ONLY with the JSON object. No preamble, no explanation outside JSON.`;
 
 export async function runMoneyTrail(
-  subject: string
+  subject: string,
+  deep = false
 ): Promise<AgentFinding> {
   return runAgent(
     {
@@ -60,12 +61,14 @@ export async function runMoneyTrail(
       userPrompt: (s, ctx) =>
         `Investigate why ${s} failed from a FINANCIAL perspective only.\n\nSearch evidence gathered:\n${ctx}\n\nAnalyze and return JSON.`,
     },
-    subject
+    subject,
+    deep
   );
 }
 
 export async function runMoneyTrailPremortem(
-  subject: string
+  subject: string,
+  deep = false
 ): Promise<PremortemFinding> {
   return runPremortemAgent(
     {
@@ -79,6 +82,7 @@ export async function runMoneyTrailPremortem(
       userPrompt: (s, ctx) =>
         `Assess what COULD kill ${s} from a FINANCIAL perspective.\n\nSearch evidence gathered:\n${ctx}\n\nAnalyze and return JSON.`,
     },
-    subject
+    subject,
+    deep
   );
 }

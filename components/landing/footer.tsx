@@ -2,59 +2,33 @@ import Link from "next/link";
 
 export function Footer() {
   return (
-    <footer className="border-t border-[#2A2A2A] bg-[#0E0E0E] px-6 py-5">
+    <footer className="border-t border-[#2A2A2A] bg-[#0E0E0E] px-6 py-6">
       <div className="mx-auto max-w-6xl">
         <div className="flex flex-col items-center gap-4 sm:flex-row sm:justify-between">
-          <span className="font-mono text-[11px] uppercase tracking-wider text-[#71706B]">
-            AUTOPSY / 2026 / OPEN SOURCE
+          <span className="text-xs text-[#71706B]">
+            Autopsy / 2026 / Open source
           </span>
 
-          <nav className="flex items-center font-mono text-[11px] text-[#B8B5AE]">
+          <nav className="flex items-center gap-4 text-xs text-[#B8B5AE]">
             <Link href="/investigate" className="transition-colors hover:text-[#F4F1EA]">
-              CASE FILES
+              Investigate
             </Link>
-            <span className="mx-1.5 text-[#71706B]">/</span>
-            <Link href="/#whatifs" className="transition-colors hover:text-[#F4F1EA]">
-              WHAT-IFS
-            </Link>
-            <span className="mx-1.5 text-[#71706B]">/</span>
             <Link href="/architecture" className="transition-colors hover:text-[#F4F1EA]">
-              ARCHITECTURE
+              Architecture
             </Link>
-            <span className="mx-1.5 text-[#71706B]">/</span>
             <Link href="/about" className="transition-colors hover:text-[#F4F1EA]">
-              ABOUT
+              About
             </Link>
-            <span className="mx-1.5 text-[#71706B]">/</span>
             <a
               href="https://github.com/anilandcode/autopsy"
               target="_blank"
               rel="noopener noreferrer"
               className="transition-colors hover:text-[#F4F1EA]"
             >
-              GITHUB
+              GitHub
             </a>
           </nav>
-
-          <span className="font-mono text-[11px] text-[#71706B]">
-            CASE #2026-0847
-          </span>
         </div>
-
-        <div className="mt-4 flex items-center justify-center gap-2 font-mono text-[10px] uppercase tracking-wider text-[#5C5852]">
-          <span>MODES:</span>
-          <span className="text-[#D62828]">POSTMORTEM</span>
-          <span>/</span>
-          <span className="text-[#FFD60A]">PRE-MORTEM</span>
-          <span>/</span>
-          <span className="text-[#06D6A0]">FOUNDER</span>
-          <span>/</span>
-          <span className="text-[#FACC15]">COUNTERFACTUAL</span>
-        </div>
-
-        <p className="mt-3 text-center font-mono text-[10px] text-[#5C5852]">
-          Built for the AMD MI300X Hackathon — May 2026
-        </p>
       </div>
     </footer>
   );

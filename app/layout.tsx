@@ -1,6 +1,11 @@
 import type { Metadata } from "next";
-import { Instrument_Serif, JetBrains_Mono } from "next/font/google";
+import { Inter, Instrument_Serif, JetBrains_Mono } from "next/font/google";
 import "./globals.css";
+
+const inter = Inter({
+  variable: "--font-sans",
+  subsets: ["latin"],
+});
 
 const instrumentSerif = Instrument_Serif({
   variable: "--font-instrument-serif",
@@ -14,11 +19,11 @@ const jetbrainsMono = JetBrains_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Autopsy — Forensic Intelligence. Postmortems, Pre-Mortems & Counterfactuals.",
+  title: "Autopsy — Research why companies fail with six specialized analysts",
   description:
-    "Six AI agents investigate why companies failed, predict what could kill living companies, analyze your startup idea, and explore alternate histories. Built on AMD MI300X.",
+    "Six AI agents investigate why companies failed, predict what could kill living companies, analyze your startup idea, and explore alternate histories.",
   openGraph: {
-    title: "Autopsy — Forensic Intelligence. Postmortems, Pre-Mortems & Counterfactuals.",
+    title: "Autopsy — Research why companies fail with six specialized analysts",
     description:
       "Six AI agents investigate why companies failed, predict what could kill living companies, analyze your startup idea, and explore alternate histories. One platform, four modes.",
     url: "https://autopsy-nine.vercel.app",
@@ -28,14 +33,14 @@ export const metadata: Metadata = {
         url: "/opengraph-image",
         width: 1200,
         height: 630,
-        alt: "AUTOPSY — Forensic Postmortem Intelligence",
+        alt: "Autopsy — Research why companies fail",
       },
     ],
     type: "website",
   },
   twitter: {
     card: "summary_large_image",
-    title: "Autopsy — Forensic Intelligence. Postmortems, Pre-Mortems & Counterfactuals.",
+    title: "Autopsy — Research why companies fail with six specialized analysts",
     description:
       "Six AI agents investigate why companies failed, predict what could kill living companies, analyze your startup idea, and explore alternate histories.",
     images: ["/opengraph-image"],
@@ -51,9 +56,9 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${instrumentSerif.variable} ${jetbrainsMono.variable} h-full antialiased`}
+      className={`${inter.variable} ${instrumentSerif.variable} ${jetbrainsMono.variable} h-full antialiased`}
     >
-      <body className="min-h-full flex flex-col bg-[#0E0E0E] text-[#F4F1EA]">
+      <body className="min-h-full flex flex-col bg-[#0E0E0E] text-[#F4F1EA]" style={{ fontFamily: "var(--font-sans), system-ui, sans-serif" }}>
         {children}
       </body>
     </html>

@@ -45,6 +45,6 @@ ${searchContext}
 Analyze the MARKET impact of this alternate decision. Would it have changed market dynamics, competitive positioning, or consumer behavior? Be skeptical but fair. Cite real historical precedents. Respond with JSON only.`,
 };
 
-export async function runCFMarketAnalyst(input: CounterfactualInput): Promise<CounterfactualAgentFinding> {
+export async function runCFMarketAnalyst(input: CounterfactualInput, deep = false): Promise<CounterfactualAgentFinding> {
   return runCounterfactualAgent(cfMarketAnalystConfig, input);
 }

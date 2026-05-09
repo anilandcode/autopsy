@@ -25,7 +25,7 @@ import { AgentFinding, AgentRole, PostmortemReport, PremortemFinding, PremortemR
 
 const agentRunners: {
   role: AgentRole;
-  run: (subject: string) => Promise<AgentFinding>;
+  run: (subject: string, deep: boolean) => Promise<AgentFinding>;
 }[] = [
   { role: "market-analyst", run: runMarketAnalyst },
   { role: "operator", run: runOperator },
@@ -37,7 +37,7 @@ const agentRunners: {
 
 const premortemRunners: {
   role: AgentRole;
-  run: (subject: string) => Promise<PremortemFinding>;
+  run: (subject: string, deep: boolean) => Promise<PremortemFinding>;
 }[] = [
   { role: "market-analyst", run: runMarketAnalystPremortem },
   { role: "operator", run: runOperatorPremortem },
@@ -49,7 +49,7 @@ const premortemRunners: {
 
 const founderRunners: {
   role: AgentRole;
-  run: (input: FounderModeInput) => Promise<FounderFinding>;
+  run: (input: FounderModeInput, deep: boolean) => Promise<FounderFinding>;
 }[] = [
   { role: "market-analyst", run: runFounderMarketAnalyst },
   { role: "operator", run: runFounderOperator },
@@ -102,18 +102,19 @@ function makeFounderErrorFinding(role: AgentRole): FounderFinding {
 
 export async function runInvestigation(
   subject: string,
+  deep: boolean,
   onAgentUpdate: (finding: AgentFinding) => void,
   onAgentStarted?: (role: AgentRole) => void,
   onDebateStarted?: () => void,
   onDebateComplete?: (debate: AgentDebateOutput[]) => void
 ): Promise<PostmortemReport> {
   async function runWithUpdate(
-    runFn: () => Promise<AgentFinding>,
+    runFn: (deep: boolean) => Promise<AgentFinding>,
     role: AgentRole
   ): Promise<AgentFinding> {
     onAgentStarted?.(role);
     try {
-      const result = await runFn();
+      const result = await runFn(deep);
       onAgentUpdate(result);
       return result;
     } catch {
@@ -124,12 +125,12 @@ export async function runInvestigation(
   }
 
   const results = await Promise.allSettled([
-    runWithUpdate(() => runMarketAnalyst(subject), "market-analyst"),
-    runWithUpdate(() => runOperator(subject), "operator"),
-    runWithUpdate(() => runMoneyTrail(subject), "money-trail"),
-    runWithUpdate(() => runCustomerVoice(subject), "customer-voice"),
-    runWithUpdate(() => runEngineer(subject), "engineer"),
-    runWithUpdate(() => runHistorian(subject), "historian"),
+    runWithUpdate(() => runMarketAnalyst(subject, deep), "market-analyst"),
+    runWithUpdate(() => runOperator(subject, deep), "operator"),
+    runWithUpdate(() => runMoneyTrail(subject, deep), "money-trail"),
+    runWithUpdate(() => runCustomerVoice(subject, deep), "customer-voice"),
+    runWithUpdate(() => runEngineer(subject, deep), "engineer"),
+    runWithUpdate(() => runHistorian(subject, deep), "historian"),
   ]);
 
   const findings: AgentFinding[] = [];
@@ -147,16 +148,17 @@ export async function runInvestigation(
 
 export async function runPremortem(
   subject: string,
+  deep: boolean,
   onAgentUpdate: (finding: PremortemFinding) => void,
   onAgentStarted?: (role: AgentRole) => void
 ): Promise<PremortemReport> {
   async function runWithUpdate(
-    runFn: () => Promise<PremortemFinding>,
+    runFn: (deep: boolean) => Promise<PremortemFinding>,
     role: AgentRole
   ): Promise<PremortemFinding> {
     onAgentStarted?.(role);
     try {
-      const result = await runFn();
+      const result = await runFn(deep);
       onAgentUpdate(result);
       return result;
     } catch {
@@ -168,7 +170,7 @@ export async function runPremortem(
 
   const results = await Promise.allSettled(
     premortemRunners.map(({ role, run }) =>
-      runWithUpdate(() => run(subject), role)
+      runWithUpdate(() => run(subject, deep), role)
     )
   );
 
@@ -182,16 +184,17 @@ export async function runPremortem(
 
 export async function runFounderMode(
   input: FounderModeInput,
+  deep: boolean,
   onAgentUpdate: (finding: FounderFinding) => void,
   onAgentStarted?: (role: AgentRole) => void
 ): Promise<FounderReport> {
   async function runWithUpdate(
-    runFn: () => Promise<FounderFinding>,
+    runFn: (deep: boolean) => Promise<FounderFinding>,
     role: AgentRole
   ): Promise<FounderFinding> {
     onAgentStarted?.(role);
     try {
-      const result = await runFn();
+      const result = await runFn(deep);
       onAgentUpdate(result);
       return result;
     } catch {
@@ -203,7 +206,7 @@ export async function runFounderMode(
 
   const results = await Promise.allSettled(
     founderRunners.map(({ role, run }) =>
-      runWithUpdate(() => run(input), role)
+      runWithUpdate(() => run(input, deep), role)
     )
   );
 
@@ -232,16 +235,17 @@ function makeCounterfactualErrorFinding(role: AgentRole): CounterfactualAgentFin
 
 export async function runCounterfactual(
   input: CounterfactualInput,
+  deep: boolean,
   onAgentUpdate: (finding: CounterfactualAgentFinding) => void,
   onAgentStarted?: (role: AgentRole) => void
 ): Promise<CounterfactualReport> {
   async function runWithUpdate(
-    runFn: () => Promise<CounterfactualAgentFinding>,
+    runFn: (deep: boolean) => Promise<CounterfactualAgentFinding>,
     role: AgentRole
   ): Promise<CounterfactualAgentFinding> {
     onAgentStarted?.(role);
     try {
-      const result = await runFn();
+      const result = await runFn(deep);
       onAgentUpdate(result);
       return result;
     } catch {
@@ -252,12 +256,12 @@ export async function runCounterfactual(
   }
 
   const results = await Promise.allSettled([
-    runWithUpdate(() => runCFMarketAnalyst(input), "market-analyst"),
-    runWithUpdate(() => runCFOperator(input), "operator"),
-    runWithUpdate(() => runCFMoneyTrail(input), "money-trail"),
-    runWithUpdate(() => runCFCustomerVoice(input), "customer-voice"),
-    runWithUpdate(() => runCFEngineer(input), "engineer"),
-    runWithUpdate(() => runCFHistorian(input), "historian"),
+    runWithUpdate(() => runCFMarketAnalyst(input, deep), "market-analyst"),
+    runWithUpdate(() => runCFOperator(input, deep), "operator"),
+    runWithUpdate(() => runCFMoneyTrail(input, deep), "money-trail"),
+    runWithUpdate(() => runCFCustomerVoice(input, deep), "customer-voice"),
+    runWithUpdate(() => runCFEngineer(input, deep), "engineer"),
+    runWithUpdate(() => runCFHistorian(input, deep), "historian"),
   ]);
 
   const findings: CounterfactualAgentFinding[] = [];

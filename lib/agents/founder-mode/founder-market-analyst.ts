@@ -36,6 +36,6 @@ const config: FounderAgentConfig = {
     `Analyze the MARKET risk for this early-stage startup:\n\nName: ${input.name}\nDescription: ${input.description}\nStage: ${input.stage}${input.targetCustomer ? `\nTarget customer: ${input.targetCustomer}` : ""}\n\nSearch evidence:\n${ctx}\n\nReturn JSON.`,
 };
 
-export async function runFounderMarketAnalyst(input: FounderModeInput): Promise<FounderFinding> {
+export async function runFounderMarketAnalyst(input: FounderModeInput, deep = false): Promise<FounderFinding> {
   return runFounderAgent(config, input);
 }

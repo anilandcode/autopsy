@@ -12,9 +12,10 @@ export interface AgentConfig {
 
 export async function runAgent(
   config: AgentConfig,
-  subject: string
+  subject: string,
+  deep = false
 ): Promise<AgentFinding> {
-  const TIMEOUT_MS = 25000;
+  const TIMEOUT_MS = deep ? 45000 : 25000;
 
   const timeoutPromise = new Promise<never>((_, reject) =>
     setTimeout(
@@ -27,7 +28,12 @@ export async function runAgent(
     // Step 1: web search
     const queries = config.searchQueries(subject);
     const allResults = await Promise.all(
-      queries.map((q) => webSearch(q, { maxResults: 3, searchDepth: "basic" }))
+      queries.map((q) =>
+        webSearch(q, {
+          maxResults: deep ? 5 : 3,
+          searchDepth: deep ? "advanced" : "basic",
+        })
+      )
     );
     const flatResults = allResults.flat();
     const searchContext = formatSearchResults(flatResults);
@@ -36,7 +42,7 @@ export async function runAgent(
     const userPrompt = config.userPrompt(subject, searchContext);
     const rawOutput = await complete(config.systemPrompt, userPrompt, {
       temperature: 0.7,
-      maxTokens: 1500,
+      maxTokens: deep ? 2500 : 1500,
     });
 
     // Step 3: parse structured output
@@ -62,7 +68,7 @@ export async function runAgent(
       })(),
       fullAnalysis: (parsed.fullAnalysis as string) || rawOutput,
       sources: flatResults
-        .slice(0, 3)
+        .slice(0, deep ? 5 : 3)
         .map((r) => ({ title: r.title, url: r.url })),
     };
   };

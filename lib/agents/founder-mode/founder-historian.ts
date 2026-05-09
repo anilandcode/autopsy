@@ -47,6 +47,6 @@ const config: FounderAgentConfig = {
   },
 };
 
-export async function runFounderHistorian(input: FounderModeInput): Promise<FounderFinding> {
+export async function runFounderHistorian(input: FounderModeInput, deep = false): Promise<FounderFinding> {
   return runFounderAgent(config, input);
 }

@@ -4,7 +4,7 @@ import { PremortemFinding, AgentRole } from "@/types/investigation";
 export const maxDuration = 55;
 
 export async function POST(request: Request) {
-  const { subject } = await request.json();
+  const { subject, deep } = await request.json();
 
   if (!subject?.trim()) {
     return new Response("Missing subject", { status: 400 });
@@ -20,10 +20,11 @@ export async function POST(request: Request) {
       }
 
       try {
-        sendEvent("started", { subject });
+        sendEvent("started", { subject, deep: !!deep });
 
         const report = await runPremortem(
           subject,
+          !!deep,
           (finding: PremortemFinding) => {
             sendEvent("agent_update", finding);
           },

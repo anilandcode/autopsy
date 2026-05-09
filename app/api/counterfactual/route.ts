@@ -5,7 +5,7 @@ export const maxDuration = 55;
 
 export async function POST(request: Request) {
   const body = await request.json();
-  const { subject, originalDecision, alternateDecision, context } = body;
+  const { subject, originalDecision, alternateDecision, context, deep } = body;
 
   if (!subject?.trim() || !originalDecision?.trim() || !alternateDecision?.trim()) {
     return new Response("Missing required fields: subject, originalDecision, alternateDecision", { status: 400 });
@@ -23,10 +23,11 @@ export async function POST(request: Request) {
       }
 
       try {
-        sendEvent("started", { input });
+        sendEvent("started", { input, deep: !!deep });
 
         const report = await runCounterfactual(
           input,
+          !!deep,
           (finding: CounterfactualAgentFinding) => {
             sendEvent("cf_agent_update", finding);
           },

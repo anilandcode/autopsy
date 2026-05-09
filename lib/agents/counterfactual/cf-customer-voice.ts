@@ -48,6 +48,6 @@ ${searchContext}
 Analyze the CUSTOMER impact of this alternate decision. Would adoption, retention, and word-of-mouth have changed? Reference real customer sentiment data. Cite historical precedents where similar customer-facing changes changed outcomes. Respond with JSON only.`,
 };
 
-export async function runCFCustomerVoice(input: CounterfactualInput): Promise<CounterfactualAgentFinding> {
+export async function runCFCustomerVoice(input: CounterfactualInput, deep = false): Promise<CounterfactualAgentFinding> {
   return runCounterfactualAgent(cfCustomerVoiceConfig, input);
 }

@@ -5,7 +5,7 @@ export const maxDuration = 55;
 
 export async function POST(request: Request) {
   const body = await request.json();
-  const { name, description, stage, targetCustomer } = body;
+  const { name, description, stage, targetCustomer, deep } = body;
 
   if (!name?.trim() || !description?.trim() || !stage) {
     return new Response("Missing required fields: name, description, stage", { status: 400 });
@@ -28,10 +28,11 @@ export async function POST(request: Request) {
       }
 
       try {
-        sendEvent("started", { name: input.name });
+        sendEvent("started", { name: input.name, deep: !!deep });
 
         const report = await runFounderMode(
           input,
+          !!deep,
           (finding: FounderFinding) => {
             sendEvent("agent_update", finding);
           },

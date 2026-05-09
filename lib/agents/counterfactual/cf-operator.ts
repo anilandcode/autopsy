@@ -47,6 +47,6 @@ ${searchContext}
 Could this team have EXECUTED the alternate decision? Assess leadership capability, organizational culture, and operational requirements. Cite real historical precedents where execution quality determined a pivot's outcome. Respond with JSON only.`,
 };
 
-export async function runCFOperator(input: CounterfactualInput): Promise<CounterfactualAgentFinding> {
+export async function runCFOperator(input: CounterfactualInput, deep = false): Promise<CounterfactualAgentFinding> {
   return runCounterfactualAgent(cfOperatorConfig, input);
 }

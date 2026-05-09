@@ -49,6 +49,6 @@ ${searchContext}
 Analyze the TECHNICAL FEASIBILITY of this alternate decision. Could the engineering team have built it? What complexity would it have added? Cite real precedents where similar technical pivots succeeded or failed. Respond with JSON only.`,
 };
 
-export async function runCFEngineer(input: CounterfactualInput): Promise<CounterfactualAgentFinding> {
+export async function runCFEngineer(input: CounterfactualInput, deep = false): Promise<CounterfactualAgentFinding> {
   return runCounterfactualAgent(cfEngineerConfig, input);
 }

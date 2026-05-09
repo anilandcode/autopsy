@@ -139,7 +139,7 @@ function buildSimilarBlock(subject: string): string {
     : "No similar cases found in database.";
 }
 
-export async function runHistorian(subject: string): Promise<AgentFinding> {
+export async function runHistorian(subject: string, deep = false): Promise<AgentFinding> {
   const similarBlock = buildSimilarBlock(subject);
 
   return runAgent(
@@ -153,11 +153,12 @@ export async function runHistorian(subject: string): Promise<AgentFinding> {
       userPrompt: (s, ctx) =>
         `What historical pattern does ${s}'s failure match?\n\n${similarBlock}\n\nEvidence from research:\n${ctx.slice(0, 1800)}\n\nReturn JSON only.`,
     },
-    subject
+    subject,
+    deep
   );
 }
 
-export async function runHistorianPremortem(subject: string): Promise<PremortemFinding> {
+export async function runHistorianPremortem(subject: string, deep = false): Promise<PremortemFinding> {
   const similarBlock = buildSimilarBlock(subject);
 
   return runPremortemAgent(
@@ -171,6 +172,7 @@ export async function runHistorianPremortem(subject: string): Promise<PremortemF
       userPrompt: (s, ctx) =>
         `What historical pattern could repeat and kill ${s}?\n\n${similarBlock}\n\nEvidence from research:\n${ctx.slice(0, 1800)}\n\nReturn JSON only.`,
     },
-    subject
+    subject,
+    deep
   );
 }

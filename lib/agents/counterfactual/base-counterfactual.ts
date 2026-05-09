@@ -12,15 +12,16 @@ export interface CounterfactualAgentConfig {
 
 export async function runCounterfactualAgent(
   config: CounterfactualAgentConfig,
-  input: CounterfactualInput
+  input: CounterfactualInput,
+  deep = false
 ): Promise<CounterfactualAgentFinding> {
-  const TIMEOUT_MS = 28000;
+  const TIMEOUT_MS = deep ? 45000 : 28000;
 
   const agentWork = async (): Promise<CounterfactualAgentFinding> => {
     // Search for evidence
     const queries = config.searchQueries(input);
     const allResults = await Promise.all(
-      queries.map(q => webSearch(q, { maxResults: 3 }))
+      queries.map(q => webSearch(q, { maxResults: deep ? 5 : 3, searchDepth: deep ? "advanced" : "basic" }))
     );
     const searchContext = formatSearchResults(allResults.flat());
 
@@ -28,7 +29,7 @@ export async function runCounterfactualAgent(
     const raw = await complete(
       config.systemPrompt,
       config.userPrompt(input, searchContext),
-      { temperature: 0.8, maxTokens: 1500 }
+      { temperature: 0.8, maxTokens: deep ? 2500 : 1500 }
     );
 
     // Parse JSON

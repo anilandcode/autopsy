@@ -11,7 +11,7 @@ const agentNames: Record<AgentRole, string> = {
   "customer-voice": "Customer Voice",
   engineer: "The Engineer",
   historian: "The Historian",
-  synthesizer: "Synthesizer",
+  synthesizer: "The Synthesizer",
 };
 
 interface DebateRoomProps {
@@ -31,8 +31,8 @@ export function DebateRoom({ debate }: DebateRoomProps) {
         className="mb-8 flex items-center gap-3"
       >
         <Swords className="h-4 w-4 text-[#D62828]" />
-        <h3 className="font-mono text-lg uppercase tracking-[0.1em] text-[#F4F1EA]">
-          &sect;02 &mdash; DEBATE ROUND
+        <h3 className="text-base font-medium text-[#F4F1EA]">
+          Agent debate
         </h3>
       </motion.div>
 
@@ -43,7 +43,7 @@ export function DebateRoom({ debate }: DebateRoomProps) {
           return (
             <motion.div
               key={d.agentRole}
-              initial={{ opacity: 0, x: isEven ? -30 : 30 }}
+              initial={{ opacity: 0, x: isEven ? -20 : 20 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{
                 duration: 0.25,
@@ -53,15 +53,11 @@ export function DebateRoom({ debate }: DebateRoomProps) {
               className={`${isEven ? "ml-0" : "ml-8 sm:ml-16"} my-4`}
             >
               {/* Disagreement */}
-              <p
-                className="font-mono text-[11px] uppercase tracking-wider text-[#D62828]"
-                style={{ letterSpacing: "0.1em" }}
-              >
-                {agentNames[d.agentRole]} &mdash; DISAGREEMENT FILED AGAINST{" "}
-                {agentNames[d.disagreesWith]}
+              <p className="text-xs text-[#D62828]">
+                {agentNames[d.agentRole]} disagrees with {agentNames[d.disagreesWith]}
               </p>
               <p
-                className="mt-1 text-lg italic text-[#F4F1EA]"
+                className="mt-1 text-base italic text-[#F4F1EA]"
                 style={{ fontFamily: "var(--font-instrument-serif), Georgia, serif" }}
               >
                 &ldquo;{d.disagreementReason}&rdquo;
@@ -71,15 +67,11 @@ export function DebateRoom({ debate }: DebateRoomProps) {
               <div className="my-3 h-px bg-[#2A2A2A]" />
 
               {/* Agreement */}
-              <p
-                className="font-mono text-[11px] uppercase tracking-wider text-[#06D6A0]"
-                style={{ letterSpacing: "0.1em" }}
-              >
-                {agentNames[d.agentRole]} &mdash; AGREEMENT FILED WITH{" "}
-                {agentNames[d.agreesWith]}
+              <p className="text-xs text-[#06D6A0]">
+                {agentNames[d.agentRole]} agrees with {agentNames[d.agreesWith]}
               </p>
               <p
-                className="mt-1 text-lg italic text-[#B8B5AE]"
+                className="mt-1 text-base italic text-[#B8B5AE]"
                 style={{ fontFamily: "var(--font-instrument-serif), Georgia, serif" }}
               >
                 &ldquo;{d.agreementReason}&rdquo;

@@ -14,6 +14,7 @@
   --accent-bone: #F4F1EA;
   --accent-yellow: #FFD60A;
   --accent-verified: #06D6A0;
+  --font-sans: var(--font-sans);
   --font-display: var(--font-instrument-serif);
   --font-mono: var(--font-jetbrains-mono);
 
@@ -39,7 +40,7 @@
   --color-verified: var(--verified);
   --color-muted: var(--muted);
   --color-muted-dark: var(--muted-dark);
-  --font-sans: var(--font-instrument-serif);
+  --font-sans: var(--font-sans);
   --font-mono: var(--font-jetbrains-mono);
 }
 
@@ -51,7 +52,7 @@ html {
 body {
   background: #0E0E0E;
   color: #F4F1EA;
-  font-family: var(--font-instrument-serif), Georgia, serif;
+  font-family: var(--font-sans), system-ui, sans-serif;
   position: relative;
 }
 

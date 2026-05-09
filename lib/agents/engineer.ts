@@ -45,7 +45,7 @@ You ALWAYS respond with valid JSON in this exact format:
 
 Respond ONLY with the JSON object. No preamble, no explanation outside JSON.`;
 
-export async function runEngineer(subject: string): Promise<AgentFinding> {
+export async function runEngineer(subject: string, deep = false): Promise<AgentFinding> {
   return runAgent(
     {
       role: "engineer",
@@ -58,12 +58,14 @@ export async function runEngineer(subject: string): Promise<AgentFinding> {
       userPrompt: (s, ctx) =>
         `Investigate why ${s} failed from an ENGINEERING and PRODUCT perspective only.\n\nSearch evidence gathered:\n${ctx}\n\nAnalyze and return JSON.`,
     },
-    subject
+    subject,
+    deep
   );
 }
 
 export async function runEngineerPremortem(
-  subject: string
+  subject: string,
+  deep = false
 ): Promise<PremortemFinding> {
   return runPremortemAgent(
     {
@@ -77,6 +79,7 @@ export async function runEngineerPremortem(
       userPrompt: (s, ctx) =>
         `Assess what COULD kill ${s} from an ENGINEERING and PRODUCT perspective.\n\nSearch evidence gathered:\n${ctx}\n\nAnalyze and return JSON.`,
     },
-    subject
+    subject,
+    deep
   );
 }

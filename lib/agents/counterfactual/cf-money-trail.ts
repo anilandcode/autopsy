@@ -48,6 +48,6 @@ ${searchContext}
 Analyze the FINANCIAL impact of this alternate decision. Would unit economics, burn rate, revenue potential, or investor dynamics have changed? Be specific with numbers. Cite real financial precedents. Respond with JSON only.`,
 };
 
-export async function runCFMoneyTrail(input: CounterfactualInput): Promise<CounterfactualAgentFinding> {
+export async function runCFMoneyTrail(input: CounterfactualInput, deep = false): Promise<CounterfactualAgentFinding> {
   return runCounterfactualAgent(cfMoneyTrailConfig, input);
 }

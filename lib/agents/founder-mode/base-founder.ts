@@ -12,9 +12,10 @@ export interface FounderAgentConfig {
 
 export async function runFounderAgent(
   config: FounderAgentConfig,
-  input: FounderModeInput
+  input: FounderModeInput,
+  deep = false
 ): Promise<FounderFinding> {
-  const TIMEOUT_MS = 25000;
+  const TIMEOUT_MS = deep ? 45000 : 25000;
 
   const timeoutPromise = new Promise<never>((_, reject) =>
     setTimeout(
@@ -26,7 +27,12 @@ export async function runFounderAgent(
   const agentPromise = async (): Promise<FounderFinding> => {
     const queries = config.searchQueries(input);
     const allResults = await Promise.all(
-      queries.map((q) => webSearch(q, { maxResults: 3, searchDepth: "basic" }))
+      queries.map((q) =>
+        webSearch(q, {
+          maxResults: deep ? 5 : 3,
+          searchDepth: deep ? "advanced" : "basic",
+        })
+      )
     );
     const flatResults = allResults.flat();
     const searchContext = formatSearchResults(flatResults);
@@ -34,7 +40,7 @@ export async function runFounderAgent(
     const userPrompt = config.userPrompt(input, searchContext);
     const rawOutput = await complete(config.systemPrompt, userPrompt, {
       temperature: 0.7,
-      maxTokens: 1500,
+      maxTokens: deep ? 2500 : 1500,
     });
 
     let parsed: Record<string, unknown> = {};
@@ -60,7 +66,7 @@ export async function runFounderAgent(
       evidence: Array.isArray(parsed.evidence) ? (parsed.evidence as string[]) : [],
       fullAnalysis: (parsed.fullAnalysis as string) || rawOutput,
       mitigations: Array.isArray(parsed.mitigations) ? (parsed.mitigations as string[]) : [],
-      sources: flatResults.slice(0, 3).map((r) => ({ title: r.title, url: r.url })),
+      sources: flatResults.slice(0, deep ? 5 : 3).map((r) => ({ title: r.title, url: r.url })),
     };
   };
 
