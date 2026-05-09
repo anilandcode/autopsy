@@ -75,23 +75,38 @@ export function Hero() {
       </nav>
 
       {/* Hero content */}
-      <div className="flex flex-1 flex-col items-center justify-center pb-16 pt-8">
-        {/* Small wordmark */}
+      <div className="flex flex-1 flex-col items-center justify-center pb-16 pt-2">
+        {/* Big title */}
+        <motion.h1
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.3 }}
+          className="w-full text-center leading-none tracking-[-0.04em] text-[#F4F1EA]"
+          style={{
+            fontSize: "clamp(80px, 18vw, 260px)",
+            fontWeight: 400,
+            fontFamily: '"Instrument Serif", serif',
+          }}
+        >
+          Autopsy
+        </motion.h1>
+
         <motion.p
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.3 }}
-          className="text-sm tracking-wide text-[#71706B]"
-          style={{ fontFamily: "var(--font-instrument-serif), Georgia, serif" }}
+          transition={{ duration: 0.3, delay: 0.05 }}
+          className="mt-4 max-w-lg text-center text-base leading-relaxed text-[#B8B5AE] sm:text-lg"
         >
-          Autopsy
+          Six specialized analysts research why companies fail — from market timing
+          to engineering debt. Postmortems, pre-mortems, founder stress-tests,
+          and alternate-history what-ifs.
         </motion.p>
 
         {/* Main search input */}
         <motion.div
           initial={{ opacity: 0, y: 16 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.3, delay: 0.05 }}
+          transition={{ duration: 0.3, delay: 0.1 }}
           className="mt-8 w-full max-w-2xl"
         >
           <div className="flex items-center rounded-xl border border-[#3F3F3F] bg-[#161616] px-5 py-4 transition-colors focus-within:border-[#D62828]">
@@ -119,7 +134,7 @@ export function Hero() {
         <motion.div
           initial={{ opacity: 0, y: 12 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.3, delay: 0.1 }}
+          transition={{ duration: 0.3, delay: 0.15 }}
           className="mt-5 flex flex-wrap items-center justify-center gap-2"
         >
           {MODES.map((m) => (
@@ -142,7 +157,7 @@ export function Hero() {
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
-          transition={{ duration: 0.3, delay: 0.15 }}
+          transition={{ duration: 0.3, delay: 0.2 }}
           className="mt-4 flex items-center gap-2"
         >
           <button
@@ -166,10 +181,10 @@ export function Hero() {
         <motion.p
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
-          transition={{ duration: 0.3, delay: 0.2 }}
+          transition={{ duration: 0.3, delay: 0.25 }}
           className="mt-8 text-center text-sm text-[#71706B]"
         >
-          Research why companies fail with six specialized analysts.
+          Press Enter to investigate. Choose a mode above or toggle deep research for more thorough analysis.
         </motion.p>
       </div>
     </section>
