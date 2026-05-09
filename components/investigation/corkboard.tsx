@@ -3,7 +3,7 @@
 import { motion } from "framer-motion";
 import { X } from "lucide-react";
 import { AgentCard } from "./agent-card";
-import type { AgentRole, AgentStatus, AgentFinding, PremortemFinding, FounderFinding, InvestigationMode } from "@/types/investigation";
+import type { AgentRole, AgentStatus, AgentFinding, PremortemFinding, FounderFinding, CounterfactualAgentFinding, InvestigationMode } from "@/types/investigation";
 
 interface CorkboardProps {
   subject: string;
@@ -11,6 +11,7 @@ interface CorkboardProps {
   agentFindings: Record<AgentRole, AgentFinding | null>;
   premortemFindings: Record<AgentRole, PremortemFinding | null>;
   founderFindings: Record<AgentRole, FounderFinding | null>;
+  counterfactualFindings: Record<AgentRole, CounterfactualAgentFinding | null>;
   agentStatuses: Record<AgentRole, AgentStatus>;
   mode: InvestigationMode;
   onCancel?: () => void;
@@ -22,6 +23,7 @@ export function Corkboard({
   agentFindings,
   premortemFindings,
   founderFindings,
+  counterfactualFindings,
   agentStatuses,
   mode,
   onCancel,
@@ -41,8 +43,8 @@ export function Corkboard({
           </span>
           <h3 className="font-mono text-lg uppercase tracking-[0.1em] text-[#F4F1EA]">
             &sect;01 &mdash;{" "}
-            {mode === "founder" ? "FOUNDER MODE:" : mode === "premortem" ? "PRE-MORTEM:" : "INVESTIGATING:"}{" "}
-            <span className={mode === "founder" ? "text-[#06D6A0]" : mode === "premortem" ? "text-[#FFD60A]" : "text-[#D62828]"}>{subject}</span>
+            {mode === "founder" ? "FOUNDER MODE:" : mode === "premortem" ? "PRE-MORTEM:" : mode === "counterfactual" ? "COUNTERFACTUAL:" : "INVESTIGATING:"}{" "}
+            <span className={mode === "founder" ? "text-[#06D6A0]" : mode === "premortem" ? "text-[#FFD60A]" : mode === "counterfactual" ? "text-[#FACC15]" : "text-[#D62828]"}>{subject}</span>
           </h3>
         </div>
         {onCancel && (
@@ -65,6 +67,7 @@ export function Corkboard({
             finding={agentFindings[role]}
             premortemFinding={premortemFindings[role]}
             founderFinding={founderFindings[role]}
+            counterfactualFinding={counterfactualFindings[role]}
             index={i}
             mode={mode}
           />

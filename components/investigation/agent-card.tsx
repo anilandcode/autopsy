@@ -9,6 +9,7 @@ import type {
   AgentFinding,
   PremortemFinding,
   FounderFinding,
+  CounterfactualAgentFinding,
   RiskLevel,
   InvestigationMode,
 } from "@/types/investigation";
@@ -70,6 +71,7 @@ interface AgentCardProps {
   finding: AgentFinding | null;
   premortemFinding: PremortemFinding | null;
   founderFinding: FounderFinding | null;
+  counterfactualFinding: CounterfactualAgentFinding | null;
   index: number;
   mode: InvestigationMode;
 }
@@ -80,6 +82,7 @@ export function AgentCard({
   finding,
   premortemFinding,
   founderFinding,
+  counterfactualFinding,
   index,
   mode,
 }: AgentCardProps) {
@@ -88,11 +91,14 @@ export function AgentCard({
 
   const isPremortem = mode === "premortem";
   const isFounder = mode === "founder";
-  const activeFinding = isFounder
-    ? founderFinding
-    : isPremortem
-      ? premortemFinding
-      : finding;
+  const isCF = mode === "counterfactual";
+  const activeFinding = isCF
+    ? counterfactualFinding
+    : isFounder
+      ? founderFinding
+      : isPremortem
+        ? premortemFinding
+        : finding;
   const activeRiskLevel =
     isFounder && founderFinding
       ? founderFinding.severity
@@ -169,6 +175,11 @@ export function AgentCard({
 
         {(status === "done" || status === "error") &&
           activeFinding &&
+          isCF &&
+          counterfactualFinding && <CounterfactualCardContent finding={counterfactualFinding} />}
+
+        {(status === "done" || status === "error") &&
+          activeFinding &&
           isPremortem && (
             <PremortemCardContent finding={activeFinding as PremortemFinding} />
           )}
@@ -176,7 +187,8 @@ export function AgentCard({
         {(status === "done" || status === "error") &&
           activeFinding &&
           !isPremortem &&
-          !isFounder && (
+          !isFounder &&
+          !isCF && (
             <PostmortemCardContent finding={activeFinding as AgentFinding} />
           )}
       </div>
@@ -327,6 +339,87 @@ function FounderCardContent({ finding }: { finding: FounderFinding }) {
           {finding.mitigations.map((m, i) => (
             <p key={i} className="text-[11px] leading-5 text-[#B8B5AE]">
               ▸ {m}
+            </p>
+          ))}
+        </div>
+      )}
+
+      {finding.sources && finding.sources.length > 0 && (
+        <SourcesSection sources={finding.sources} />
+      )}
+    </div>
+  );
+}
+
+function CounterfactualCardContent({ finding }: { finding: CounterfactualAgentFinding }) {
+  const [expanded, setExpanded] = useState(false);
+  const isLong = finding.reasoning && finding.reasoning.length > 200;
+  const confidencePct = Math.round(finding.confidenceInAlterate);
+  const filled = Math.round(confidencePct / 10);
+  const empty = 10 - filled;
+  const barColor = confidencePct > 70 ? "#06D6A0" : confidencePct > 40 ? "#FFD60A" : "#D62828";
+
+  return (
+    <div className="pt-1">
+      {/* Two-column: actual vs alternate */}
+      <div className="grid grid-cols-2 gap-3">
+        <div>
+          <p className="font-mono text-[9px] font-bold uppercase tracking-[0.1em] text-[#5C5852]">
+            Actual Timeline
+          </p>
+          <p className="mt-1 text-xs leading-5 text-[#B8B5AE] line-clamp-4">
+            {finding.actualOutcome}
+          </p>
+        </div>
+        <div className="border-l border-[#2A2A2A] pl-3">
+          <p className="font-mono text-[9px] font-bold uppercase tracking-[0.1em] text-[#FACC15]">
+            Alternate Timeline
+          </p>
+          <p className="mt-1 text-xs leading-5 text-[#B8B5AE] line-clamp-4">
+            {finding.alternateOutcome}
+          </p>
+        </div>
+      </div>
+
+      {/* Verdict: would it have helped? */}
+      <div className="mt-3 border-t border-[#2A2A2A] pt-3">
+        <p className={`font-mono text-xs font-bold uppercase tracking-[0.1em] ${finding.wouldItHaveHelped ? "text-[#06D6A0]" : "text-[#D62828]"}`}>
+          VERDICT: {finding.wouldItHaveHelped ? "WOULD HAVE HELPED" : "WOULDN'T HAVE MATTERED"}
+        </p>
+        <div className="mt-1.5 flex items-center gap-2">
+          <span className="font-mono text-[9px] uppercase tracking-wider text-[#71706B]">
+            Confidence
+          </span>
+          <span className="font-mono text-xs" style={{ color: barColor }}>
+            {"█".repeat(filled)}{"░".repeat(empty)} {confidencePct}%
+          </span>
+        </div>
+      </div>
+
+      {/* Reasoning */}
+      {finding.reasoning && (
+        <>
+          <p className={`mt-2 text-sm leading-5 text-[#B8B5AE] ${!expanded ? "line-clamp-3" : ""}`}>
+            {finding.reasoning}
+          </p>
+          {isLong && !expanded && (
+            <button
+              onClick={() => setExpanded(true)}
+              className="mt-1 font-mono text-[10px] font-bold uppercase tracking-[0.1em] text-[#B8B5AE] transition-colors hover:text-[#F4F1EA]"
+            >
+              ▸ READ FULL ANALYSIS
+            </button>
+          )}
+        </>
+      )}
+
+      {/* Historical precedents */}
+      {finding.historicalPrecedents.length > 0 && (
+        <div className="mt-3 border-t border-[#2A2A2A] pt-3">
+          {finding.historicalPrecedents.map((p, i) => (
+            <p key={i} className="text-[11px] leading-5 text-[#B8B5AE]">
+              <span className="font-mono text-[10px] text-[#FACC15]">PRECEDENT: </span>
+              {p}
             </p>
           ))}
         </div>

@@ -1,3 +1,5 @@
+export const dynamic = "force-dynamic";
+
 import { Suspense } from "react";
 import { InvestigationRoomV2 } from "@/components/investigation-v2/investigation-room-v2";
 

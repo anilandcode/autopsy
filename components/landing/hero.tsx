@@ -36,6 +36,12 @@ export function Hero() {
               CASE FILES
             </Link>
             <Link
+              href="/#whatifs"
+              className="font-mono text-[11px] font-medium uppercase tracking-[0.1em] text-[#B8B5AE] transition-colors hover:text-[#F4F1EA]"
+            >
+              WHAT-IFS
+            </Link>
+            <Link
               href="/architecture"
               className="font-mono text-[11px] font-medium uppercase tracking-[0.1em] text-[#B8B5AE] transition-colors hover:text-[#F4F1EA]"
             >
@@ -111,8 +117,28 @@ export function Hero() {
         <div className="w-full sm:w-[60%] sm:pr-12">
           <p className="font-serif text-3xl leading-relaxed text-[#F4F1EA] sm:text-4xl">
             Forensic postmortem intelligence for failed and failing companies.
-            Six agents. One verdict.
+            Four modes. Six agents. One platform.
           </p>
+
+          {/* 4-mode explainer strip */}
+          <div className="mt-6 flex flex-wrap gap-2">
+            <span className="inline-flex items-center gap-1.5 border-2 border-[#D62828]/40 bg-[#D62828]/5 px-3 py-1.5 font-mono text-[10px] font-bold uppercase tracking-[0.1em] text-[#D62828]">
+              POSTMORTEM
+              <span className="font-normal text-[#71706B]">Why it died</span>
+            </span>
+            <span className="inline-flex items-center gap-1.5 border-2 border-[#FFD60A]/40 bg-[#FFD60A]/5 px-3 py-1.5 font-mono text-[10px] font-bold uppercase tracking-[0.1em] text-[#FFD60A]">
+              PRE-MORTEM
+              <span className="font-normal text-[#71706B]">What could kill it</span>
+            </span>
+            <span className="inline-flex items-center gap-1.5 border-2 border-[#06D6A0]/40 bg-[#06D6A0]/5 px-3 py-1.5 font-mono text-[10px] font-bold uppercase tracking-[0.1em] text-[#06D6A0]">
+              FOUNDER MODE
+              <span className="font-normal text-[#71706B]">Will yours survive</span>
+            </span>
+            <span className="inline-flex items-center gap-1.5 border-2 border-[#FACC15]/40 bg-[#FACC15]/5 px-3 py-1.5 font-mono text-[10px] font-bold uppercase tracking-[0.1em] text-[#FACC15]">
+              ⎇ COUNTERFACTUAL
+              <span className="font-normal text-[#71706B]">What if they chose differently</span>
+            </span>
+          </div>
         </div>
 
         {/* RIGHT — CTA Box (40%) */}

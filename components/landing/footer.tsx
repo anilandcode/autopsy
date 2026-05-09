@@ -14,6 +14,10 @@ export function Footer() {
               CASE FILES
             </Link>
             <span className="mx-1.5 text-[#71706B]">/</span>
+            <Link href="/#whatifs" className="transition-colors hover:text-[#F4F1EA]">
+              WHAT-IFS
+            </Link>
+            <span className="mx-1.5 text-[#71706B]">/</span>
             <Link href="/architecture" className="transition-colors hover:text-[#F4F1EA]">
               ARCHITECTURE
             </Link>
@@ -37,7 +41,18 @@ export function Footer() {
           </span>
         </div>
 
-        <p className="mt-4 text-center font-mono text-[10px] text-[#5C5852]">
+        <div className="mt-4 flex items-center justify-center gap-2 font-mono text-[10px] uppercase tracking-wider text-[#5C5852]">
+          <span>MODES:</span>
+          <span className="text-[#D62828]">POSTMORTEM</span>
+          <span>/</span>
+          <span className="text-[#FFD60A]">PRE-MORTEM</span>
+          <span>/</span>
+          <span className="text-[#06D6A0]">FOUNDER</span>
+          <span>/</span>
+          <span className="text-[#FACC15]">COUNTERFACTUAL</span>
+        </div>
+
+        <p className="mt-3 text-center font-mono text-[10px] text-[#5C5852]">
           Built for the AMD MI300X Hackathon — May 2026
         </p>
       </div>

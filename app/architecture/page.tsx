@@ -12,12 +12,22 @@ const AGENTS = [
   { name: "The Historian", role: "historian", model: "DeepSeek V4 Pro", mem: "~28 GB" },
 ];
 
+const MODES = [
+  { name: "POSTMORTEM", color: "#D62828", path: "6 agents → Debate → Synthesizer → Report" },
+  { name: "PRE-MORTEM", color: "#FFD60A", path: "6 risk agents → Risk Synthesizer → Report" },
+  { name: "FOUNDER MODE", color: "#06D6A0", path: "6 founder agents → Founder Synthesizer → Report" },
+  { name: "COUNTERFACTUAL", color: "#FACC15", path: "6 CF agents → CF Synthesizer → Report" },
+];
+
 const STATS = [
+  { value: "4", unit: "", label: "Investigation Modes" },
+  { value: "24", unit: "", label: "Specialized Agents" },
   { value: "192", unit: "GB", label: "HBM3 Memory" },
-  { value: "6", unit: "", label: "Concurrent Agents" },
+  { value: "1M", unit: "", label: "Token Context Window" },
   { value: "5.3", unit: "TB/s", label: "Memory Bandwidth" },
   { value: "22", unit: "s", label: "Avg Investigation" },
   { value: "70", unit: "B", label: "Params / Agent" },
+  { value: "30", unit: "", label: "Historical Cases in DB" },
 ];
 
 const TECH_STACK = [
@@ -32,128 +42,97 @@ const TECH_STACK = [
 ];
 
 function ArchitectureDiagram() {
+  const modeY = 30;
   const agentY = 140;
-  const debateY = 260;
-  const synthY = 340;
-  const verdictY = 420;
+  const synthY = 280;
+  const verdictY = 360;
   const centerX = 400;
-  const agentSpacing = 120;
-  const startAgentX = centerX - agentSpacing * 2.5;
 
   return (
     <div className="w-full overflow-x-auto">
-      <svg viewBox="0 0 800 480" className="mx-auto w-full max-w-4xl" style={{ minWidth: 600 }}>
-        {/* User Input */}
-        <rect x={centerX - 100} y={20} width={200} height={50} fill="#161616" stroke="#FFD60A" strokeWidth={2} />
-        <text x={centerX} y={50} textAnchor="middle" fill="#FFD60A" fontFamily="monospace" fontSize={12} fontWeight="bold">
-          USER INPUT
+      <svg viewBox="0 0 800 440" className="mx-auto w-full max-w-4xl" style={{ minWidth: 600 }}>
+        {/* Mode Selector */}
+        <rect x={centerX - 120} y={modeY} width={240} height={50} fill="#161616" stroke="#F4F1EA" strokeWidth={2} />
+        <text x={centerX} y={modeY + 20} textAnchor="middle" fill="#F4F1EA" fontFamily="monospace" fontSize={11} fontWeight="bold">
+          MODE SELECTOR
+        </text>
+        <text x={centerX} y={modeY + 38} textAnchor="middle" fill="#71706B" fontFamily="monospace" fontSize={8}>
+          4 modes — 24 agents total
         </text>
 
-        {/* Lines from User to each agent */}
-        {AGENTS.map((_, i) => {
-          const ax = startAgentX + i * agentSpacing;
+        {/* Mode branches */}
+        {MODES.map((m, i) => {
+          const bx = 80 + i * 185;
+          const by = modeY + 50 + 10;
           return (
-            <motion.line
-              key={`in-${i}`}
-              x1={centerX} y1={70}
-              x2={ax + 45} y2={agentY}
-              stroke="#2A2A2A" strokeWidth={1}
-              initial={{ pathLength: 0 }}
-              animate={{ pathLength: 1 }}
-              transition={{ delay: 0.3 + i * 0.1, duration: 0.4, ease: "linear" }}
-            />
-          );
-        })}
-
-        {/* Agent boxes */}
-        {AGENTS.map((agent, i) => {
-          const ax = startAgentX + i * agentSpacing;
-          return (
-            <g key={agent.role}>
-              <rect x={ax} y={agentY} width={90} height={80} fill="#161616" stroke="#D62828" strokeWidth={1.5} />
-              <text x={ax + 45} y={agentY + 20} textAnchor="middle" fill="#F4F1EA" fontFamily="monospace" fontSize={9} fontWeight="bold">
-                {agent.name.length > 12 ? agent.name.slice(0, 11) + "\u2026" : agent.name}
-              </text>
-              <text x={ax + 45} y={agentY + 38} textAnchor="middle" fill="#71706B" fontFamily="monospace" fontSize={7}>
-                {agent.model}
-              </text>
-              <text x={ax + 45} y={agentY + 54} textAnchor="middle" fill="#5C5852" fontFamily="monospace" fontSize={7}>
-                {agent.mem}
-              </text>
-              {/* Pulse indicator */}
-              <motion.circle
-                cx={ax + 78} cy={agentY + 8}
-                r={3}
-                fill="#D62828"
-                animate={{ opacity: [1, 0.3, 1] }}
-                transition={{ repeat: Infinity, duration: 1.5, delay: i * 0.2 }}
+            <g key={m.name}>
+              <motion.line
+                x1={centerX} y1={modeY + 50}
+                x2={bx + 70} y2={agentY - 10}
+                stroke={m.color} strokeWidth={1.5}
+                initial={{ pathLength: 0 }}
+                animate={{ pathLength: 1 }}
+                transition={{ delay: 0.2 + i * 0.15, duration: 0.4, ease: "linear" }}
               />
+              <rect x={bx} y={agentY - 10} width={140} height={30} fill="#161616" stroke={m.color} strokeWidth={1.5} />
+              <text x={bx + 70} y={agentY + 10} textAnchor="middle" fill={m.color} fontFamily="monospace" fontSize={9} fontWeight="bold">
+                {m.name}
+              </text>
+              <text x={bx + 70} y={agentY + 50} textAnchor="middle" fill="#71706B" fontFamily="monospace" fontSize={7}>
+                {m.path}
+              </text>
             </g>
           );
         })}
 
-        {/* Lines from agents to Debate */}
-        {AGENTS.map((_, i) => {
-          const ax = startAgentX + i * agentSpacing;
-          return (
-            <motion.line
-              key={`deb-${i}`}
-              x1={ax + 45} y1={agentY + 80}
-              x2={centerX} y2={debateY}
-              stroke="#D62828" strokeWidth={1}
-              strokeDasharray="4 2"
-              initial={{ pathLength: 0 }}
-              animate={{ pathLength: 1 }}
-              transition={{ delay: 1 + i * 0.05, duration: 0.3, ease: "linear" }}
-            />
-          );
-        })}
-
-        {/* Debate Round box */}
-        <rect x={centerX - 120} y={debateY} width={240} height={50} fill="#161616" stroke="#FFD60A" strokeWidth={2} />
-        <text x={centerX} y={debateY + 20} textAnchor="middle" fill="#FFD60A" fontFamily="monospace" fontSize={12} fontWeight="bold">
-          DEBATE ROUND
+        {/* 6 parallel agents block */}
+        <rect x={centerX - 200} y={agentY + 60} width={400} height={60} fill="#161616" stroke="#D62828" strokeWidth={1.5} strokeDasharray="6 3" />
+        <text x={centerX} y={agentY + 85} textAnchor="middle" fill="#D62828" fontFamily="monospace" fontSize={11} fontWeight="bold">
+          6 PARALLEL AGENTS
         </text>
-        <text x={centerX} y={debateY + 38} textAnchor="middle" fill="#71706B" fontFamily="monospace" fontSize={8}>
-          Agents critique each other&apos;s findings
+        <text x={centerX} y={agentY + 105} textAnchor="middle" fill="#71706B" fontFamily="monospace" fontSize={8}>
+          Market · Operator · Money · Customer · Engineer · Historian
         </text>
 
-        {/* Line from Debate to Synthesizer */}
+        {/* Arrow to Synthesizer */}
         <motion.line
-          x1={centerX} y1={debateY + 50}
+          x1={centerX} y1={agentY + 120}
           x2={centerX} y2={synthY}
           stroke="#FFD60A" strokeWidth={1.5}
+          initial={{ pathLength: 0 }}
+          animate={{ pathLength: 1 }}
+          transition={{ delay: 1.2, duration: 0.3, ease: "linear" }}
+        />
+
+        {/* Synthesizer */}
+        <rect x={centerX - 120} y={synthY} width={240} height={40} fill="#161616" stroke="#06D6A0" strokeWidth={2} />
+        <text x={centerX} y={synthY + 25} textAnchor="middle" fill="#06D6A0" fontFamily="monospace" fontSize={11} fontWeight="bold">
+          MODE-SPECIFIC SYNTHESIZER
+        </text>
+
+        {/* Arrow to Verdict */}
+        <motion.line
+          x1={centerX} y1={synthY + 40}
+          x2={centerX} y2={verdictY}
+          stroke="#06D6A0" strokeWidth={1.5}
           initial={{ pathLength: 0 }}
           animate={{ pathLength: 1 }}
           transition={{ delay: 1.5, duration: 0.3, ease: "linear" }}
         />
 
-        {/* Synthesizer box */}
-        <rect x={centerX - 90} y={synthY} width={180} height={50} fill="#161616" stroke="#06D6A0" strokeWidth={2} />
-        <text x={centerX} y={synthY + 20} textAnchor="middle" fill="#06D6A0" fontFamily="monospace" fontSize={12} fontWeight="bold">
-          SYNTHESIZER
-        </text>
-        <text x={centerX} y={synthY + 38} textAnchor="middle" fill="#71706B" fontFamily="monospace" fontSize={8}>
-          Weighs debate + evidence
-        </text>
-
-        {/* Line from Synth to Verdict */}
-        <motion.line
-          x1={centerX} y1={synthY + 50}
-          x2={centerX} y2={verdictY}
-          stroke="#06D6A0" strokeWidth={1.5}
-          initial={{ pathLength: 0 }}
-          animate={{ pathLength: 1 }}
-          transition={{ delay: 1.8, duration: 0.3, ease: "linear" }}
-        />
-
-        {/* Final Verdict box */}
-        <rect x={centerX - 100} y={verdictY} width={200} height={50} fill="#161616" stroke="#D62828" strokeWidth={2} />
-        <text x={centerX} y={verdictY + 20} textAnchor="middle" fill="#D62828" fontFamily="monospace" fontSize={12} fontWeight="bold">
-          FINAL VERDICT
+        {/* Verdict */}
+        <rect x={centerX - 140} y={verdictY} width={280} height={50} fill="#161616" stroke="#D62828" strokeWidth={2} />
+        <text x={centerX} y={verdictY + 20} textAnchor="middle" fill="#D62828" fontFamily="monospace" fontSize={11} fontWeight="bold">
+          VERDICT / REPORT
         </text>
         <text x={centerX} y={verdictY + 38} textAnchor="middle" fill="#71706B" fontFamily="monospace" fontSize={8}>
-          Root cause + pivotal disagreement
+          Postmortem · Premortem · Founder · Counterfactual
+        </text>
+
+        {/* AMD MI300X bottom layer */}
+        <rect x={40} y={verdictY + 60} width={720} height={30} fill="#0E0E0E" stroke="#3F3F3F" strokeWidth={1} />
+        <text x={400} y={verdictY + 80} textAnchor="middle" fill="#5C5852" fontFamily="monospace" fontSize={9}>
+          AMD MI300X — 192GB HBM3 — 5.3 TB/s BANDWIDTH — ALL MODES SHARE THIS LAYER
         </text>
       </svg>
     </div>
@@ -190,11 +169,11 @@ export default function ArchitecturePage() {
             &sect;01 &mdash; Execution Architecture
           </span>
           <h1 className="mt-6 font-serif text-4xl sm:text-6xl leading-tight text-[#F4F1EA]">
-            6 Agents. 1 GPU.{" "}
+            4 Modes. 24 Agents. 1 GPU.{" "}
             <span className="text-[#D62828]">Parallel Execution.</span>
           </h1>
           <p className="mt-8 max-w-2xl font-serif text-base leading-8 text-[#B8B5AE]">
-            How Autopsy uses AMD MI300X&apos;s 192GB HBM3 memory to run 6 specialized 70B-parameter agents simultaneously — enabling real-time cross-agent debate that&apos;s impossible on smaller GPUs.
+            How Autopsy uses AMD MI300X&apos;s 192GB HBM3 memory to run 24 specialized agents across 4 investigation modes — enabling real-time cross-agent debate that&apos;s impossible on smaller GPUs.
           </p>
         </section>
 
@@ -204,7 +183,7 @@ export default function ArchitecturePage() {
             &sect;02 &mdash; Live Architecture
           </span>
           <h2 className="mt-6 mb-8 font-mono text-sm text-[#F4F1EA] uppercase tracking-wider">
-            Pipeline: Input &#8594; Parallel Agents &#8594; Debate &#8594; Synthesis &#8594; Verdict
+            Pipeline: Mode Select &#8594; Parallel Agents &#8594; Synthesis &#8594; Verdict
           </h2>
           <div className="border border-[#2A2A2A] bg-[#161616] p-6">
             <ArchitectureDiagram />
@@ -220,7 +199,6 @@ export default function ArchitecturePage() {
             The hardware advantage that makes debate possible
           </h2>
           <div className="grid gap-0 sm:grid-cols-2">
-            {/* H100 — Left, muted */}
             <div className="border border-[#2A2A2A] bg-[#161616] p-8">
               <p className="mb-1 font-mono text-xs font-bold uppercase tracking-wider text-[#5C5852]">
                 ON A SINGLE H100
@@ -245,8 +223,6 @@ export default function ArchitecturePage() {
                 </li>
               </ul>
             </div>
-
-            {/* MI300X — Right, red accent */}
             <div className="border-2 border-[#D62828] bg-[#161616] p-8">
               <p className="mb-1 font-mono text-xs font-bold uppercase tracking-wider text-[#D62828]">
                 ON AMD MI300X
@@ -279,22 +255,22 @@ export default function ArchitecturePage() {
           <span className="font-mono text-xs font-bold uppercase tracking-[0.2em] text-[#71706B]">
             &sect;04 &mdash; By The Numbers
           </span>
-          <div className="mt-6 grid grid-cols-2 gap-4 sm:grid-cols-5">
+          <div className="mt-6 grid grid-cols-2 gap-4 sm:grid-cols-4 lg:grid-cols-8">
             {STATS.map((stat, i) => (
               <motion.div
                 key={stat.label}
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: i * 0.1, duration: 0.25, ease: "linear" }}
-                className="border-2 border-[#3F3F3F] bg-[#161616] p-5 text-center"
+                transition={{ delay: i * 0.06, duration: 0.25, ease: "linear" }}
+                className="border-2 border-[#3F3F3F] bg-[#161616] p-4 text-center"
               >
-                <span className="font-mono text-3xl font-bold text-[#D62828]">
+                <span className="font-mono text-2xl font-bold text-[#D62828]">
                   {stat.value}
                 </span>
                 <span className="font-mono text-sm text-[#71706B]">
                   {stat.unit}
                 </span>
-                <p className="mt-2 font-mono text-[9px] uppercase tracking-wider text-[#71706B]">
+                <p className="mt-2 font-mono text-[8px] uppercase tracking-wider text-[#71706B]">
                   {stat.label}
                 </p>
               </motion.div>
@@ -302,14 +278,50 @@ export default function ArchitecturePage() {
           </div>
         </section>
 
-        {/* §05 — Tech Stack */}
+        {/* §05 — Counterfactual Architecture */}
+        <section className="mb-24">
+          <span className="font-mono text-xs font-bold uppercase tracking-[0.2em] text-[#FACC15]">
+            &sect;05 &mdash; Counterfactual Architecture
+          </span>
+          <h2 className="mt-6 mb-4 font-serif text-2xl sm:text-3xl text-[#F4F1EA]">
+            Reasoning about what <span className="text-[#FACC15]">didn&apos;t</span> happen
+          </h2>
+          <p className="mb-8 max-w-2xl text-sm leading-7 text-[#B8B5AE]">
+            Standard agents analyze what happened. Counterfactual agents must reason about what DIDN&apos;T happen. This requires agents to:
+          </p>
+          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            {[
+              { num: "01", title: "Understand the actual causal chain", desc: "Each agent maps what actually led to failure before reasoning about alternatives." },
+              { num: "02", title: "Identify the decision point", desc: "Pinpoint the specific decision that created the divergence between actual and alternate timelines." },
+              { num: "03", title: "Model the alternate causal chain", desc: "Build a plausible alternate timeline from the decision point forward, grounded in evidence." },
+              { num: "04", title: "Find historical precedents", desc: "Search for real companies that made the alternate decision. Their outcomes become evidence." },
+              { num: "05", title: "Assess second and third-order consequences", desc: "Butterfly effects — the alternate decision creates cascading changes beyond the obvious." },
+            ].map((step, i) => (
+              <motion.div
+                key={step.num}
+                initial={{ opacity: 0, y: 12 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: i * 0.08 }}
+                className="border border-[#FACC15]/20 bg-[#161616] p-5"
+              >
+                <span className="font-mono text-xs text-[#FACC15]">{step.num}</span>
+                <h3 className="mt-2 font-mono text-sm font-bold uppercase tracking-wider text-[#F4F1EA]">
+                  {step.title}
+                </h3>
+                <p className="mt-2 text-xs leading-5 text-[#B8B5AE]">{step.desc}</p>
+              </motion.div>
+            ))}
+          </div>
+        </section>
+
+        {/* §06 — Tech Stack */}
         <section className="mb-24">
           <span className="font-mono text-xs font-bold uppercase tracking-[0.2em] text-[#71706B]">
-            &sect;05 &mdash; Tech Stack
+            &sect;06 &mdash; Tech Stack
           </span>
-
           <div className="mt-6 border-t border-[#2A2A2A]">
-            {TECH_STACK.map((tech, i) => (
+            {TECH_STACK.map((tech) => (
               <div
                 key={tech.name}
                 className="border-b border-[#2A2A2A] py-4 flex items-baseline justify-between gap-4"
@@ -325,10 +337,10 @@ export default function ArchitecturePage() {
           </div>
         </section>
 
-        {/* §06 — Open Source Note */}
+        {/* §07 — Open Source Note */}
         <section className="mb-12">
           <span className="font-mono text-xs font-bold uppercase tracking-[0.2em] text-[#71706B]">
-            &sect;06 &mdash; Open Source
+            &sect;07 &mdash; Open Source
           </span>
           <div className="mt-6 border-2 border-[#FFD60A] bg-[#161616] p-8">
             <p className="mb-6 font-serif text-lg leading-8 text-[#B8B5AE]">
@@ -348,15 +360,19 @@ export default function ArchitecturePage() {
 
       {/* Footer */}
       <footer className="border-t border-[#2A2A2A] px-6 py-8 sm:px-12">
-        <div className="mx-auto max-w-5xl flex flex-col sm:flex-row items-center justify-between gap-4">
+        <div className="mx-auto max-w-5xl flex flex-col items-center gap-4 sm:flex-row sm:justify-between">
           <span className="font-mono text-xs text-[#71706B]">
             AUTOPSY / 2026 / OPEN SOURCE
           </span>
-          <span className="font-mono text-xs text-[#5C5852]">
-            Built for AMD Developer Hackathon 2026
+          <span className="flex items-center gap-1 font-mono text-[10px] uppercase tracking-wider text-[#5C5852]">
+            MODES:
+            <span className="text-[#D62828]">POSTMORTEM</span> /
+            <span className="text-[#FFD60A]">PRE-MORTEM</span> /
+            <span className="text-[#06D6A0]">FOUNDER</span> /
+            <span className="text-[#FACC15]">COUNTERFACTUAL</span>
           </span>
           <span className="font-mono text-xs text-[#71706B]">
-            CASE #2026-0113
+            Built for AMD Developer Hackathon 2026
           </span>
         </div>
       </footer>

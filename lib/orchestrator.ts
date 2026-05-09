@@ -14,7 +14,14 @@ import { runFounderEngineer } from "@/lib/agents/founder-mode/founder-engineer";
 import { runFounderHistorian } from "@/lib/agents/founder-mode/founder-historian";
 import { runFounderSynthesizer } from "@/lib/agents/founder-synthesizer";
 import { runDebateRound } from "@/lib/agents/debate";
-import { AgentFinding, AgentRole, PostmortemReport, PremortemFinding, PremortemReport, FounderFinding, FounderReport, FounderModeInput, AgentDebateOutput } from "@/types/investigation";
+import { runCFMarketAnalyst } from "@/lib/agents/counterfactual/cf-market-analyst";
+import { runCFOperator } from "@/lib/agents/counterfactual/cf-operator";
+import { runCFMoneyTrail } from "@/lib/agents/counterfactual/cf-money-trail";
+import { runCFCustomerVoice } from "@/lib/agents/counterfactual/cf-customer-voice";
+import { runCFEngineer } from "@/lib/agents/counterfactual/cf-engineer";
+import { runCFHistorian } from "@/lib/agents/counterfactual/cf-historian";
+import { runCounterfactualSynthesizer } from "@/lib/agents/counterfactual/cf-synthesizer";
+import { AgentFinding, AgentRole, PostmortemReport, PremortemFinding, PremortemReport, FounderFinding, FounderReport, FounderModeInput, AgentDebateOutput, CounterfactualInput, CounterfactualAgentFinding, CounterfactualReport } from "@/types/investigation";
 
 const agentRunners: {
   role: AgentRole;
@@ -206,4 +213,57 @@ export async function runFounderMode(
   });
 
   return runFounderSynthesizer(input, findings);
+}
+
+function makeCounterfactualErrorFinding(role: AgentRole): CounterfactualAgentFinding {
+  return {
+    role,
+    displayName: role,
+    status: "error",
+    actualOutcome: "Agent encountered an error",
+    alternateOutcome: "Agent encountered an error",
+    wouldItHaveHelped: false,
+    confidenceInAlterate: 0,
+    reasoning: "This agent failed to complete its counterfactual analysis.",
+    historicalPrecedents: [],
+    sources: [],
+  };
+}
+
+export async function runCounterfactual(
+  input: CounterfactualInput,
+  onAgentUpdate: (finding: CounterfactualAgentFinding) => void,
+  onAgentStarted?: (role: AgentRole) => void
+): Promise<CounterfactualReport> {
+  async function runWithUpdate(
+    runFn: () => Promise<CounterfactualAgentFinding>,
+    role: AgentRole
+  ): Promise<CounterfactualAgentFinding> {
+    onAgentStarted?.(role);
+    try {
+      const result = await runFn();
+      onAgentUpdate(result);
+      return result;
+    } catch {
+      const errorFinding = makeCounterfactualErrorFinding(role);
+      onAgentUpdate(errorFinding);
+      return errorFinding;
+    }
+  }
+
+  const results = await Promise.allSettled([
+    runWithUpdate(() => runCFMarketAnalyst(input), "market-analyst"),
+    runWithUpdate(() => runCFOperator(input), "operator"),
+    runWithUpdate(() => runCFMoneyTrail(input), "money-trail"),
+    runWithUpdate(() => runCFCustomerVoice(input), "customer-voice"),
+    runWithUpdate(() => runCFEngineer(input), "engineer"),
+    runWithUpdate(() => runCFHistorian(input), "historian"),
+  ]);
+
+  const findings: CounterfactualAgentFinding[] = [];
+  results.forEach((result) => {
+    if (result.status === "fulfilled") findings.push(result.value);
+  });
+
+  return runCounterfactualSynthesizer(input, findings);
 }

@@ -11,7 +11,7 @@ export type AgentStatus = "idle" | "researching" | "analyzing" | "done" | "error
 
 export type RiskLevel = "low" | "medium" | "high" | "critical";
 
-export type InvestigationMode = "postmortem" | "premortem" | "founder";
+export type InvestigationMode = "postmortem" | "premortem" | "founder" | "counterfactual";
 
 export interface AgentFinding {
   role: AgentRole;
@@ -114,5 +114,51 @@ export interface FounderReport {
   similarSuccesses: string[];
   similarFailures: string[];
   agentFindings: FounderFinding[];
+  generatedAt: string;
+}
+
+export interface CounterfactualInput {
+  subject: string;
+  originalDecision: string;
+  alternateDecision: string;
+  context?: string;
+}
+
+export type CounterfactualVerdict =
+  | "would-have-survived"
+  | "would-have-delayed-failure"
+  | "would-have-failed-differently"
+  | "would-have-made-no-difference"
+  | "could-have-transformed-the-company";
+
+export interface CounterfactualAgentFinding {
+  role: AgentRole;
+  displayName: string;
+  status: AgentStatus;
+  actualOutcome: string;
+  alternateOutcome: string;
+  wouldItHaveHelped: boolean;
+  confidenceInAlterate: number;
+  reasoning: string;
+  historicalPrecedents: string[];
+  sources: { title: string; url: string }[];
+}
+
+export interface CounterfactualReport {
+  subject: string;
+  originalDecision: string;
+  alternateDecision: string;
+  verdict: CounterfactualVerdict;
+  verdictLabel: string;
+  survivalProbabilityActual: number;
+  survivalProbabilityAlternate: number;
+  probabilityDelta: number;
+  executiveSummary: string;
+  agentFindings: CounterfactualAgentFinding[];
+  agentsWhoThinkItHelps: AgentRole[];
+  agentsWhoThinkItDoesntMatter: AgentRole[];
+  keyInsight: string;
+  butterflyEffects: string[];
+  historicalParallels: string[];
   generatedAt: string;
 }

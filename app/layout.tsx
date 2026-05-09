@@ -14,13 +14,13 @@ const jetbrainsMono = JetBrains_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Autopsy — Forensic Postmortem Intelligence",
+  title: "Autopsy — Forensic Intelligence. Postmortems, Pre-Mortems & Counterfactuals.",
   description:
-    "6 specialized AI agents investigate why startups fail. Parallel research, cross-agent debate, one forensic verdict. Built on AMD MI300X.",
+    "Six AI agents investigate why companies failed, predict what could kill living companies, analyze your startup idea, and explore alternate histories. Built on AMD MI300X.",
   openGraph: {
-    title: "Autopsy — Forensic Postmortem Intelligence",
+    title: "Autopsy — Forensic Intelligence. Postmortems, Pre-Mortems & Counterfactuals.",
     description:
-      "6 AI agents investigate startup failures. Parallel research, cross-agent debate, one verdict in 90 seconds.",
+      "Six AI agents investigate why companies failed, predict what could kill living companies, analyze your startup idea, and explore alternate histories. One platform, four modes.",
     url: "https://autopsy-nine.vercel.app",
     siteName: "Autopsy",
     images: [
@@ -35,9 +35,9 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "Autopsy — Forensic Postmortem Intelligence",
+    title: "Autopsy — Forensic Intelligence. Postmortems, Pre-Mortems & Counterfactuals.",
     description:
-      "6 AI agents investigate startup failures. Parallel research, cross-agent debate, one verdict.",
+      "Six AI agents investigate why companies failed, predict what could kill living companies, analyze your startup idea, and explore alternate histories.",
     images: ["/opengraph-image"],
   },
   metadataBase: new URL("https://autopsy-nine.vercel.app"),
