@@ -656,7 +656,7 @@ export function FinalVerdict({ report, onExploreCounterfactual }: FinalVerdictPr
       <div className="flex justify-end py-8">
         <button
           onClick={() => generatePDF(report)}
-          className="inline-flex h-10 items-center gap-2 rounded-md border border-[#3F3F3F] bg-[#0F1110] px-4 text-sm text-[#A1A1AA] transition-colors hover:border-[#4B4BA0] hover:text-[white]"
+          className="inline-flex h-10 items-center gap-2 rounded-md border border-[rgba(255,255,255,0.1)] bg-[#0F1110] px-4 text-sm text-[#A1A1AA] transition-colors hover:border-[#4B4BA0] hover:text-[white]"
         >
           <FileDown className="h-4 w-4" />
           Download report (PDF)

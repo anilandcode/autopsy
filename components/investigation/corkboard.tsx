@@ -45,7 +45,7 @@ export function Corkboard({
           </span>
           <h3 className="text-base font-medium text-[white]">
             {mode === "founder" ? "Founder mode: " : mode === "premortem" ? "Pre-mortem: " : mode === "counterfactual" ? "Counterfactual: " : "Investigating: "}
-            <span className={mode === "founder" ? "text-[#06D6A0]" : mode === "premortem" ? "text-[#FFD60A]" : mode === "counterfactual" ? "text-[#FACC15]" : "text-[#4B4BA0]"}>{subject}</span>
+            <span className={mode === "founder" ? "text-[#00A67E]" : mode === "premortem" ? "text-[#8F47AE]" : mode === "counterfactual" ? "text-[#8F47AE]" : "text-[#4B4BA0]"}>{subject}</span>
             {deep && (
               <span className="ml-2 rounded-full bg-[#4B4BA0]/10 px-2 py-0.5 text-[10px] font-medium text-[#4B4BA0]">
                 Deep mode

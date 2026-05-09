@@ -38,7 +38,7 @@ export default function NotFound() {
           </Link>
           <Link
             href="/investigate"
-            className="inline-flex h-10 items-center gap-2 border-2 border-[#4B4BA0] bg-[#1A1E1C] px-5 font-mono text-sm text-[#4B4BA0] transition-colors hover:bg-[#4B4BA0] hover:text-[#0E0E0E]"
+            className="inline-flex h-10 items-center gap-2 border-2 border-[#4B4BA0] bg-[#1A1E1C] px-5 font-mono text-sm text-[#4B4BA0] transition-colors hover:bg-[#4B4BA0] hover:text-[#0F1110]"
           >
             NEW INVESTIGATION
           </Link>

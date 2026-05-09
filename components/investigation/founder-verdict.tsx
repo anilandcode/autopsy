@@ -10,7 +10,7 @@ interface FounderVerdictProps {
 }
 
 function ViabilityScoreDisplay({ score }: { score: number }) {
-  const color = score >= 70 ? "#00A67E" : score >= 40 ? "#FFD60A" : "#4B4BA0";
+  const color = score >= 70 ? "#00A67E" : score >= 40 ? "#8F47AE" : "#4B4BA0";
   const label = score >= 70 ? "Viable" : score >= 40 ? "Risky" : "Unviable";
 
   return (
@@ -51,7 +51,7 @@ function generateFounderPDF(report: FounderReport) {
   const printWindow = window.open("", "_blank");
   if (!printWindow) return;
 
-  const vColor = report.viabilityScore >= 70 ? "#00A67E" : report.viabilityScore >= 40 ? "#FFD60A" : "#4B4BA0";
+  const vColor = report.viabilityScore >= 70 ? "#00A67E" : report.viabilityScore >= 40 ? "#8F47AE" : "#4B4BA0";
 
   const html = `<!DOCTYPE html>
 <html>
@@ -213,8 +213,8 @@ export function FounderVerdict({ report }: FounderVerdictProps) {
       </div>
 
       {/* Founder Homework */}
-      <div className="mt-6 rounded-lg border border-[#FFD60A]/30 bg-[#0F1110] p-6">
-        <p className="text-xs text-[#FFD60A]">Founder homework — validate this week</p>
+      <div className="mt-6 rounded-lg border border-[#8F47AE]/30 bg-[#0F1110] p-6">
+        <p className="text-xs text-[#8F47AE]">Founder homework — validate this week</p>
         <ul className="mt-4 space-y-3">
           {report.founderHomework.map((item, i) => (
             <li key={i} className="flex items-start gap-3 text-sm">
@@ -222,9 +222,9 @@ export function FounderVerdict({ report }: FounderVerdictProps) {
                 type="checkbox"
                 checked={!!checked[i]}
                 onChange={() => toggle(i)}
-                className="mt-0.5 h-4 w-4 shrink-0 cursor-pointer appearance-none rounded border border-[#FFD60A]/40 bg-transparent checked:bg-[#FFD60A] checked:border-[#FFD60A]"
+                className="mt-0.5 h-4 w-4 shrink-0 cursor-pointer appearance-none rounded border border-[#8F47AE]/40 bg-transparent checked:bg-[#8F47AE] checked:border-[#8F47AE]"
               />
-              <span className={checked[i] ? "text-[#5C5852] line-through" : "text-[white]"}>
+              <span className={checked[i] ? "text-[#A1A1AA] line-through" : "text-[white]"}>
                 {item}
               </span>
             </li>
@@ -265,7 +265,7 @@ export function FounderVerdict({ report }: FounderVerdictProps) {
                 <span className="text-xs text-[#00A67E]">&#10003;</span>{" "}
                 <span style={{ fontFamily: "var(--font-serif), Georgia, serif" }}>{s}</span>
               </li>
-            )) : <li className="text-sm text-[#5C5852]">No close matches found</li>}
+            )) : <li className="text-sm text-[#A1A1AA]">No close matches found</li>}
           </ul>
         </div>
         <div className="rounded-lg border border-[rgba(255,255,255,0.1)] bg-[#0F1110] p-5">
@@ -276,7 +276,7 @@ export function FounderVerdict({ report }: FounderVerdictProps) {
                 <span className="text-xs text-[#4B4BA0]">&#10007;</span>{" "}
                 <span style={{ fontFamily: "var(--font-serif), Georgia, serif" }}>{f}</span>
               </li>
-            )) : <li className="text-sm text-[#5C5852]">No close matches found</li>}
+            )) : <li className="text-sm text-[#A1A1AA]">No close matches found</li>}
           </ul>
         </div>
       </div>

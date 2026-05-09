@@ -62,10 +62,10 @@ export function CounterfactualVerdictComponent({ report }: CounterfactualVerdict
           {/* Left — Actual */}
           <div className="rounded-lg border border-[rgba(255,255,255,0.1)] bg-[#0F1110] p-6 text-center">
             <p className="text-[10px] text-[#A1A1AA]">Actual survival probability</p>
-            <p className="mt-3 text-4xl font-bold text-[#5C5852]" style={{ fontFamily: "var(--font-serif), Georgia, serif" }}>
+            <p className="mt-3 text-4xl font-bold text-[#A1A1AA]" style={{ fontFamily: "var(--font-serif), Georgia, serif" }}>
               {report.survivalProbabilityActual}%
             </p>
-            <p className="mt-2 line-clamp-2 text-[10px] text-[#5C5852]">
+            <p className="mt-2 line-clamp-2 text-[10px] text-[#A1A1AA]">
               {report.originalDecision}
             </p>
           </div>
@@ -146,7 +146,7 @@ export function CounterfactualVerdictComponent({ report }: CounterfactualVerdict
 
         {/* Executive summary */}
         <div className="mt-6 border-t border-[rgba(255,255,255,0.1)] pt-6">
-          <p className="text-xs text-[#5C5852]">Executive summary</p>
+          <p className="text-xs text-[#A1A1AA]">Executive summary</p>
           <p
             className="mt-3 text-base leading-7 text-[#A1A1AA]"
             style={{ fontFamily: "var(--font-serif), Georgia, serif" }}
@@ -213,7 +213,7 @@ export function CounterfactualVerdictComponent({ report }: CounterfactualVerdict
             transition={{ delay: 1.0 }}
             className="mt-6 border-t border-[rgba(255,255,255,0.1)] pt-6"
           >
-            <p className="text-xs text-[#5C5852]">Real companies that made similar pivots</p>
+            <p className="text-xs text-[#A1A1AA]">Real companies that made similar pivots</p>
             <div className="mt-4 space-y-2">
               {report.historicalParallels.map((parallel, i) => (
                 <p key={i} className="text-sm text-[#A1A1AA]">

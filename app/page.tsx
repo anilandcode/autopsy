@@ -4,7 +4,7 @@ import Link from 'next/link';
 import { Search } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useState, useEffect } from 'react';
-import DataWaveBackground from '@/components/DataWaveBackground';
+import HeroVideoBackground from '@/components/HeroVideoBackground';
 import MagneticButton from '@/components/MagneticButton';
 
 const recentCases = [
@@ -51,7 +51,7 @@ export default function Home() {
       {/* Hero Section */}
       <motion.div variants={STAGGER_CHILD} className="flex flex-col items-center text-center px-6 py-24 md:py-36 border-b border-white/5 relative bg-[#0F1110] overflow-hidden">
         {/* Abstract Data Wave Mesh */}
-        <DataWaveBackground />
+        <HeroVideoBackground />
 
         {/* Ambient Center Light */}
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-[radial-gradient(circle,rgba(75,75,160,0.15)_0%,rgba(26,30,28,0)_70%)] pointer-events-none z-0"></div>

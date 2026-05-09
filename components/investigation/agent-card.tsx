@@ -354,13 +354,13 @@ function CounterfactualCardContent({ finding }: { finding: CounterfactualAgentFi
       {/* Two-column: actual vs alternate */}
       <div className="grid grid-cols-2 gap-3">
         <div>
-          <p className="text-[10px] font-medium text-[#5C5852]">Actual timeline</p>
+          <p className="text-[10px] font-medium text-[#A1A1AA]">Actual timeline</p>
           <p className="mt-1 line-clamp-4 text-xs leading-5 text-[#A1A1AA]">
             {finding.actualOutcome}
           </p>
         </div>
         <div className="border-l border-[rgba(255,255,255,0.1)] pl-3">
-          <p className="text-[10px] font-medium text-[#FACC15]">Alternate timeline</p>
+          <p className="text-[10px] font-medium text-[#8F47AE]">Alternate timeline</p>
           <p className="mt-1 line-clamp-4 text-xs leading-5 text-[#A1A1AA]">
             {finding.alternateOutcome}
           </p>
@@ -405,7 +405,7 @@ function CounterfactualCardContent({ finding }: { finding: CounterfactualAgentFi
         <div className="mt-3 border-t border-[rgba(255,255,255,0.1)] pt-3">
           {finding.historicalPrecedents.map((p, i) => (
             <p key={i} className="text-[11px] leading-5 text-[#A1A1AA]">
-              <span className="text-[10px] text-[#FACC15]">Precedent: </span>
+              <span className="text-[10px] text-[#8F47AE]">Precedent: </span>
               {p}
             </p>
           ))}
@@ -426,7 +426,7 @@ function SourcesSection({
 }) {
   return (
     <div className="mt-3 border-t border-[rgba(255,255,255,0.1)] pt-3">
-      <p className="mb-1.5 text-[10px] font-medium text-[#5C5852]">Sources</p>
+      <p className="mb-1.5 text-[10px] font-medium text-[#A1A1AA]">Sources</p>
       {sources.slice(0, 3).map((src, i) => (
         <a
           key={i}

@@ -11,6 +11,7 @@ import { PremortemVerdict } from "./premortem-verdict";
 import { FounderVerdict } from "./founder-verdict";
 import { CounterfactualVerdictComponent } from "./counterfactual-verdict";
 import { DebateRoom } from "./debate-room";
+import DataWaveBackground from "@/components/DataWaveBackground";
 import type { AgentFinding, AgentRole, AgentStatus, PostmortemReport, PremortemFinding, PremortemReport, FounderFinding, FounderReport, CounterfactualAgentFinding, CounterfactualReport, CounterfactualInput, InvestigationMode, AgentDebateOutput } from "@/types/investigation";
 
 const AGENT_ROLES: AgentRole[] = [
@@ -624,7 +625,7 @@ export function InvestigationRoom() {
   function generatePostmortemPDF(r: PostmortemReport) {
     const printWindow = window.open("", "_blank");
     if (!printWindow) return;
-    const html = `<!DOCTYPE html><html><head><title>Autopsy — ${r.subject}</title><style>*{margin:0;padding:0;box-sizing:border-box}body{font-family:Georgia,serif;color:#1a1a1a;background:white;padding:40px;max-width:800px;margin:0 auto}.header{border-bottom:3px solid #4B4BA0;padding-bottom:20px;margin-bottom:30px}.brand{font-family:sans-serif;color:#4B4BA0;font-size:12px;letter-spacing:1px;font-weight:bold;margin-bottom:8px}h1{font-size:28px;color:#0E0E0E;margin-bottom:6px}.date{color:#666;font-size:12px}.cause-box{background:#FEF2F2;border:2px solid #4B4BA0;padding:20px;margin:24px 0}.cause-label{font-size:10px;letter-spacing:1px;color:#4B4BA0;font-weight:bold;margin-bottom:8px}.cause-text{font-size:18px;font-weight:bold;color:#0E0E0E}h2{font-size:14px;letter-spacing:1px;color:#4B4BA0;margin:28px 0 12px;font-family:sans-serif}p{font-size:14px;line-height:1.7;color:#333;margin-bottom:12px}ul,ol{padding-left:20px}li{font-size:13px;line-height:1.8;color:#333;margin-bottom:4px}.agent-section{margin:16px 0;padding:16px;border:1px solid #e5e5e5;page-break-inside:avoid}.agent-name{font-weight:bold;font-size:13px;color:#0E0E0E;margin-bottom:4px}.agent-analysis{font-size:12px;color:#555;line-height:1.6;margin-top:8px;border-top:1px solid #f0f0f0;padding-top:8px}.footer{margin-top:40px;padding-top:16px;border-top:1px solid #e5e5e5;font-size:11px;color:#999;text-align:center;font-family:sans-serif}@media print{body{padding:20px}.agent-section{page-break-inside:avoid}}</style></head><body><div class="header"><div class="brand">Autopsy</div><h1>Postmortem: ${r.subject}</h1><div class="date">Generated ${new Date(r.generatedAt).toLocaleDateString("en-US",{year:"numeric",month:"long",day:"numeric",hour:"2-digit",minute:"2-digit"})}</div></div><div class="cause-box"><div class="cause-label">PRIMARY CAUSE OF DEATH</div><div class="cause-text">${r.primaryCauseOfDeath}</div></div><h2>Executive Summary</h2><p>${r.executiveSummary}</p><h2>What Would Have Saved It</h2><ul>${r.whatWouldHaveSavedIt.map((i:string)=>`<li>${i}</li>`).join("")}</ul><h2>Lessons for Builders</h2><ol>${r.lessonsForBuilders.map((i:string)=>`<li>${i}</li>`).join("")}</ol><h2>Agent Reports</h2>${r.agentFindings.filter((f)=>f.status==="done").map((f)=>`<div class="agent-section"><div class="agent-name">${f.displayName}</div><div class="agent-analysis">${f.fullAnalysis}</div></div>`).join("")}<div class="footer">Autopsy · 6 AI Agents · autopsy-nine.vercel.app</div></body></html>`;
+    const html = `<!DOCTYPE html><html><head><title>Autopsy — ${r.subject}</title><style>*{margin:0;padding:0;box-sizing:border-box}body{font-family:Georgia,serif;color:#1a1a1a;background:white;padding:40px;max-width:800px;margin:0 auto}.header{border-bottom:3px solid #4B4BA0;padding-bottom:20px;margin-bottom:30px}.brand{font-family:sans-serif;color:#4B4BA0;font-size:12px;letter-spacing:1px;font-weight:bold;margin-bottom:8px}h1{font-size:28px;color:#0F1110;margin-bottom:6px}.date{color:#666;font-size:12px}.cause-box{background:#FEF2F2;border:2px solid #4B4BA0;padding:20px;margin:24px 0}.cause-label{font-size:10px;letter-spacing:1px;color:#4B4BA0;font-weight:bold;margin-bottom:8px}.cause-text{font-size:18px;font-weight:bold;color:#0F1110}h2{font-size:14px;letter-spacing:1px;color:#4B4BA0;margin:28px 0 12px;font-family:sans-serif}p{font-size:14px;line-height:1.7;color:#333;margin-bottom:12px}ul,ol{padding-left:20px}li{font-size:13px;line-height:1.8;color:#333;margin-bottom:4px}.agent-section{margin:16px 0;padding:16px;border:1px solid #e5e5e5;page-break-inside:avoid}.agent-name{font-weight:bold;font-size:13px;color:#0F1110;margin-bottom:4px}.agent-analysis{font-size:12px;color:#555;line-height:1.6;margin-top:8px;border-top:1px solid #f0f0f0;padding-top:8px}.footer{margin-top:40px;padding-top:16px;border-top:1px solid #e5e5e5;font-size:11px;color:#999;text-align:center;font-family:sans-serif}@media print{body{padding:20px}.agent-section{page-break-inside:avoid}}</style></head><body><div class="header"><div class="brand">Autopsy</div><h1>Postmortem: ${r.subject}</h1><div class="date">Generated ${new Date(r.generatedAt).toLocaleDateString("en-US",{year:"numeric",month:"long",day:"numeric",hour:"2-digit",minute:"2-digit"})}</div></div><div class="cause-box"><div class="cause-label">PRIMARY CAUSE OF DEATH</div><div class="cause-text">${r.primaryCauseOfDeath}</div></div><h2>Executive Summary</h2><p>${r.executiveSummary}</p><h2>What Would Have Saved It</h2><ul>${r.whatWouldHaveSavedIt.map((i:string)=>`<li>${i}</li>`).join("")}</ul><h2>Lessons for Builders</h2><ol>${r.lessonsForBuilders.map((i:string)=>`<li>${i}</li>`).join("")}</ol><h2>Agent Reports</h2>${r.agentFindings.filter((f)=>f.status==="done").map((f)=>`<div class="agent-section"><div class="agent-name">${f.displayName}</div><div class="agent-analysis">${f.fullAnalysis}</div></div>`).join("")}<div class="footer">Autopsy · 6 AI Agents · autopsy-nine.vercel.app</div></body></html>`;
     printWindow.document.write(html);
     printWindow.document.close();
     printWindow.onload = () => { setTimeout(() => { printWindow.print(); }, 500); };
@@ -641,10 +642,12 @@ export function InvestigationRoom() {
   const cfFormValid = subject.trim() && cfOriginalDecision.trim() && cfAlternateDecision.trim();
 
   return (
-    <main className="min-h-dvh bg-[#0E0E0E] text-[white]">
+    <main className="relative min-h-dvh text-[white]">
+      <DataWaveBackground />
+
       {/* Minimal status line when investigating */}
       {isInvestigating && (
-        <div className="border-b border-[rgba(255,255,255,0.1)] bg-[#0F1110] px-6 py-2 sm:px-12">
+        <div className="relative z-10 border-b border-[rgba(255,255,255,0.1)] bg-[#0F1110] px-6 py-2 sm:px-12">
           <div className="mx-auto flex max-w-5xl items-center justify-between">
             <p className="text-xs text-[#A1A1AA]">
               {deepMode ? "Deep mode — ~2 minutes" : "Investigating — ~30 seconds"}
@@ -660,28 +663,17 @@ export function InvestigationRoom() {
       )}
 
       {/* Nav */}
-      <nav className="flex items-center justify-between border-b border-[rgba(255,255,255,0.1)] px-6 py-4 sm:px-12">
+      <nav className="relative z-10 flex items-center border-b border-[rgba(255,255,255,0.1)] px-6 py-4 sm:px-12">
         <Link
           href="/"
           className="text-xs text-[#A1A1AA] transition-colors hover:text-[white]"
         >
           ← Back
         </Link>
-        <span
-          className="text-lg font-medium text-[#4B4BA0]"
-          style={{ fontFamily: "var(--font-serif), Georgia, serif" }}
-        >
-          Autopsy
-        </span>
-        <Link
-          href="/investigate"
-          className="inline-flex h-8 items-center justify-center rounded-md border border-[#4B4BA0] px-3 text-xs font-medium text-[#4B4BA0] transition-colors hover:bg-[#4B4BA0] hover:text-white"
-        >
-          Launch
-        </Link>
       </nav>
 
-      <AnimatePresence mode="wait">
+      <div className="relative z-10">
+        <AnimatePresence mode="wait">
         {!isInvestigating && !report && !premortemReport && !founderReport && !cfReport ? (
           <motion.div
             key="input"
@@ -759,7 +751,7 @@ export function InvestigationRoom() {
                     value={founderName}
                     onChange={(e) => setFounderName(e.target.value)}
                     placeholder="e.g. 'AI Pet Therapist'"
-                    className="h-12 w-full rounded-md border border-[rgba(255,255,255,0.1)] bg-[#0F1110] px-3 text-sm text-[white] placeholder:text-[#A1A1AA] outline-none transition-colors focus:border-[#06D6A0]"
+                    className="h-12 w-full rounded-md border border-[rgba(255,255,255,0.1)] bg-[#0F1110] px-3 text-sm text-[white] placeholder:text-[#A1A1AA] outline-none transition-colors focus:border-[#00A67E]"
                   />
                 </div>
                 <div>
@@ -771,7 +763,7 @@ export function InvestigationRoom() {
                     onChange={(e) => setFounderDescription(e.target.value)}
                     placeholder="Describe your idea in 2-3 sentences. What problem does it solve? How?"
                     rows={3}
-                    className="w-full rounded-md border border-[rgba(255,255,255,0.1)] bg-[#0F1110] px-3 py-3 text-sm text-[white] placeholder:text-[#A1A1AA] outline-none transition-colors focus:border-[#06D6A0]"
+                    className="w-full rounded-md border border-[rgba(255,255,255,0.1)] bg-[#0F1110] px-3 py-3 text-sm text-[white] placeholder:text-[#A1A1AA] outline-none transition-colors focus:border-[#00A67E]"
                   />
                 </div>
                 <div className="grid grid-cols-2 gap-4">
@@ -782,7 +774,7 @@ export function InvestigationRoom() {
                     <select
                       value={founderStage}
                       onChange={(e) => setFounderStage(e.target.value)}
-                      className="h-12 w-full rounded-md border border-[rgba(255,255,255,0.1)] bg-[#0F1110] px-3 text-sm text-[white] outline-none transition-colors focus:border-[#06D6A0]"
+                      className="h-12 w-full rounded-md border border-[rgba(255,255,255,0.1)] bg-[#0F1110] px-3 text-sm text-[white] outline-none transition-colors focus:border-[#00A67E]"
                     >
                       {STAGES.map((s) => <option key={s} value={s} className="bg-[#0F1110]">{s}</option>)}
                     </select>
@@ -796,14 +788,14 @@ export function InvestigationRoom() {
                       value={founderTargetCustomer}
                       onChange={(e) => setFounderTargetCustomer(e.target.value)}
                       placeholder="e.g. 'SMB owners'"
-                      className="h-12 w-full rounded-md border border-[rgba(255,255,255,0.1)] bg-[#0F1110] px-3 text-sm text-[white] placeholder:text-[#A1A1AA] outline-none transition-colors focus:border-[#06D6A0]"
+                      className="h-12 w-full rounded-md border border-[rgba(255,255,255,0.1)] bg-[#0F1110] px-3 text-sm text-[white] placeholder:text-[#A1A1AA] outline-none transition-colors focus:border-[#00A67E]"
                     />
                   </div>
                 </div>
                 <button
                   onClick={handleFounderStart}
                   disabled={!founderFormValid}
-                  className="mt-4 inline-flex h-12 w-full items-center justify-center gap-2 rounded-md bg-[#06D6A0] px-8 text-sm font-medium text-[#0E0E0E] transition-colors hover:bg-[#05B88A] disabled:cursor-not-allowed disabled:opacity-40"
+                  className="mt-4 inline-flex h-12 w-full items-center justify-center gap-2 rounded-md bg-[#00A67E] px-8 text-sm font-medium text-[#0F1110] transition-colors hover:bg-[#05B88A] disabled:cursor-not-allowed disabled:opacity-40"
                 >
                   Run founder mode
                 </button>
@@ -820,7 +812,7 @@ export function InvestigationRoom() {
                     value={subject}
                     onChange={(e) => setSubject(e.target.value)}
                     placeholder="Quibi, Theranos, Blockbuster..."
-                    className="h-12 w-full rounded-md border border-[rgba(255,255,255,0.1)] bg-[#0F1110] px-3 text-sm text-[white] placeholder:text-[#A1A1AA] outline-none transition-colors focus:border-[#FACC15]"
+                    className="h-12 w-full rounded-md border border-[rgba(255,255,255,0.1)] bg-[#0F1110] px-3 text-sm text-[white] placeholder:text-[#A1A1AA] outline-none transition-colors focus:border-[#8F47AE]"
                   />
                 </div>
                 <div>
@@ -832,7 +824,7 @@ export function InvestigationRoom() {
                     value={cfOriginalDecision}
                     onChange={(e) => setCfOriginalDecision(e.target.value)}
                     placeholder="Launched as mobile-only"
-                    className="h-12 w-full rounded-md border border-[rgba(255,255,255,0.1)] bg-[#0F1110] px-3 text-sm text-[white] placeholder:text-[#A1A1AA] outline-none transition-colors focus:border-[#FACC15]"
+                    className="h-12 w-full rounded-md border border-[rgba(255,255,255,0.1)] bg-[#0F1110] px-3 text-sm text-[white] placeholder:text-[#A1A1AA] outline-none transition-colors focus:border-[#8F47AE]"
                   />
                   <p className="mt-1 text-xs text-[#A1A1AA]">
                     What did they actually do that you think was wrong?
@@ -849,7 +841,7 @@ export function InvestigationRoom() {
                     onChange={(e) => setCfAlternateDecision(e.target.value)}
                     onKeyDown={(e) => e.key === "Enter" && handleCFStart()}
                     placeholder="Launched on TV and mobile simultaneously"
-                    className="h-12 w-full rounded-md border border-[rgba(255,255,255,0.1)] bg-[#0F1110] px-3 text-sm text-[white] placeholder:text-[#A1A1AA] outline-none transition-colors focus:border-[#FACC15]"
+                    className="h-12 w-full rounded-md border border-[rgba(255,255,255,0.1)] bg-[#0F1110] px-3 text-sm text-[white] placeholder:text-[#A1A1AA] outline-none transition-colors focus:border-[#8F47AE]"
                   />
                   <p className="mt-1 text-xs text-[#A1A1AA]">
                     The "what if" — what's the alternate path?
@@ -864,7 +856,7 @@ export function InvestigationRoom() {
                     onChange={(e) => setCfContext(e.target.value)}
                     placeholder="Year this happened, relevant market context..."
                     rows={2}
-                    className="w-full rounded-md border border-[rgba(255,255,255,0.1)] bg-[#0F1110] px-3 py-3 text-sm text-[white] placeholder:text-[#A1A1AA] outline-none transition-colors focus:border-[#FACC15]"
+                    className="w-full rounded-md border border-[rgba(255,255,255,0.1)] bg-[#0F1110] px-3 py-3 text-sm text-[white] placeholder:text-[#A1A1AA] outline-none transition-colors focus:border-[#8F47AE]"
                   />
                 </div>
 
@@ -882,7 +874,7 @@ export function InvestigationRoom() {
                           setCfOriginalDecision(preset.originalDecision);
                           setCfAlternateDecision(preset.alternateDecision);
                         }}
-                        className="rounded-md border border-[rgba(255,255,255,0.1)] bg-[#0F1110] px-3 py-1.5 text-xs text-[#A1A1AA] transition-colors hover:border-[#FACC15]/50 hover:text-[white]"
+                        className="rounded-md border border-[rgba(255,255,255,0.1)] bg-[#0F1110] px-3 py-1.5 text-xs text-[#A1A1AA] transition-colors hover:border-[#8F47AE]/50 hover:text-[white]"
                       >
                         {preset.label}
                       </button>
@@ -893,7 +885,7 @@ export function InvestigationRoom() {
                 <button
                   onClick={handleCFStart}
                   disabled={!cfFormValid}
-                  className="mt-4 inline-flex h-12 w-full items-center justify-center gap-2 rounded-md bg-[#FACC15] px-8 text-sm font-medium text-[#0E0E0E] transition-colors hover:bg-[#E6B800] disabled:cursor-not-allowed disabled:opacity-40"
+                  className="mt-4 inline-flex h-12 w-full items-center justify-center gap-2 rounded-md bg-[#8F47AE] px-8 text-sm font-medium text-[#0F1110] transition-colors hover:bg-[#E6B800] disabled:cursor-not-allowed disabled:opacity-40"
                 >
                   Begin counterfactual analysis
                 </button>
@@ -974,7 +966,7 @@ export function InvestigationRoom() {
                     >
                       <span className="flex items-center gap-3">
                         <span className={`rounded-full px-2 py-0.5 text-[10px] font-medium ${
-                          c.mode === "counterfactual" ? "bg-[#FACC15]/10 text-[#FACC15]" : c.mode === "premortem" ? "bg-[#8F47AE]/10 text-[#8F47AE]" : c.mode === "founder" ? "bg-[#06D6A0]/10 text-[#06D6A0]" : "bg-[#4B4BA0]/10 text-[#4B4BA0]"
+                          c.mode === "counterfactual" ? "bg-[#8F47AE]/10 text-[#8F47AE]" : c.mode === "premortem" ? "bg-[#8F47AE]/10 text-[#8F47AE]" : c.mode === "founder" ? "bg-[#00A67E]/10 text-[#00A67E]" : "bg-[#4B4BA0]/10 text-[#4B4BA0]"
                         }`}>
                           {c.mode === "counterfactual" ? "CF" : c.mode === "premortem" ? "PM" : c.mode === "founder" ? "FO" : "PO"}
                         </span>
@@ -1023,7 +1015,7 @@ export function InvestigationRoom() {
             {report && mode === "postmortem" && (
               <div ref={verdictRef}>
                 {/* Sticky top bar — case complete + PDF */}
-                <div className="sticky top-0 z-40 border-b border-[rgba(255,255,255,0.1)] bg-[#0E0E0E]/95 px-4 py-2 backdrop-blur sm:px-6">
+                <div className="sticky top-0 z-40 border-b border-[rgba(255,255,255,0.1)] bg-[#0F1110]/95 px-4 py-2 backdrop-blur sm:px-6">
                   <div className="mx-auto flex max-w-5xl items-center justify-between">
                     <span className="text-xs text-[#A1A1AA]">
                       CASE COMPLETE — <span className="text-[white]">{report.subject}</span>
@@ -1068,7 +1060,7 @@ export function InvestigationRoom() {
                           type="text"
                           value={cfOrigFromReport}
                           onChange={(e) => setCfOrigFromReport(e.target.value)}
-                          className="h-10 w-full rounded-md border border-[rgba(255,255,255,0.1)] bg-[#0E0E0E] px-3 text-sm text-[white] placeholder:text-[#A1A1AA] outline-none focus:border-[#8F47AE]"
+                          className="h-10 w-full rounded-md border border-[rgba(255,255,255,0.1)] bg-[#0F1110] px-3 text-sm text-[white] placeholder:text-[#A1A1AA] outline-none focus:border-[#8F47AE]"
                         />
                       </div>
                       <div>
@@ -1080,7 +1072,7 @@ export function InvestigationRoom() {
                           value={cfAltFromReport}
                           onChange={(e) => setCfAltFromReport(e.target.value)}
                           placeholder="Loading suggestion..."
-                          className="h-10 w-full rounded-md border border-[rgba(255,255,255,0.1)] bg-[#0E0E0E] px-3 text-sm text-[white] placeholder:text-[#A1A1AA] outline-none focus:border-[#8F47AE]"
+                          className="h-10 w-full rounded-md border border-[rgba(255,255,255,0.1)] bg-[#0F1110] px-3 text-sm text-[white] placeholder:text-[#A1A1AA] outline-none focus:border-[#8F47AE]"
                         />
                       </div>
                     </div>
@@ -1088,7 +1080,7 @@ export function InvestigationRoom() {
                     <button
                       onClick={handleRunCF}
                       disabled={!cfAltFromReport.trim()}
-                      className="mt-6 inline-flex h-12 w-full items-center justify-center gap-2 rounded-md bg-[#8F47AE] px-8 text-sm font-medium text-[#0E0E0E] transition-colors hover:bg-[#E6C000] disabled:cursor-not-allowed disabled:opacity-40"
+                      className="mt-6 inline-flex h-12 w-full items-center justify-center gap-2 rounded-md bg-[#8F47AE] px-8 text-sm font-medium text-[#0F1110] transition-colors hover:bg-[#E6C000] disabled:cursor-not-allowed disabled:opacity-40"
                     >
                       Run counterfactual analysis
                     </button>
@@ -1130,7 +1122,7 @@ export function InvestigationRoom() {
                 <div className="mx-auto mt-8 flex max-w-5xl flex-col items-center gap-4">
                   <button
                     onClick={() => handleBridgeToCF(premortemReport.topThreatToSurvival)}
-                    className="inline-flex h-11 items-center gap-2 rounded-md border border-[#FACC15] px-6 text-sm font-medium text-[#FACC15] transition-colors hover:bg-[#FACC15]/10"
+                    className="inline-flex h-11 items-center gap-2 rounded-md border border-[#8F47AE] px-6 text-sm font-medium text-[#8F47AE] transition-colors hover:bg-[#8F47AE]/10"
                   >
                     Test a counterfactual against this risk
                   </button>
@@ -1144,7 +1136,7 @@ export function InvestigationRoom() {
                     </button>
                     <button
                       onClick={handleNewInvestigation}
-                      className="inline-flex h-11 items-center gap-2 rounded-md bg-[#8F47AE] px-6 text-sm font-medium text-[#0E0E0E] transition-colors hover:bg-[#E6C000]"
+                      className="inline-flex h-11 items-center gap-2 rounded-md bg-[#8F47AE] px-6 text-sm font-medium text-[#0F1110] transition-colors hover:bg-[#E6C000]"
                     >
                       <RotateCcw className="h-4 w-4" />
                       New pre-mortem
@@ -1167,7 +1159,7 @@ export function InvestigationRoom() {
                   </button>
                   <button
                     onClick={handleNewInvestigation}
-                    className="inline-flex h-11 items-center gap-2 rounded-md bg-[#06D6A0] px-6 text-sm font-medium text-[#0E0E0E] transition-colors hover:bg-[#05B88A]"
+                    className="inline-flex h-11 items-center gap-2 rounded-md bg-[#00A67E] px-6 text-sm font-medium text-[#0F1110] transition-colors hover:bg-[#05B88A]"
                   >
                     <RotateCcw className="h-4 w-4" />
                     New founder analysis
@@ -1189,7 +1181,7 @@ export function InvestigationRoom() {
                   </button>
                   <button
                     onClick={handleNewInvestigation}
-                    className="inline-flex h-11 items-center gap-2 rounded-md bg-[#FACC15] px-6 text-sm font-medium text-[#0E0E0E] transition-colors hover:bg-[#E6B800]"
+                    className="inline-flex h-11 items-center gap-2 rounded-md bg-[#8F47AE] px-6 text-sm font-medium text-[#0F1110] transition-colors hover:bg-[#E6B800]"
                   >
                     <RotateCcw className="h-4 w-4" />
                     New counterfactual
@@ -1200,13 +1192,14 @@ export function InvestigationRoom() {
           </motion.div>
         )}
       </AnimatePresence>
+      </div>
 
       {/* Investigation log — collapsible drawer on right side */}
       {isInvestigating && (
         <div className="fixed bottom-0 right-0 z-50 w-80 max-w-[90vw]">
           <button
             onClick={() => setLogOpen(!logOpen)}
-            className="flex w-full items-center justify-between border-t border-l border-[rgba(255,255,255,0.1)] bg-[#0E0E0E] px-4 py-2 text-[10px] font-medium text-[#4B4BA0] transition-colors hover:text-[white]"
+            className="flex w-full items-center justify-between border-t border-l border-[rgba(255,255,255,0.1)] bg-[#0F1110] px-4 py-2 text-[10px] font-medium text-[#4B4BA0] transition-colors hover:text-[white]"
           >
             <span>
               {mode === "founder"
@@ -1220,7 +1213,7 @@ export function InvestigationRoom() {
             {logOpen ? <ChevronUp className="h-3 w-3" /> : <ChevronDown className="h-3 w-3" />}
           </button>
           {logOpen && (
-            <div className="max-h-[250px] overflow-y-auto border-l border-t border-[rgba(255,255,255,0.1)] bg-[#0E0E0E] px-4 py-3 text-[11px]">
+            <div className="max-h-[250px] overflow-y-auto border-l border-t border-[rgba(255,255,255,0.1)] bg-[#0F1110] px-4 py-3 text-[11px]">
               {logs.map((log, i) => (
                 <div key={i} className="leading-5 text-[#A1A1AA]">
                   {log}

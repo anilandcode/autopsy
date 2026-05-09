@@ -61,21 +61,12 @@ export default function AboutPage() {
   return (
     <main className="min-h-dvh bg-[#0F1110] text-[white]">
       {/* Nav */}
-      <nav className="border-b border-[rgba(255,255,255,0.1)] flex items-center justify-between px-6 py-4 sm:px-12">
+      <nav className="border-b border-[rgba(255,255,255,0.1)] flex items-center px-6 py-4 sm:px-12">
         <Link
           href="/"
           className="font-mono text-sm text-[#A1A1AA] transition-colors hover:text-[white]"
         >
           &larr; BACK
-        </Link>
-        <span className="font-mono text-lg font-bold tracking-wider text-[#4B4BA0]">
-          AUTOPSY
-        </span>
-        <Link
-          href="/investigate"
-          className="font-mono text-sm border-2 border-[#4B4BA0] text-[#4B4BA0] px-4 py-1.5 hover:bg-[#4B4BA0] hover:text-[#0F1110] transition-colors"
-        >
-          [ LAUNCH &#9656; ]
         </Link>
       </nav>
 
