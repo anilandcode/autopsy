@@ -4,7 +4,7 @@ import { useState, useEffect, useCallback, useRef } from "react";
 import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
-import { RotateCcw, Share2, Clock } from "lucide-react";
+import { RotateCcw, Share2, Clock, ChevronDown, ChevronUp } from "lucide-react";
 import { Corkboard } from "./corkboard";
 import { FinalVerdict } from "./final-verdict";
 import { PremortemVerdict } from "./premortem-verdict";
@@ -124,6 +124,7 @@ export function InvestigationRoom() {
   const [shareCopied, setShareCopied] = useState(false);
   const [deepMode, setDeepMode] = useState(false);
   const [caseHistory, setCaseHistory] = useState<CaseHistoryEntry[]>([]);
+  const [logOpen, setLogOpen] = useState(false);
 
   // Founder form fields
   const [founderName, setFounderName] = useState("");
@@ -141,6 +142,7 @@ export function InvestigationRoom() {
   const verdictRef = useRef<HTMLDivElement | null>(null);
   const cfInputRef = useRef<HTMLDivElement | null>(null);
   const cfAltInputRef = useRef<HTMLInputElement | null>(null);
+  const logEndRef = useRef<HTMLDivElement | null>(null);
 
   function addLog(msg: string) {
     setLogs((prev) => [...prev, `${new Date().toLocaleTimeString()} — ${msg}`]);
@@ -156,6 +158,10 @@ export function InvestigationRoom() {
       setTimeout(() => verdictRef.current?.scrollIntoView({ behavior: "smooth" }), 300);
     }
   }, [report, premortemReport, founderReport, cfReport]);
+
+  useEffect(() => {
+    if (logOpen) logEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  }, [logs, logOpen]);
 
   // Read URL params on mount
   useEffect(() => {
@@ -496,19 +502,19 @@ export function InvestigationRoom() {
   }, [mode, founderName, founderDescription, founderStage, founderTargetCustomer, cfOriginalDecision, cfAlternateDecision, deepMode]);
 
   const handleStart = useCallback(() => {
-    startInvestigation(subject);
-  }, [subject, startInvestigation]);
+    startInvestigation(subject, deepMode);
+  }, [subject, deepMode, startInvestigation]);
 
   const handleFounderStart = useCallback(() => {
     if (!founderName.trim() || !founderDescription.trim()) return;
     setSubject(founderName);
-    startInvestigation(founderName);
-  }, [founderName, founderDescription, startInvestigation]);
+    startInvestigation(founderName, deepMode);
+  }, [founderName, founderDescription, deepMode, startInvestigation]);
 
   const handleCFStart = useCallback(() => {
     if (!subject.trim() || !cfOriginalDecision.trim() || !cfAlternateDecision.trim()) return;
-    startInvestigation(subject);
-  }, [subject, cfOriginalDecision, cfAlternateDecision, startInvestigation]);
+    startInvestigation(subject, deepMode);
+  }, [subject, cfOriginalDecision, cfAlternateDecision, deepMode, startInvestigation]);
 
   const handleBridgeToCF = useCallback((origDecision?: string) => {
     setMode("counterfactual");
@@ -1053,6 +1059,37 @@ export function InvestigationRoom() {
           </motion.div>
         )}
       </AnimatePresence>
+
+      {/* Investigation log — collapsible drawer on right side */}
+      {isInvestigating && (
+        <div className="fixed bottom-0 right-0 z-50 w-80 max-w-[90vw]">
+          <button
+            onClick={() => setLogOpen(!logOpen)}
+            className="flex w-full items-center justify-between border-t border-l border-[#2A2A2A] bg-[#0E0E0E] px-4 py-2 text-[10px] font-medium text-[#D62828] transition-colors hover:text-[#F4F1EA]"
+          >
+            <span>
+              {mode === "founder"
+                ? "Founder mode log"
+                : mode === "premortem"
+                  ? "Pre-mortem log"
+                  : mode === "counterfactual"
+                    ? "Counterfactual log"
+                    : "Investigation log"}
+            </span>
+            {logOpen ? <ChevronUp className="h-3 w-3" /> : <ChevronDown className="h-3 w-3" />}
+          </button>
+          {logOpen && (
+            <div className="max-h-[250px] overflow-y-auto border-l border-t border-[#2A2A2A] bg-[#0E0E0E] px-4 py-3 text-[11px]">
+              {logs.map((log, i) => (
+                <div key={i} className="leading-5 text-[#5C5852]">
+                  {log}
+                </div>
+              ))}
+              <div ref={logEndRef} />
+            </div>
+          )}
+        </div>
+      )}
     </main>
   );
 }
