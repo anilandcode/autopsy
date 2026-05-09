@@ -30,8 +30,8 @@ export function DebateRoom({ debate }: DebateRoomProps) {
         transition={{ duration: 0.25, ease: "linear" }}
         className="mb-8 flex items-center gap-3"
       >
-        <Swords className="h-4 w-4 text-[#D62828]" />
-        <h3 className="text-base font-medium text-[#F4F1EA]">
+        <Swords className="h-4 w-4 text-[#4B4BA0]" />
+        <h3 className="text-base font-medium text-[white]">
           Agent debate
         </h3>
       </motion.div>
@@ -53,41 +53,41 @@ export function DebateRoom({ debate }: DebateRoomProps) {
               className={`${isEven ? "ml-0" : "ml-8 sm:ml-16"} my-4`}
             >
               {/* Disagreement */}
-              <p className="text-xs text-[#D62828]">
+              <p className="text-xs text-[#4B4BA0]">
                 {agentNames[d.agentRole]} disagrees with {agentNames[d.disagreesWith]}
               </p>
               {d.disagreementReason ? (
                 <p
-                  className="mt-1 text-base italic text-[#F4F1EA]"
-                  style={{ fontFamily: "var(--font-instrument-serif), Georgia, serif" }}
+                  className="mt-1 text-base italic text-[white]"
+                  style={{ fontFamily: "var(--font-serif), Georgia, serif" }}
                 >
                   &ldquo;{d.disagreementReason}&rdquo;
                 </p>
               ) : (
-                <p className="mt-1 text-sm italic text-[#5C5852]">Agent withheld comment</p>
+                <p className="mt-1 text-sm italic text-[#A1A1AA]">Agent withheld comment</p>
               )}
 
               {/* Thin horizontal rule */}
-              <div className="my-3 h-px bg-[#2A2A2A]" />
+              <div className="my-3 h-px bg-[rgba(255,255,255,0.1)]" />
 
               {/* Agreement */}
-              <p className="text-xs text-[#06D6A0]">
+              <p className="text-xs text-[#00A67E]">
                 {agentNames[d.agentRole]} agrees with {agentNames[d.agreesWith]}
               </p>
               {d.agreementReason ? (
                 <p
-                  className="mt-1 text-base italic text-[#B8B5AE]"
-                  style={{ fontFamily: "var(--font-instrument-serif), Georgia, serif" }}
+                  className="mt-1 text-base italic text-[#A1A1AA]"
+                  style={{ fontFamily: "var(--font-serif), Georgia, serif" }}
                 >
                   &ldquo;{d.agreementReason}&rdquo;
                 </p>
               ) : (
-                <p className="mt-1 text-sm italic text-[#5C5852]">Agent withheld comment</p>
+                <p className="mt-1 text-sm italic text-[#A1A1AA]">Agent withheld comment</p>
               )}
 
               {/* Divider between debates (not after last) */}
               {i < debate.length - 1 && (
-                <div className="my-4 h-px bg-[#2A2A2A]" />
+                <div className="my-4 h-px bg-[rgba(255,255,255,0.1)]" />
               )}
             </motion.div>
           );

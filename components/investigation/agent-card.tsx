@@ -28,36 +28,36 @@ const statusConfig: Record<
   AgentStatus,
   { label: string; bg: string; text: string }
 > = {
-  idle: { label: "Idle", bg: "rgba(42,42,42,1)", text: "#71706B" },
+  idle: { label: "Idle", bg: "rgba(42,42,42,1)", text: "#A1A1AA" },
   researching: {
     label: "Researching",
     bg: "rgba(255,214,10,0.15)",
-    text: "#FFD60A",
+    text: "#8F47AE",
   },
   analyzing: {
     label: "Analyzing",
     bg: "rgba(255,214,10,0.15)",
-    text: "#FFD60A",
+    text: "#8F47AE",
   },
-  done: { label: "Done", bg: "rgba(6,214,160,0.10)", text: "#06D6A0" },
-  error: { label: "Error", bg: "rgba(214,40,40,0.15)", text: "#D62828" },
+  done: { label: "Done", bg: "rgba(6,214,160,0.10)", text: "#00A67E" },
+  error: { label: "Error", bg: "rgba(214,40,40,0.15)", text: "#4B4BA0" },
 };
 
 const riskLevelConfig: Record<RiskLevel, { label: string; color: string }> = {
-  low: { label: "Low", color: "#06D6A0" },
-  medium: { label: "Medium", color: "#FFD60A" },
-  high: { label: "High", color: "#D62828" },
-  critical: { label: "Critical", color: "#D62828" },
+  low: { label: "Low", color: "#00A67E" },
+  medium: { label: "Medium", color: "#8F47AE" },
+  high: { label: "High", color: "#4B4BA0" },
+  critical: { label: "Critical", color: "#4B4BA0" },
 };
 
 function ConfidenceBar({ value }: { value: number }) {
   const pct = Math.round(value * 100);
   const color =
-    value > 0.7 ? "#06D6A0" : value > 0.4 ? "#FFD60A" : "#D62828";
+    value > 0.7 ? "#00A67E" : value > 0.4 ? "#8F47AE" : "#4B4BA0";
 
   return (
     <div className="flex items-center gap-2">
-      <div className="h-1.5 flex-1 rounded-full bg-[#2A2A2A]">
+      <div className="h-1.5 flex-1 rounded-full bg-[rgba(255,255,255,0.1)]">
         <div
           className="h-full rounded-full transition-all"
           style={{ width: `${pct}%`, backgroundColor: color }}
@@ -119,7 +119,7 @@ export function AgentCard({
       className="flex flex-col"
     >
       {/* Card body */}
-      <div className="relative rounded-lg border border-[#3F3F3F] bg-[#161616] p-4">
+      <div className="relative rounded-lg border border-[rgba(255,255,255,0.1)] bg-[#0F1110] p-4">
         {/* Status or risk badge */}
         <div className="absolute right-3 top-3">
           {showRiskBadge ? (
@@ -146,7 +146,7 @@ export function AgentCard({
         </div>
 
         {/* Agent name */}
-        <p className="pr-20 text-sm font-medium text-[#F4F1EA]">
+        <p className="pr-20 text-sm font-medium text-[white]">
           {displayName}
         </p>
 
@@ -155,11 +155,11 @@ export function AgentCard({
           !activeFinding && <SkeletonLines />}
 
         {status === "idle" && (
-          <p className="mt-3 text-xs text-[#71706B]">Awaiting deployment</p>
+          <p className="mt-3 text-xs text-[#A1A1AA]">Awaiting deployment</p>
         )}
 
         {status === "error" && !activeFinding && (
-          <p className="mt-3 text-xs text-[#D62828]">Agent error</p>
+          <p className="mt-3 text-xs text-[#4B4BA0]">Agent error</p>
         )}
 
         {(status === "done" || status === "error") &&
@@ -193,9 +193,9 @@ export function AgentCard({
 function SkeletonLines() {
   return (
     <div className="mt-3 space-y-2">
-      <div className="h-3 w-3/4 animate-pulse rounded bg-[#2A2A2A]" />
-      <div className="h-3 w-1/2 animate-pulse rounded bg-[#2A2A2A]" />
-      <div className="h-3 w-2/3 animate-pulse rounded bg-[#2A2A2A]" />
+      <div className="h-3 w-3/4 animate-pulse rounded bg-[rgba(255,255,255,0.1)]" />
+      <div className="h-3 w-1/2 animate-pulse rounded bg-[rgba(255,255,255,0.1)]" />
+      <div className="h-3 w-2/3 animate-pulse rounded bg-[rgba(255,255,255,0.1)]" />
     </div>
   );
 }
@@ -208,8 +208,8 @@ function PostmortemCardContent({ finding }: { finding: AgentFinding }) {
     <div className="mt-3">
       {finding.primaryCause && (
         <p
-          className="mb-2 text-base leading-7 text-[#F4F1EA]"
-          style={{ fontFamily: '"Instrument Serif", serif' }}
+          className="mb-2 text-base leading-7 text-[white]"
+          style={{ fontFamily: '"var(--font-serif)", serif' }}
         >
           {finding.primaryCause}
         </p>
@@ -217,7 +217,7 @@ function PostmortemCardContent({ finding }: { finding: AgentFinding }) {
 
       {typeof finding.confidence === "number" && finding.confidence > 0 && (
         <div className="mb-3">
-          <span className="text-[10px] text-[#71706B]">Confidence</span>
+          <span className="text-[10px] text-[#A1A1AA]">Confidence</span>
           <ConfidenceBar value={finding.confidence} />
         </div>
       )}
@@ -225,14 +225,14 @@ function PostmortemCardContent({ finding }: { finding: AgentFinding }) {
       {finding.fullAnalysis && (
         <>
           <p
-            className={`text-sm leading-5 text-[#B8B5AE] ${!expanded ? "line-clamp-4" : ""}`}
+            className={`text-sm leading-5 text-[#A1A1AA] ${!expanded ? "line-clamp-4" : ""}`}
           >
             {finding.fullAnalysis}
           </p>
           {isLong && !expanded && (
             <button
               onClick={() => setExpanded(true)}
-              className="mt-1.5 text-xs text-[#B8B5AE] transition-colors hover:text-[#F4F1EA]"
+              className="mt-1.5 text-xs text-[#A1A1AA] transition-colors hover:text-[white]"
             >
               Read full analysis
             </button>
@@ -252,8 +252,8 @@ function PremortemCardContent({ finding }: { finding: PremortemFinding }) {
     <div className="mt-3">
       {finding.topRisk && (
         <p
-          className="mb-2 text-base leading-7 text-[#F4F1EA]"
-          style={{ fontFamily: '"Instrument Serif", serif' }}
+          className="mb-2 text-base leading-7 text-[white]"
+          style={{ fontFamily: '"var(--font-serif)", serif' }}
         >
           Top risk: {finding.topRisk}
         </p>
@@ -262,7 +262,7 @@ function PremortemCardContent({ finding }: { finding: PremortemFinding }) {
       {finding.evidence.length > 0 && (
         <div className="mb-3 space-y-1">
           {finding.evidence.map((ev, i) => (
-            <p key={i} className="text-xs leading-5 text-[#B8B5AE]">
+            <p key={i} className="text-xs leading-5 text-[#A1A1AA]">
               {ev}
             </p>
           ))}
@@ -270,18 +270,18 @@ function PremortemCardContent({ finding }: { finding: PremortemFinding }) {
       )}
 
       {finding.fullAnalysis && (
-        <p className="mb-3 line-clamp-4 text-sm leading-5 text-[#B8B5AE]">
+        <p className="mb-3 line-clamp-4 text-sm leading-5 text-[#A1A1AA]">
           {finding.fullAnalysis}
         </p>
       )}
 
       {finding.earlyWarnings.length > 0 && (
-        <div className="border-t border-[#2A2A2A] pt-3">
-          <p className="mb-1.5 text-[10px] font-medium text-[#FFD60A]">
+        <div className="border-t border-[rgba(255,255,255,0.1)] pt-3">
+          <p className="mb-1.5 text-[10px] font-medium text-[#8F47AE]">
             Early warnings to watch
           </p>
           {finding.earlyWarnings.map((w, i) => (
-            <p key={i} className="text-[11px] leading-5 text-[#B8B5AE]">
+            <p key={i} className="text-[11px] leading-5 text-[#A1A1AA]">
               {w}
             </p>
           ))}
@@ -300,8 +300,8 @@ function FounderCardContent({ finding }: { finding: FounderFinding }) {
     <div className="mt-3">
       {finding.topFailureMode && (
         <p
-          className="mb-2 text-base leading-7 text-[#F4F1EA]"
-          style={{ fontFamily: '"Instrument Serif", serif' }}
+          className="mb-2 text-base leading-7 text-[white]"
+          style={{ fontFamily: '"var(--font-serif)", serif' }}
         >
           {finding.topFailureMode}
         </p>
@@ -310,7 +310,7 @@ function FounderCardContent({ finding }: { finding: FounderFinding }) {
       {finding.evidence.length > 0 && (
         <div className="mb-3 space-y-1">
           {finding.evidence.map((ev, i) => (
-            <p key={i} className="text-xs leading-5 text-[#B8B5AE]">
+            <p key={i} className="text-xs leading-5 text-[#A1A1AA]">
               {ev}
             </p>
           ))}
@@ -318,18 +318,18 @@ function FounderCardContent({ finding }: { finding: FounderFinding }) {
       )}
 
       {finding.fullAnalysis && (
-        <p className="mb-3 line-clamp-4 text-sm leading-5 text-[#B8B5AE]">
+        <p className="mb-3 line-clamp-4 text-sm leading-5 text-[#A1A1AA]">
           {finding.fullAnalysis}
         </p>
       )}
 
       {finding.mitigations && finding.mitigations.length > 0 && (
-        <div className="border-t border-[#2A2A2A] pt-3">
-          <p className="mb-1.5 text-[10px] font-medium text-[#06D6A0]">
+        <div className="border-t border-[rgba(255,255,255,0.1)] pt-3">
+          <p className="mb-1.5 text-[10px] font-medium text-[#00A67E]">
             Mitigations
           </p>
           {finding.mitigations.map((m, i) => (
-            <p key={i} className="text-[11px] leading-5 text-[#B8B5AE]">
+            <p key={i} className="text-[11px] leading-5 text-[#A1A1AA]">
               {m}
             </p>
           ))}
@@ -347,7 +347,7 @@ function CounterfactualCardContent({ finding }: { finding: CounterfactualAgentFi
   const [expanded, setExpanded] = useState(false);
   const isLong = finding.reasoning && finding.reasoning.length > 200;
   const confidencePct = Math.round(finding.confidenceInAlterate);
-  const barColor = confidencePct > 70 ? "#06D6A0" : confidencePct > 40 ? "#FFD60A" : "#D62828";
+  const barColor = confidencePct > 70 ? "#00A67E" : confidencePct > 40 ? "#8F47AE" : "#4B4BA0";
 
   return (
     <div className="mt-3">
@@ -355,27 +355,27 @@ function CounterfactualCardContent({ finding }: { finding: CounterfactualAgentFi
       <div className="grid grid-cols-2 gap-3">
         <div>
           <p className="text-[10px] font-medium text-[#5C5852]">Actual timeline</p>
-          <p className="mt-1 line-clamp-4 text-xs leading-5 text-[#B8B5AE]">
+          <p className="mt-1 line-clamp-4 text-xs leading-5 text-[#A1A1AA]">
             {finding.actualOutcome}
           </p>
         </div>
-        <div className="border-l border-[#2A2A2A] pl-3">
+        <div className="border-l border-[rgba(255,255,255,0.1)] pl-3">
           <p className="text-[10px] font-medium text-[#FACC15]">Alternate timeline</p>
-          <p className="mt-1 line-clamp-4 text-xs leading-5 text-[#B8B5AE]">
+          <p className="mt-1 line-clamp-4 text-xs leading-5 text-[#A1A1AA]">
             {finding.alternateOutcome}
           </p>
         </div>
       </div>
 
       {/* Verdict */}
-      <div className="mt-3 border-t border-[#2A2A2A] pt-3">
-        <p className={`text-xs font-medium ${finding.wouldItHaveHelped ? "text-[#06D6A0]" : "text-[#D62828]"}`}>
+      <div className="mt-3 border-t border-[rgba(255,255,255,0.1)] pt-3">
+        <p className={`text-xs font-medium ${finding.wouldItHaveHelped ? "text-[#00A67E]" : "text-[#4B4BA0]"}`}>
           Verdict: {finding.wouldItHaveHelped ? "Would have helped" : "Wouldn't have mattered"}
         </p>
         <div className="mt-1.5 flex items-center gap-2">
-          <span className="text-[10px] text-[#71706B]">Confidence</span>
+          <span className="text-[10px] text-[#A1A1AA]">Confidence</span>
           <div className="flex items-center gap-2">
-            <div className="h-1.5 w-24 rounded-full bg-[#2A2A2A]">
+            <div className="h-1.5 w-24 rounded-full bg-[rgba(255,255,255,0.1)]">
               <div className="h-full rounded-full transition-all" style={{ width: `${confidencePct}%`, backgroundColor: barColor }} />
             </div>
             <span className="text-xs font-medium" style={{ color: barColor }}>{confidencePct}%</span>
@@ -386,13 +386,13 @@ function CounterfactualCardContent({ finding }: { finding: CounterfactualAgentFi
       {/* Reasoning */}
       {finding.reasoning && (
         <>
-          <p className={`mt-2 text-sm leading-5 text-[#B8B5AE] ${!expanded ? "line-clamp-3" : ""}`}>
+          <p className={`mt-2 text-sm leading-5 text-[#A1A1AA] ${!expanded ? "line-clamp-3" : ""}`}>
             {finding.reasoning}
           </p>
           {isLong && !expanded && (
             <button
               onClick={() => setExpanded(true)}
-              className="mt-1 text-xs text-[#B8B5AE] transition-colors hover:text-[#F4F1EA]"
+              className="mt-1 text-xs text-[#A1A1AA] transition-colors hover:text-[white]"
             >
               Read full analysis
             </button>
@@ -402,9 +402,9 @@ function CounterfactualCardContent({ finding }: { finding: CounterfactualAgentFi
 
       {/* Historical precedents */}
       {finding.historicalPrecedents.length > 0 && (
-        <div className="mt-3 border-t border-[#2A2A2A] pt-3">
+        <div className="mt-3 border-t border-[rgba(255,255,255,0.1)] pt-3">
           {finding.historicalPrecedents.map((p, i) => (
-            <p key={i} className="text-[11px] leading-5 text-[#B8B5AE]">
+            <p key={i} className="text-[11px] leading-5 text-[#A1A1AA]">
               <span className="text-[10px] text-[#FACC15]">Precedent: </span>
               {p}
             </p>
@@ -425,7 +425,7 @@ function SourcesSection({
   sources: { title: string; url: string }[];
 }) {
   return (
-    <div className="mt-3 border-t border-[#2A2A2A] pt-3">
+    <div className="mt-3 border-t border-[rgba(255,255,255,0.1)] pt-3">
       <p className="mb-1.5 text-[10px] font-medium text-[#5C5852]">Sources</p>
       {sources.slice(0, 3).map((src, i) => (
         <a
@@ -433,7 +433,7 @@ function SourcesSection({
           href={src.url}
           target="_blank"
           rel="noopener noreferrer"
-          className="flex items-center gap-1.5 text-xs text-[#B8B5AE] no-underline transition-colors hover:text-[#F4F1EA] hover:underline"
+          className="flex items-center gap-1.5 text-xs text-[#A1A1AA] no-underline transition-colors hover:text-[white] hover:underline"
         >
           <ExternalLink className="h-2.5 w-2.5 shrink-0" />
           {src.title}

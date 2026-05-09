@@ -23,14 +23,14 @@ function ConfidenceBar({ value }: { value: number }) {
   const pct = Math.round(value * 100);
   const color =
     value > 0.7
-      ? "#06D6A0"
+      ? "#00A67E"
       : value > 0.4
-        ? "#FFD60A"
-        : "#D62828";
+        ? "#8F47AE"
+        : "#4B4BA0";
 
   return (
     <div className="flex items-center gap-3">
-      <div className="h-2 flex-1 rounded-full bg-[#2A2A2A]">
+      <div className="h-2 flex-1 rounded-full bg-[rgba(255,255,255,0.1)]">
         <div
           className="h-full rounded-full transition-all duration-700"
           style={{ width: `${pct}%`, backgroundColor: color }}
@@ -72,32 +72,32 @@ function generatePDF(report: PostmortemReport) {
     }
 
     .header {
-      border-bottom: 3px solid #D62828;
+      border-bottom: 3px solid #4B4BA0;
       padding-bottom: 24px;
       margin-bottom: 40px;
       display: flex;
       justify-content: space-between;
       align-items: flex-start;
     }
-    .brand { font-size: 11px; color: #D62828; letter-spacing: 2px; font-weight: 700; margin-bottom: 8px; }
-    .subject { font-family: 'Instrument Serif', Georgia, serif; font-size: 32px; color: #0E0E0E; margin-bottom: 4px; }
+    .brand { font-size: 11px; color: #4B4BA0; letter-spacing: 2px; font-weight: 700; margin-bottom: 8px; }
+    .subject { font-family: 'Instrument Serif', Georgia, serif; font-size: 32px; color: #0F1110; margin-bottom: 4px; }
     .date { font-size: 11px; color: #888; }
-    .mode-pill { font-size: 10px; color: #D62828; border: 1px solid #D62828; padding: 2px 10px; border-radius: 999px; }
+    .mode-pill { font-size: 10px; color: #4B4BA0; border: 1px solid #4B4BA0; padding: 2px 10px; border-radius: 999px; }
 
     .section { margin-bottom: 36px; page-break-inside: avoid; }
-    .section-num { font-size: 10px; color: #D62828; letter-spacing: 1px; font-weight: 700; margin-bottom: 4px; }
-    .section-title { font-size: 11px; color: #5C5852; letter-spacing: 0.5px; font-weight: 600; margin-bottom: 16px; text-transform: uppercase; }
+    .section-num { font-size: 10px; color: #4B4BA0; letter-spacing: 1px; font-weight: 700; margin-bottom: 4px; }
+    .section-title { font-size: 11px; color: #A1A1AA; letter-spacing: 0.5px; font-weight: 600; margin-bottom: 16px; text-transform: uppercase; }
     .divider { height: 1px; background: #e5e5e5; margin: 36px 0; }
 
     .cause-box {
       background: #FEF2F2;
-      border-left: 4px solid #D62828;
+      border-left: 4px solid #4B4BA0;
       padding: 20px 24px;
     }
     .cause-text {
       font-family: 'Instrument Serif', Georgia, serif;
       font-size: 22px;
-      color: #0E0E0E;
+      color: #0F1110;
       line-height: 1.4;
     }
     .confidence-row { margin-top: 12px; display: flex; align-items: center; gap: 10px; }
@@ -121,20 +121,20 @@ function generatePDF(report: PostmortemReport) {
       page-break-inside: avoid;
     }
     .agent-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
-    .agent-name { font-weight: 700; font-size: 12px; color: #0E0E0E; }
-    .agent-confidence { font-size: 10px; color: #D62828; }
+    .agent-name { font-weight: 700; font-size: 12px; color: #0F1110; }
+    .agent-confidence { font-size: 10px; color: #4B4BA0; }
     .agent-cause { font-size: 13px; color: #333; margin-bottom: 6px; }
     .agent-analysis { font-size: 12px; color: #555; line-height: 1.6; border-top: 1px solid #f0f0f0; padding-top: 8px; margin-top: 8px; }
     .agent-sources { font-size: 10px; color: #999; margin-top: 6px; }
 
     .debate-row { margin-bottom: 10px; padding: 12px 16px; border: 1px solid #f0f0f0; border-radius: 4px; page-break-inside: avoid; }
-    .debate-agent { font-size: 11px; font-weight: 700; color: #0E0E0E; }
-    .debate-disagree { font-size: 11px; color: #D62828; margin-top: 4px; }
-    .debate-agree { font-size: 11px; color: #06D6A0; margin-top: 4px; }
+    .debate-agent { font-size: 11px; font-weight: 700; color: #0F1110; }
+    .debate-disagree { font-size: 11px; color: #4B4BA0; margin-top: 4px; }
+    .debate-agree { font-size: 11px; color: #00A67E; margin-top: 4px; }
     .debate-quote { font-family: 'Instrument Serif', Georgia, serif; font-style: italic; font-size: 13px; color: #444; margin-top: 2px; }
 
     .list-item { display: flex; gap: 10px; margin-bottom: 8px; align-items: flex-start; }
-    .list-num { font-size: 11px; color: #D62828; font-weight: 700; min-width: 22px; }
+    .list-num { font-size: 11px; color: #4B4BA0; font-weight: 700; min-width: 22px; }
     .list-text { font-size: 13px; color: #333; line-height: 1.6; }
     .list-text-serif { font-family: 'Instrument Serif', Georgia, serif; font-size: 14px; color: #333; line-height: 1.7; }
 
@@ -149,18 +149,18 @@ function generatePDF(report: PostmortemReport) {
       page-break-inside: avoid;
     }
     .dis-topic { font-size: 10px; color: #888; letter-spacing: 0.5px; font-weight: 700; margin-bottom: 8px; grid-column: 1 / -1; text-transform: uppercase; }
-    .dis-agent { font-size: 11px; font-weight: 700; color: #0E0E0E; margin-bottom: 4px; }
+    .dis-agent { font-size: 11px; font-weight: 700; color: #0F1110; margin-bottom: 4px; }
     .dis-pos { font-size: 12px; color: #444; line-height: 1.5; }
 
     .pivotal {
-      border: 2px solid #D62828;
+      border: 2px solid #4B4BA0;
       border-radius: 6px;
       padding: 20px;
       page-break-inside: avoid;
     }
-    .pivotal-label { font-size: 10px; color: #D62828; letter-spacing: 1px; font-weight: 700; margin-bottom: 8px; }
-    .pivotal-agents { font-size: 12px; color: #D62828; margin-bottom: 8px; }
-    .pivotal-topic { font-family: 'Instrument Serif', Georgia, serif; font-size: 18px; color: #0E0E0E; margin-bottom: 8px; }
+    .pivotal-label { font-size: 10px; color: #4B4BA0; letter-spacing: 1px; font-weight: 700; margin-bottom: 8px; }
+    .pivotal-agents { font-size: 12px; color: #4B4BA0; margin-bottom: 8px; }
+    .pivotal-topic { font-family: 'Instrument Serif', Georgia, serif; font-size: 18px; color: #0F1110; margin-bottom: 8px; }
     .pivotal-verdict { font-size: 13px; color: #333; line-height: 1.6; }
 
     .footer {
@@ -198,9 +198,9 @@ function generatePDF(report: PostmortemReport) {
       <div class="confidence-row">
         <span class="confidence-label">Confidence</span>
         <div class="confidence-bar-bg">
-          <div class="confidence-bar-fill" style="width:${Math.round(report.confidenceScore * 100)}%; background-color:${report.confidenceScore > 0.7 ? "#06D6A0" : report.confidenceScore > 0.4 ? "#FFD60A" : "#D62828"}"></div>
+          <div class="confidence-bar-fill" style="width:${Math.round(report.confidenceScore * 100)}%; background-color:${report.confidenceScore > 0.7 ? "#00A67E" : report.confidenceScore > 0.4 ? "#8F47AE" : "#4B4BA0"}"></div>
         </div>
-        <span class="confidence-pct" style="color:${report.confidenceScore > 0.7 ? "#06D6A0" : report.confidenceScore > 0.4 ? "#FFD60A" : "#D62828"}">${Math.round(report.confidenceScore * 100)}%</span>
+        <span class="confidence-pct" style="color:${report.confidenceScore > 0.7 ? "#00A67E" : report.confidenceScore > 0.4 ? "#8F47AE" : "#4B4BA0"}">${Math.round(report.confidenceScore * 100)}%</span>
       </div>
     </div>
   </div>
@@ -336,24 +336,24 @@ export function FinalVerdict({ report, onExploreCounterfactual }: FinalVerdictPr
       initial={{ opacity: 0, y: 30 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.3, delay: 0.2, ease: "linear" }}
-      className="mx-auto max-w-5xl divide-y divide-[#2A2A2A]"
+      className="mx-auto max-w-5xl divide-y divide-[rgba(255,255,255,0.1)]"
     >
       {/* §01 Primary Cause of Death */}
       <motion.section {...sectionFade} className="py-10">
         <div className="mb-4 flex items-center gap-3">
-          <span className="font-mono text-xs font-bold text-[#D62828]">§01</span>
-          <span className="text-xs font-medium uppercase tracking-wide text-[#5C5852]">
+          <span className="font-mono text-xs font-bold text-[#4B4BA0]">§01</span>
+          <span className="text-xs font-medium uppercase tracking-wide text-[#A1A1AA]">
             Primary cause of death
           </span>
         </div>
         <p
-          className="text-2xl leading-snug text-[#F4F1EA] sm:text-3xl lg:text-4xl"
-          style={{ fontFamily: "var(--font-instrument-serif), Georgia, serif" }}
+          className="text-2xl leading-snug text-[white] sm:text-3xl lg:text-4xl"
+          style={{ fontFamily: "var(--font-serif), Georgia, serif" }}
         >
           {report.primaryCauseOfDeath}
         </p>
         <div className="mt-6 max-w-md">
-          <span className="text-[10px] text-[#71706B]">Confidence</span>
+          <span className="text-[10px] text-[#A1A1AA]">Confidence</span>
           <div className="mt-1.5">
             <ConfidenceBar value={report.confidenceScore} />
           </div>
@@ -367,14 +367,14 @@ export function FinalVerdict({ report, onExploreCounterfactual }: FinalVerdictPr
         className="py-10"
       >
         <div className="mb-4 flex items-center gap-3">
-          <span className="font-mono text-xs font-bold text-[#D62828]">§02</span>
-          <span className="text-xs font-medium uppercase tracking-wide text-[#5C5852]">
+          <span className="font-mono text-xs font-bold text-[#4B4BA0]">§02</span>
+          <span className="text-xs font-medium uppercase tracking-wide text-[#A1A1AA]">
             Executive summary
           </span>
         </div>
         <p
-          className="max-w-3xl text-base leading-7 text-[#B8B5AE] sm:text-lg sm:leading-8"
-          style={{ fontFamily: "var(--font-instrument-serif), Georgia, serif" }}
+          className="max-w-3xl text-base leading-7 text-[#A1A1AA] sm:text-lg sm:leading-8"
+          style={{ fontFamily: "var(--font-serif), Georgia, serif" }}
         >
           {report.executiveSummary}
         </p>
@@ -387,8 +387,8 @@ export function FinalVerdict({ report, onExploreCounterfactual }: FinalVerdictPr
         className="py-10"
       >
         <div className="mb-6 flex items-center gap-3">
-          <span className="font-mono text-xs font-bold text-[#D62828]">§03</span>
-          <span className="text-xs font-medium uppercase tracking-wide text-[#5C5852]">
+          <span className="font-mono text-xs font-bold text-[#4B4BA0]">§03</span>
+          <span className="text-xs font-medium uppercase tracking-wide text-[#A1A1AA]">
             Agent findings
           </span>
         </div>
@@ -399,17 +399,17 @@ export function FinalVerdict({ report, onExploreCounterfactual }: FinalVerdictPr
               initial={{ opacity: 0, y: 12 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.3 + i * 0.08, duration: 0.25, ease: "linear" }}
-              className="rounded-lg border border-[#2A2A2A] bg-[#161616] p-5"
+              className="rounded-lg border border-[rgba(255,255,255,0.1)] bg-[#0F1110] p-5"
             >
               <div className="mb-2 flex items-center justify-between">
-                <span className="text-xs font-medium text-[#F4F1EA]">{f.displayName}</span>
-                <span className="font-mono text-xs text-[#71706B]">
+                <span className="text-xs font-medium text-[white]">{f.displayName}</span>
+                <span className="font-mono text-xs text-[#A1A1AA]">
                   {Math.round(f.confidence * 100)}%
                 </span>
               </div>
-              <p className="text-sm text-[#B8B5AE]">{f.primaryCause}</p>
+              <p className="text-sm text-[#A1A1AA]">{f.primaryCause}</p>
               {f.fullAnalysis && (
-                <p className="mt-3 border-t border-[#2A2A2A] pt-3 text-xs leading-5 text-[#5C5852]">
+                <p className="mt-3 border-t border-[rgba(255,255,255,0.1)] pt-3 text-xs leading-5 text-[#A1A1AA]">
                   {f.fullAnalysis.length > 200
                     ? f.fullAnalysis.slice(0, 200) + "..."
                     : f.fullAnalysis}
@@ -428,11 +428,11 @@ export function FinalVerdict({ report, onExploreCounterfactual }: FinalVerdictPr
           className="py-10"
         >
           <div className="mb-6 flex items-center gap-3">
-            <span className="font-mono text-xs font-bold text-[#D62828]">§04</span>
-            <span className="text-xs font-medium uppercase tracking-wide text-[#5C5852]">
+            <span className="font-mono text-xs font-bold text-[#4B4BA0]">§04</span>
+            <span className="text-xs font-medium uppercase tracking-wide text-[#A1A1AA]">
               Debate room
             </span>
-            <Swords className="h-3 w-3 text-[#D62828]" />
+            <Swords className="h-3 w-3 text-[#4B4BA0]" />
           </div>
           <div className="space-y-4">
             {debateItems.map((d, i) => {
@@ -445,32 +445,32 @@ export function FinalVerdict({ report, onExploreCounterfactual }: FinalVerdictPr
                   transition={{ delay: 0.4 + i * 0.1, duration: 0.25, ease: "linear" }}
                   className={isEven ? "" : "ml-6 sm:ml-12"}
                 >
-                  <p className="text-xs font-medium text-[#D62828]">
+                  <p className="text-xs font-medium text-[#4B4BA0]">
                     {agentNames[d.agentRole]} disagrees with {agentNames[d.disagreesWith]}
                   </p>
                   {d.disagreementReason ? (
                     <p
-                      className="mt-1 text-sm italic text-[#F4F1EA]"
-                      style={{ fontFamily: "var(--font-instrument-serif), Georgia, serif" }}
+                      className="mt-1 text-sm italic text-[white]"
+                      style={{ fontFamily: "var(--font-serif), Georgia, serif" }}
                     >
                       &ldquo;{d.disagreementReason}&rdquo;
                     </p>
                   ) : (
-                    <p className="mt-1 text-xs italic text-[#5C5852]">Agent withheld comment</p>
+                    <p className="mt-1 text-xs italic text-[#A1A1AA]">Agent withheld comment</p>
                   )}
-                  <div className="my-2 h-px bg-[#2A2A2A]" />
-                  <p className="text-xs font-medium text-[#06D6A0]">
+                  <div className="my-2 h-px bg-[rgba(255,255,255,0.1)]" />
+                  <p className="text-xs font-medium text-[#00A67E]">
                     {agentNames[d.agentRole]} agrees with {agentNames[d.agreesWith]}
                   </p>
                   {d.agreementReason ? (
                     <p
-                      className="mt-1 text-sm italic text-[#B8B5AE]"
-                      style={{ fontFamily: "var(--font-instrument-serif), Georgia, serif" }}
+                      className="mt-1 text-sm italic text-[#A1A1AA]"
+                      style={{ fontFamily: "var(--font-serif), Georgia, serif" }}
                     >
                       &ldquo;{d.agreementReason}&rdquo;
                     </p>
                   ) : (
-                    <p className="mt-1 text-xs italic text-[#5C5852]">Agent withheld comment</p>
+                    <p className="mt-1 text-xs italic text-[#A1A1AA]">Agent withheld comment</p>
                   )}
                 </motion.div>
               );
@@ -486,8 +486,8 @@ export function FinalVerdict({ report, onExploreCounterfactual }: FinalVerdictPr
         className="py-10"
       >
         <div className="mb-6 flex items-center gap-3">
-          <span className="font-mono text-xs font-bold text-[#06D6A0]">§05</span>
-          <span className="text-xs font-medium uppercase tracking-wide text-[#5C5852]">
+          <span className="font-mono text-xs font-bold text-[#00A67E]">§05</span>
+          <span className="text-xs font-medium uppercase tracking-wide text-[#A1A1AA]">
             What would have saved it
           </span>
         </div>
@@ -500,12 +500,12 @@ export function FinalVerdict({ report, onExploreCounterfactual }: FinalVerdictPr
               transition={{ delay: 0.5 + i * 0.08, duration: 0.25, ease: "linear" }}
               className="flex items-start gap-3"
             >
-              <span className="font-mono text-xs font-bold text-[#06D6A0]">
+              <span className="font-mono text-xs font-bold text-[#00A67E]">
                 {String(i + 1).padStart(2, "0")}
               </span>
               <span
-                className="text-sm leading-6 text-[#B8B5AE]"
-                style={{ fontFamily: "var(--font-instrument-serif), Georgia, serif" }}
+                className="text-sm leading-6 text-[#A1A1AA]"
+                style={{ fontFamily: "var(--font-serif), Georgia, serif" }}
               >
                 {item}
               </span>
@@ -521,8 +521,8 @@ export function FinalVerdict({ report, onExploreCounterfactual }: FinalVerdictPr
         className="py-10"
       >
         <div className="mb-6 flex items-center gap-3">
-          <span className="font-mono text-xs font-bold text-[#71706B]">§06</span>
-          <span className="text-xs font-medium uppercase tracking-wide text-[#5C5852]">
+          <span className="font-mono text-xs font-bold text-[#A1A1AA]">§06</span>
+          <span className="text-xs font-medium uppercase tracking-wide text-[#A1A1AA]">
             Lessons for builders
           </span>
         </div>
@@ -535,12 +535,12 @@ export function FinalVerdict({ report, onExploreCounterfactual }: FinalVerdictPr
               transition={{ delay: 0.6 + i * 0.08, duration: 0.25, ease: "linear" }}
               className="flex items-start gap-3"
             >
-              <span className="font-mono text-xs font-bold text-[#5C5852]">
+              <span className="font-mono text-xs font-bold text-[#A1A1AA]">
                 {String(i + 1).padStart(2, "0")}
               </span>
               <span
-                className="text-sm leading-6 text-[#B8B5AE]"
-                style={{ fontFamily: "var(--font-instrument-serif), Georgia, serif" }}
+                className="text-sm leading-6 text-[#A1A1AA]"
+                style={{ fontFamily: "var(--font-serif), Georgia, serif" }}
               >
                 {item}
               </span>
@@ -557,26 +557,26 @@ export function FinalVerdict({ report, onExploreCounterfactual }: FinalVerdictPr
           className="py-10"
         >
           <div className="mb-6 flex items-center gap-3">
-            <span className="font-mono text-xs font-bold text-[#D62828]">§07</span>
-            <span className="text-xs font-medium uppercase tracking-wide text-[#5C5852]">
+            <span className="font-mono text-xs font-bold text-[#4B4BA0]">§07</span>
+            <span className="text-xs font-medium uppercase tracking-wide text-[#A1A1AA]">
               {mcd ? "Pivotal disagreement" : "Agent disagreements"}
             </span>
           </div>
 
           {mcd && (
-            <div className="rounded-lg border border-[#D62828]/40 bg-[#D62828]/5 p-6">
-              <p className="font-mono text-xs text-[#D62828]">
+            <div className="rounded-lg border border-[#4B4BA0]/40 bg-[#4B4BA0]/5 p-6">
+              <p className="font-mono text-xs text-[#4B4BA0]">
                 {agentNames[mcd.agentA] || mcd.agentA} vs {agentNames[mcd.agentB] || mcd.agentB}
               </p>
               <p
-                className="mt-2 text-lg text-[#F4F1EA]"
-                style={{ fontFamily: "var(--font-instrument-serif), Georgia, serif" }}
+                className="mt-2 text-lg text-[white]"
+                style={{ fontFamily: "var(--font-serif), Georgia, serif" }}
               >
                 {mcd.topic}
               </p>
-              <div className="mt-3 border-t border-[#2A2A2A] pt-3">
-                <p className="text-sm leading-6 text-[#B8B5AE]">
-                  <span className="font-mono text-xs text-[#D62828]">Verdict:</span>{" "}
+              <div className="mt-3 border-t border-[rgba(255,255,255,0.1)] pt-3">
+                <p className="text-sm leading-6 text-[#A1A1AA]">
+                  <span className="font-mono text-xs text-[#4B4BA0]">Verdict:</span>{" "}
                   {mcd.whoseRightAndWhy}
                 </p>
               </div>
@@ -591,31 +591,31 @@ export function FinalVerdict({ report, onExploreCounterfactual }: FinalVerdictPr
                   initial={{ opacity: 0, y: 10 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: 0.7 + i * 0.1, duration: 0.25, ease: "linear" }}
-                  className="rounded-lg border border-[#2A2A2A] bg-[#161616] p-5"
+                  className="rounded-lg border border-[rgba(255,255,255,0.1)] bg-[#0F1110] p-5"
                 >
-                  <p className="text-xs text-[#5C5852]">{d.topic}</p>
+                  <p className="text-xs text-[#A1A1AA]">{d.topic}</p>
                   <div className="mt-3 grid gap-4 sm:grid-cols-2">
-                    <div className="rounded-md border border-[#2A2A2A] bg-[#0E0E0E] p-4">
-                      <p className="text-xs font-medium text-[#71706B]">
+                    <div className="rounded-md border border-[rgba(255,255,255,0.1)] bg-[#0F1110] p-4">
+                      <p className="text-xs font-medium text-[#A1A1AA]">
                         {agentNames[d.agentA] || d.agentA}
                       </p>
                       <p
-                        className="mt-1 text-sm text-[#B8B5AE]"
+                        className="mt-1 text-sm text-[#A1A1AA]"
                         style={{
-                          fontFamily: "var(--font-instrument-serif), Georgia, serif",
+                          fontFamily: "var(--font-serif), Georgia, serif",
                         }}
                       >
                         {d.agentAPosition}
                       </p>
                     </div>
-                    <div className="rounded-md border border-[#2A2A2A] bg-[#0E0E0E] p-4">
-                      <p className="text-xs font-medium text-[#71706B]">
+                    <div className="rounded-md border border-[rgba(255,255,255,0.1)] bg-[#0F1110] p-4">
+                      <p className="text-xs font-medium text-[#A1A1AA]">
                         {agentNames[d.agentB] || d.agentB}
                       </p>
                       <p
-                        className="mt-1 text-sm text-[#B8B5AE]"
+                        className="mt-1 text-sm text-[#A1A1AA]"
                         style={{
-                          fontFamily: "var(--font-instrument-serif), Georgia, serif",
+                          fontFamily: "var(--font-serif), Georgia, serif",
                         }}
                       >
                         {d.agentBPosition}
@@ -637,14 +637,14 @@ export function FinalVerdict({ report, onExploreCounterfactual }: FinalVerdictPr
           className="py-10"
         >
           <div className="mb-6 flex items-center gap-3">
-            <span className="font-mono text-xs font-bold text-[#FFD60A]">§08</span>
-            <span className="text-xs font-medium uppercase tracking-wide text-[#5C5852]">
+            <span className="font-mono text-xs font-bold text-[#8F47AE]">§08</span>
+            <span className="text-xs font-medium uppercase tracking-wide text-[#A1A1AA]">
               Explore counterfactual
             </span>
           </div>
           <button
             onClick={onExploreCounterfactual}
-            className="group inline-flex items-center gap-2 rounded-lg border border-[#FFD60A]/30 bg-[#FFD60A]/5 px-5 py-3 text-sm text-[#FFD60A] transition-colors hover:border-[#FFD60A] hover:bg-[#FFD60A]/10"
+            className="group inline-flex items-center gap-2 rounded-lg border border-[#8F47AE]/30 bg-[#8F47AE]/5 px-5 py-3 text-sm text-[#8F47AE] transition-colors hover:border-[#8F47AE] hover:bg-[#8F47AE]/10"
           >
             What if {report.subject} had made a different decision?
             <ChevronRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
@@ -656,7 +656,7 @@ export function FinalVerdict({ report, onExploreCounterfactual }: FinalVerdictPr
       <div className="flex justify-end py-8">
         <button
           onClick={() => generatePDF(report)}
-          className="inline-flex h-10 items-center gap-2 rounded-md border border-[#3F3F3F] bg-[#0E0E0E] px-4 text-sm text-[#71706B] transition-colors hover:border-[#D62828] hover:text-[#F4F1EA]"
+          className="inline-flex h-10 items-center gap-2 rounded-md border border-[#3F3F3F] bg-[#0F1110] px-4 text-sm text-[#A1A1AA] transition-colors hover:border-[#4B4BA0] hover:text-[white]"
         >
           <FileDown className="h-4 w-4" />
           Download report (PDF)

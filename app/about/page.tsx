@@ -59,21 +59,21 @@ const techStack = [
 
 export default function AboutPage() {
   return (
-    <main className="min-h-dvh bg-[#0E0E0E] text-[#F4F1EA]">
+    <main className="min-h-dvh bg-[#0F1110] text-[white]">
       {/* Nav */}
-      <nav className="border-b border-[#2A2A2A] flex items-center justify-between px-6 py-4 sm:px-12">
+      <nav className="border-b border-[rgba(255,255,255,0.1)] flex items-center justify-between px-6 py-4 sm:px-12">
         <Link
           href="/"
-          className="font-mono text-sm text-[#71706B] transition-colors hover:text-[#F4F1EA]"
+          className="font-mono text-sm text-[#A1A1AA] transition-colors hover:text-[white]"
         >
           &larr; BACK
         </Link>
-        <span className="font-mono text-lg font-bold tracking-wider text-[#D62828]">
+        <span className="font-mono text-lg font-bold tracking-wider text-[#4B4BA0]">
           AUTOPSY
         </span>
         <Link
           href="/investigate"
-          className="font-mono text-sm border-2 border-[#D62828] text-[#D62828] px-4 py-1.5 hover:bg-[#D62828] hover:text-[#0E0E0E] transition-colors"
+          className="font-mono text-sm border-2 border-[#4B4BA0] text-[#4B4BA0] px-4 py-1.5 hover:bg-[#4B4BA0] hover:text-[#0F1110] transition-colors"
         >
           [ LAUNCH &#9656; ]
         </Link>
@@ -81,7 +81,7 @@ export default function AboutPage() {
 
       <div className="mx-auto max-w-4xl px-6 py-20 sm:px-12">
         {/* Page Header */}
-        <h1 className="mb-20 text-5xl sm:text-7xl font-serif text-[#F4F1EA] tracking-tight">
+        <h1 className="mb-20 text-5xl sm:text-7xl font-serif text-[white] tracking-tight">
           ABOUT THIS INVESTIGATION
         </h1>
 
@@ -92,13 +92,13 @@ export default function AboutPage() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.4 }}
         >
-          <span className="font-mono text-xs font-bold uppercase tracking-[0.2em] text-[#71706B]">
+          <span className="font-mono text-xs font-bold uppercase tracking-[0.2em] text-[#A1A1AA]">
             &sect;01 &mdash; WHAT IS AUTOPSY?
           </span>
 
           <div className="mt-8 flex flex-col lg:flex-row gap-8 lg:gap-12">
             {/* Main content — 70% */}
-            <div className="lg:w-[70%] space-y-6 font-serif text-base leading-8 text-[#B8B5AE]">
+            <div className="lg:w-[70%] space-y-6 font-serif text-base leading-8 text-[#A1A1AA]">
               <p>
                 Autopsy is a forensic AI tool that investigates why startups, products, and companies failed.
                 Instead of a single chatbot guessing at a postmortem, Autopsy deploys six specialist agents
@@ -119,17 +119,17 @@ export default function AboutPage() {
             </div>
 
             {/* Margin notes — 30% */}
-            <div className="lg:w-[30%] space-y-8 font-mono text-xs text-[#D62828] leading-6">
+            <div className="lg:w-[30%] space-y-8 font-mono text-xs text-[#4B4BA0] leading-6">
               <div>
-                <span className="text-[#5C5852]">NOTE //</span><br />
+                <span className="text-[#A1A1AA]">NOTE //</span><br />
                 No single agent produces the verdict. The output is always a synthesis.
               </div>
               <div>
-                <span className="text-[#5C5852]">NOTE //</span><br />
+                <span className="text-[#A1A1AA]">NOTE //</span><br />
                 Every bias is documented. Every blind spot is declared upfront.
               </div>
               <div>
-                <span className="text-[#5C5852]">NOTE //</span><br />
+                <span className="text-[#A1A1AA]">NOTE //</span><br />
                 The disagreement IS the feature. Consensus without debate is just groupthink.
               </div>
             </div>
@@ -143,28 +143,28 @@ export default function AboutPage() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.4, delay: 0.1 }}
         >
-          <span className="font-mono text-xs font-bold uppercase tracking-[0.2em] text-[#71706B]">
+          <span className="font-mono text-xs font-bold uppercase tracking-[0.2em] text-[#A1A1AA]">
             &sect;02 &mdash; THE 6 AGENTS
           </span>
 
-          <div className="mt-8 border-t border-[#2A2A2A]">
+          <div className="mt-8 border-t border-[rgba(255,255,255,0.1)]">
             {agents.map((agent, i) => (
               <div
                 key={agent.num}
-                className="border-b border-[#2A2A2A] py-6"
+                className="border-b border-[rgba(255,255,255,0.1)] py-6"
               >
                 <div className="flex flex-col sm:flex-row sm:items-baseline gap-2 sm:gap-6">
-                  <span className="font-mono text-sm text-[#D62828] tabular-nums">
+                  <span className="font-mono text-sm text-[#4B4BA0] tabular-nums">
                     {agent.num}
                   </span>
-                  <span className="font-serif text-xl text-[#F4F1EA]">
+                  <span className="font-serif text-xl text-[white]">
                     {agent.name}
                   </span>
                 </div>
-                <p className="mt-2 sm:ml-12 text-base leading-7 text-[#B8B5AE]">
+                <p className="mt-2 sm:ml-12 text-base leading-7 text-[#A1A1AA]">
                   {agent.methodology}
                 </p>
-                <p className="mt-2 sm:ml-12 text-sm italic text-[#71706B]">
+                <p className="mt-2 sm:ml-12 text-sm italic text-[#A1A1AA]">
                   KNOWN BIAS: {agent.bias}
                 </p>
               </div>
@@ -179,20 +179,20 @@ export default function AboutPage() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.4, delay: 0.2 }}
         >
-          <span className="font-mono text-xs font-bold uppercase tracking-[0.2em] text-[#71706B]">
+          <span className="font-mono text-xs font-bold uppercase tracking-[0.2em] text-[#A1A1AA]">
             &sect;03 &mdash; BUILT WITH
           </span>
 
-          <div className="mt-8 border-t border-[#2A2A2A]">
+          <div className="mt-8 border-t border-[rgba(255,255,255,0.1)]">
             {techStack.map((tech, i) => (
               <div
                 key={tech.name}
-                className="border-b border-[#2A2A2A] py-4 flex items-baseline justify-between gap-4"
+                className="border-b border-[rgba(255,255,255,0.1)] py-4 flex items-baseline justify-between gap-4"
               >
-                <span className="font-mono text-sm text-[#F4F1EA]">
+                <span className="font-mono text-sm text-[white]">
                   {tech.name}
                 </span>
-                <span className="font-mono text-xs text-[#71706B] text-right">
+                <span className="font-mono text-xs text-[#A1A1AA] text-right">
                   {tech.description}
                 </span>
               </div>
@@ -207,12 +207,12 @@ export default function AboutPage() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.4, delay: 0.3 }}
         >
-          <span className="font-mono text-xs font-bold uppercase tracking-[0.2em] text-[#71706B]">
+          <span className="font-mono text-xs font-bold uppercase tracking-[0.2em] text-[#A1A1AA]">
             &sect;04 &mdash; AMD DEVELOPER HACKATHON 2026
           </span>
 
           <div className="mt-8 flex flex-col lg:flex-row gap-8 lg:gap-12">
-            <div className="lg:w-[70%] space-y-6 font-serif text-base leading-8 text-[#B8B5AE]">
+            <div className="lg:w-[70%] space-y-6 font-serif text-base leading-8 text-[#A1A1AA]">
               <p>
                 Autopsy was built for the AMD Developer Hackathon 2026, a global competition focused on
                 leveraging AMD hardware for AI-driven applications. The project uses DeepSeek V4 Pro via
@@ -227,9 +227,9 @@ export default function AboutPage() {
               </p>
             </div>
 
-            <div className="lg:w-[30%] font-mono text-xs text-[#D62828] leading-6">
+            <div className="lg:w-[30%] font-mono text-xs text-[#4B4BA0] leading-6">
               <div>
-                <span className="text-[#5C5852]">NOTE //</span><br />
+                <span className="text-[#A1A1AA]">NOTE //</span><br />
                 192GB HBM3 &mdash; 6 agents loaded simultaneously. No sequential batching. No compromise.
               </div>
             </div>
@@ -238,15 +238,15 @@ export default function AboutPage() {
       </div>
 
       {/* Footer */}
-      <footer className="border-t border-[#2A2A2A] px-6 py-8 sm:px-12">
+      <footer className="border-t border-[rgba(255,255,255,0.1)] px-6 py-8 sm:px-12">
         <div className="mx-auto max-w-4xl flex flex-col sm:flex-row items-center justify-between gap-4">
-          <span className="font-mono text-xs text-[#71706B]">
+          <span className="font-mono text-xs text-[#A1A1AA]">
             AUTOPSY / 2026 / OPEN SOURCE
           </span>
-          <span className="font-mono text-xs text-[#5C5852]">
+          <span className="font-mono text-xs text-[#A1A1AA]">
             Built for AMD Developer Hackathon 2026
           </span>
-          <span className="font-mono text-xs text-[#71706B]">
+          <span className="font-mono text-xs text-[#A1A1AA]">
             CASE #2026-0113
           </span>
         </div>
