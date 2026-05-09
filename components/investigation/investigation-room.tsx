@@ -221,22 +221,24 @@ export function InvestigationRoom() {
 
     addLog("Checking API connection...");
     try {
-      const healthRes = await fetch("/api/test");
+      const healthController = new AbortController();
+      const healthTimeout = setTimeout(() => healthController.abort(), 5000);
+      const healthRes = await fetch("/api/test", { signal: healthController.signal });
+      clearTimeout(healthTimeout);
       const healthData = await healthRes.json();
       if (healthData.error) {
-        addLog("API error: " + healthData.error);
-        setError("API connection failed: " + healthData.error);
+        addLog("API warning: " + healthData.error);
+        setError("API keys missing: " + healthData.error);
         setIsInvestigating(false);
         return;
       }
       addLog("API OK — model: " + healthData.env?.model);
-      addLog("Tavily OK — " + healthData.searchResultsCount + " results");
     } catch (e: unknown) {
-      const msg = e instanceof Error ? e.message : "Unknown";
-      addLog("Health check failed: " + msg);
-      setError("Health check failed: " + msg);
-      setIsInvestigating(false);
-      return;
+      const msg = e instanceof Error && e.name === "AbortError"
+        ? "Health check timed out (5s)"
+        : e instanceof Error ? e.message : "Unknown";
+      addLog("Health check failed: " + msg + " — proceeding anyway");
+      // Don't block — the actual API call will surface real errors
     }
 
     let apiEndpoint: string;
