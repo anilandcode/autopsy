@@ -315,10 +315,26 @@ export default function ArchitecturePage() {
           </div>
         </section>
 
-        {/* §06 — Tech Stack */}
+        {/* §06 — Active Model */}
+        <section className="mb-24">
+          <span className="font-mono text-xs font-bold uppercase tracking-[0.2em] text-[#D62828]">
+            &sect;06 &mdash; Active Model
+          </span>
+          <div className="mt-6 border border-[#2A2A2A] bg-[#161616] p-6">
+            <p className="font-mono text-xs text-[#5C5852]">Currently running</p>
+            <p className="mt-2 text-xl text-[#F4F1EA]" style={{ fontFamily: "var(--font-instrument-serif), Georgia, serif" }}>
+              {process.env.NEXT_PUBLIC_LLM_MODEL || "accounts/fireworks/models/kimi-k2p6"}
+            </p>
+            <p className="mt-2 font-mono text-xs text-[#71706B]">
+              Configure via LLM_MODEL in .env.local — see model options there.
+            </p>
+          </div>
+        </section>
+
+        {/* §07 — Tech Stack */}
         <section className="mb-24">
           <span className="font-mono text-xs font-bold uppercase tracking-[0.2em] text-[#71706B]">
-            &sect;06 &mdash; Tech Stack
+            &sect;07 &mdash; Tech Stack
           </span>
           <div className="mt-6 border-t border-[#2A2A2A]">
             {TECH_STACK.map((tech) => (
@@ -340,7 +356,7 @@ export default function ArchitecturePage() {
         {/* §07 — Open Source Note */}
         <section className="mb-12">
           <span className="font-mono text-xs font-bold uppercase tracking-[0.2em] text-[#71706B]">
-            &sect;07 &mdash; Open Source
+            &sect;08 &mdash; Open Source
           </span>
           <div className="mt-6 border-2 border-[#FFD60A] bg-[#161616] p-8">
             <p className="mb-6 font-serif text-lg leading-8 text-[#B8B5AE]">

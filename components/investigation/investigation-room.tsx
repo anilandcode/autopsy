@@ -1038,10 +1038,16 @@ export function InvestigationRoom() {
                   </div>
                 </div>
 
-                <FinalVerdict report={report} />
+                <FinalVerdict
+                  report={report}
+                  onExploreCounterfactual={() => {
+                    const verdictEl = document.getElementById("cf-cta-section");
+                    if (verdictEl) verdictEl.scrollIntoView({ behavior: "smooth" });
+                  }}
+                />
 
                 {/* Counterfactual CTA */}
-                <div className="mx-auto mt-10 max-w-5xl">
+                <div id="cf-cta-section" className="mx-auto mt-10 max-w-5xl">
                   <div className="rounded-lg border-2 border-[#FFD60A] bg-[#FFD60A]/5 p-6 sm:p-8">
                     <span className="font-mono text-[10px] font-bold uppercase tracking-wider text-[#FFD60A]">
                       Counterfactual

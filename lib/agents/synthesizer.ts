@@ -1,84 +1,60 @@
 import { complete, extractJSON } from "@/lib/llm";
 import { AgentFinding, AgentRole, AgentDebateOutput, ConsequentialDisagreement, Disagreement, PostmortemReport } from "@/types/investigation";
 
-const SYSTEM_PROMPT = `You are the Lead Investigator synthesizing a 6-agent postmortem.
-Your job: find truth by weighing evidence, not averaging opinions.
-If 5 agents agree and 1 disagrees with strong evidence, the 1 might be right.
-Always identify the real primary cause of death — the ROOT cause, not symptoms.
-
-You have 6 agent findings AND a debate round where agents explicitly disagreed.
-Use the disagreements to find truth — the dissenting agent might be onto something the majority missed.
-Identify which debate point is most consequential.
-
-Respond ONLY with valid JSON in this exact format:
+const SYSTEM_PROMPT = `You are the Lead Investigator.
+Read the 6 agent findings and write a final verdict.
+Return ONLY valid JSON, absolutely no other text:
 {
-  "executiveSummary": "2-3 sentence sharp summary of why it truly failed",
-  "primaryCauseOfDeath": "The single root cause in one sentence",
+  "executiveSummary": "2-3 sentences. Sharp. Opinionated. No hedging.",
+  "primaryCauseOfDeath": "One root cause sentence.",
   "confidenceScore": <70-95>,
+  "whatWouldHaveSavedIt": ["action 1", "action 2", "action 3"],
+  "lessonsForBuilders": ["lesson 1", "lesson 2", "lesson 3", "lesson 4"],
   "disagreements": [
     {
       "agentA": "market-analyst",
       "agentB": "operator",
-      "topic": "what they disagree on",
-      "agentAPosition": "what market-analyst says",
-      "agentBPosition": "what operator says"
+      "topic": "topic of disagreement",
+      "agentAPosition": "what market-analyst argues",
+      "agentBPosition": "what operator argues"
     }
   ],
   "mostConsequentialDisagreement": {
     "agentA": "role",
     "agentB": "role",
-    "topic": "the debate point that matters most",
-    "whoseRightAndWhy": "One sharp sentence: [agent] is right because..."
-  },
-  "whatWouldHaveSavedIt": [
-    "Specific actionable thing 1",
-    "Specific actionable thing 2",
-    "Specific actionable thing 3"
-  ],
-  "lessonsForBuilders": [
-    "Lesson 1 — applicable to any founder",
-    "Lesson 2",
-    "Lesson 3",
-    "Lesson 4"
-  ]
-}
-
-Respond ONLY with the JSON object. No preamble, no explanation outside JSON.`;
+    "topic": "topic",
+    "whoseRightAndWhy": "explanation"
+  }
+}`;
 
 export async function runSynthesizer(
   subject: string,
   findings: AgentFinding[],
   debateOutputs: AgentDebateOutput[] = []
 ): Promise<PostmortemReport> {
-  const findingsJson = JSON.stringify(
-    findings.map((f) => ({
-      role: f.role,
-      displayName: f.displayName,
-      primaryCause: f.primaryCause,
-      confidence: f.confidence,
-      evidence: f.evidence,
-      fullAnalysis: f.fullAnalysis,
-    })),
-    null,
-    2
-  );
-
   const debateSection = debateOutputs.length > 0
-    ? `\n\nHere is the DEBATE ROUND — agents explicitly critiqued each other:\n${JSON.stringify(debateOutputs, null, 2)}\n\nUse these disagreements to sharpen your synthesis. The dissenting agent may be right.`
+    ? `\nDebate: ${JSON.stringify(debateOutputs.map(d => ({ agent: d.agentRole, disagreesWith: d.disagreesWith, reason: d.disagreementReason, agreesWith: d.agreesWith, agreeReason: d.agreementReason })))}`
     : "";
 
-  const userPrompt = `Investigate: ${subject}
+  const userPrompt = `Company: ${subject}
+Agent findings summary:
+${findings.map(f =>
+  `${f.role}: ${f.primaryCause} (confidence: ${f.confidence})`
+).join('\n')}
 
-Here are the findings from all 6 specialist agents:
+Full findings JSON:
+${JSON.stringify(findings.map(f => ({
+  role: f.role,
+  primaryCause: f.primaryCause,
+  confidence: f.confidence,
+  evidence: f.evidence.slice(0, 2)
+})))}${debateSection}
 
-${findingsJson}
-${debateSection}
-
-Synthesize these into a final verdict. Return JSON.`;
+Return verdict JSON only.`;
 
   const rawOutput = await complete(SYSTEM_PROMPT, userPrompt, {
     temperature: 0.5,
-    maxTokens: 2500,
+    maxTokens: 1200,
   });
 
   let parsed: Record<string, unknown> = {};
@@ -91,7 +67,6 @@ Synthesize these into a final verdict. Return JSON.`;
   }
 
   const rawConfidence = (parsed.confidenceScore as number) || 75;
-  // Normalize to 0-1 scale for the UI
   const confidenceScore = rawConfidence > 1 ? rawConfidence / 100 : rawConfidence;
 
   const disagreements: Disagreement[] = Array.isArray(parsed.disagreements)

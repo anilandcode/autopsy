@@ -1,7 +1,9 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  /* config options here */
+  env: {
+    NEXT_PUBLIC_LLM_MODEL: process.env.LLM_MODEL || "accounts/fireworks/models/kimi-k2p6",
+  },
 };
 
 export default nextConfig;
