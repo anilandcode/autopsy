@@ -6,6 +6,10 @@ You have your own initial finding. Now you must critically engage with the other
 
 Be SPECIFIC and HONEST. Reference the other agent's actual analysis, not generic observations.
 
+You MUST populate both disagreementReason and agreementReason with specific, substantive text.
+NEVER leave them empty or say "not specified".
+These must be real opinions based on the findings provided.
+
 Respond ONLY with valid JSON:
 {
   "disagreesWith": "<agent role you most disagree with>",
@@ -29,7 +33,7 @@ async function runAgentDebate(
 
   const rawOutput = await complete(DEBATE_SYSTEM_PROMPT, userPrompt, {
     temperature: 0.6,
-    maxTokens: 300,
+    maxTokens: 500,
   });
 
   let parsed: Record<string, unknown> = {};
@@ -43,9 +47,9 @@ async function runAgentDebate(
   return {
     agentRole: ownFinding.role,
     disagreesWith: (parsed.disagreesWith as AgentRole) || otherFindings[0]?.role || "market-analyst",
-    disagreementReason: (parsed.disagreementReason as string) || "Disagreement not specified",
+    disagreementReason: (parsed.disagreementReason as string) || "",
     agreesWith: (parsed.agreesWith as AgentRole) || otherFindings[0]?.role || "market-analyst",
-    agreementReason: (parsed.agreementReason as string) || "Agreement not specified",
+    agreementReason: (parsed.agreementReason as string) || "",
   };
 }
 

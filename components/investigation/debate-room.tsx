@@ -56,12 +56,16 @@ export function DebateRoom({ debate }: DebateRoomProps) {
               <p className="text-xs text-[#D62828]">
                 {agentNames[d.agentRole]} disagrees with {agentNames[d.disagreesWith]}
               </p>
-              <p
-                className="mt-1 text-base italic text-[#F4F1EA]"
-                style={{ fontFamily: "var(--font-instrument-serif), Georgia, serif" }}
-              >
-                &ldquo;{d.disagreementReason}&rdquo;
-              </p>
+              {d.disagreementReason ? (
+                <p
+                  className="mt-1 text-base italic text-[#F4F1EA]"
+                  style={{ fontFamily: "var(--font-instrument-serif), Georgia, serif" }}
+                >
+                  &ldquo;{d.disagreementReason}&rdquo;
+                </p>
+              ) : (
+                <p className="mt-1 text-sm italic text-[#5C5852]">Agent withheld comment</p>
+              )}
 
               {/* Thin horizontal rule */}
               <div className="my-3 h-px bg-[#2A2A2A]" />
@@ -70,12 +74,16 @@ export function DebateRoom({ debate }: DebateRoomProps) {
               <p className="text-xs text-[#06D6A0]">
                 {agentNames[d.agentRole]} agrees with {agentNames[d.agreesWith]}
               </p>
-              <p
-                className="mt-1 text-base italic text-[#B8B5AE]"
-                style={{ fontFamily: "var(--font-instrument-serif), Georgia, serif" }}
-              >
-                &ldquo;{d.agreementReason}&rdquo;
-              </p>
+              {d.agreementReason ? (
+                <p
+                  className="mt-1 text-base italic text-[#B8B5AE]"
+                  style={{ fontFamily: "var(--font-instrument-serif), Georgia, serif" }}
+                >
+                  &ldquo;{d.agreementReason}&rdquo;
+                </p>
+              ) : (
+                <p className="mt-1 text-sm italic text-[#5C5852]">Agent withheld comment</p>
+              )}
 
               {/* Divider between debates (not after last) */}
               {i < debate.length - 1 && (

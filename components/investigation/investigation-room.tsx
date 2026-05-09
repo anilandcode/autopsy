@@ -4,7 +4,7 @@ import { useState, useEffect, useCallback, useRef } from "react";
 import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
-import { RotateCcw, Share2, Clock, ChevronDown, ChevronUp } from "lucide-react";
+import { RotateCcw, Share2, Clock, ChevronDown, ChevronUp, FileDown } from "lucide-react";
 import { Corkboard } from "./corkboard";
 import { FinalVerdict } from "./final-verdict";
 import { PremortemVerdict } from "./premortem-verdict";
@@ -125,6 +125,9 @@ export function InvestigationRoom() {
   const [deepMode, setDeepMode] = useState(false);
   const [caseHistory, setCaseHistory] = useState<CaseHistoryEntry[]>([]);
   const [logOpen, setLogOpen] = useState(false);
+  const [cfSuggestion, setCfSuggestion] = useState("");
+  const [cfOrigFromReport, setCfOrigFromReport] = useState("");
+  const [cfAltFromReport, setCfAltFromReport] = useState("");
 
   // Founder form fields
   const [founderName, setFounderName] = useState("");
@@ -573,6 +576,60 @@ export function InvestigationRoom() {
     });
   }, [mode, subject, cfOriginalDecision, cfAlternateDecision, deepMode]);
 
+  // Fetch counterfactual suggestion when postmortem report loads
+  useEffect(() => {
+    if (report && mode === "postmortem") {
+      const orig = report.primaryCauseOfDeath.split(".")[0].replace(/^(The company |They )/, "").slice(0, 100);
+      setCfOrigFromReport(orig);
+      fetch("/api/suggest-counterfactual", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ subject: subject, primaryCause: report.primaryCauseOfDeath }),
+      })
+        .then((r) => r.json())
+        .then((data) => {
+          if (data.suggestion) {
+            setCfAltFromReport(data.suggestion);
+            setCfSuggestion(data.suggestion);
+          }
+        })
+        .catch(() => {});
+    }
+  }, [report, mode, subject]);
+
+  const handleRunCF = useCallback(() => {
+    setMode("counterfactual");
+    setCfOriginalDecision(cfOrigFromReport || report?.primaryCauseOfDeath || "");
+    setCfAlternateDecision(cfAltFromReport || cfSuggestion || "");
+    setReport(null);
+    setPremortemReport(null);
+    setFounderReport(null);
+    setCfReport(null);
+    setIsInvestigating(false);
+    setLogs([]);
+    setDebateOutputs([]);
+    setDebateStarted(false);
+    setAgentFindings(makeEmptyFindings());
+    setPremortemFindings(makeEmptyPremortemFindings());
+    setFounderFindings(makeEmptyFounderFindings());
+    setCfAgentFindings(makeEmptyCFFindings());
+    setAgentStatuses(makeEmptyStatuses());
+    setError(null);
+    window.scrollTo({ top: 0, behavior: "smooth" });
+    setTimeout(() => {
+      startInvestigation(subject, deepMode);
+    }, 400);
+  }, [cfOrigFromReport, cfAltFromReport, cfSuggestion, report, subject, deepMode, startInvestigation]);
+
+  function generatePostmortemPDF(r: PostmortemReport) {
+    const printWindow = window.open("", "_blank");
+    if (!printWindow) return;
+    const html = `<!DOCTYPE html><html><head><title>Autopsy — ${r.subject}</title><style>*{margin:0;padding:0;box-sizing:border-box}body{font-family:Georgia,serif;color:#1a1a1a;background:white;padding:40px;max-width:800px;margin:0 auto}.header{border-bottom:3px solid #D62828;padding-bottom:20px;margin-bottom:30px}.brand{font-family:sans-serif;color:#D62828;font-size:12px;letter-spacing:1px;font-weight:bold;margin-bottom:8px}h1{font-size:28px;color:#0E0E0E;margin-bottom:6px}.date{color:#666;font-size:12px}.cause-box{background:#FEF2F2;border:2px solid #D62828;padding:20px;margin:24px 0}.cause-label{font-size:10px;letter-spacing:1px;color:#D62828;font-weight:bold;margin-bottom:8px}.cause-text{font-size:18px;font-weight:bold;color:#0E0E0E}h2{font-size:14px;letter-spacing:1px;color:#D62828;margin:28px 0 12px;font-family:sans-serif}p{font-size:14px;line-height:1.7;color:#333;margin-bottom:12px}ul,ol{padding-left:20px}li{font-size:13px;line-height:1.8;color:#333;margin-bottom:4px}.agent-section{margin:16px 0;padding:16px;border:1px solid #e5e5e5;page-break-inside:avoid}.agent-name{font-weight:bold;font-size:13px;color:#0E0E0E;margin-bottom:4px}.agent-analysis{font-size:12px;color:#555;line-height:1.6;margin-top:8px;border-top:1px solid #f0f0f0;padding-top:8px}.footer{margin-top:40px;padding-top:16px;border-top:1px solid #e5e5e5;font-size:11px;color:#999;text-align:center;font-family:sans-serif}@media print{body{padding:20px}.agent-section{page-break-inside:avoid}}</style></head><body><div class="header"><div class="brand">Autopsy</div><h1>Postmortem: ${r.subject}</h1><div class="date">Generated ${new Date(r.generatedAt).toLocaleDateString("en-US",{year:"numeric",month:"long",day:"numeric",hour:"2-digit",minute:"2-digit"})}</div></div><div class="cause-box"><div class="cause-label">PRIMARY CAUSE OF DEATH</div><div class="cause-text">${r.primaryCauseOfDeath}</div></div><h2>Executive Summary</h2><p>${r.executiveSummary}</p><h2>What Would Have Saved It</h2><ul>${r.whatWouldHaveSavedIt.map((i:string)=>`<li>${i}</li>`).join("")}</ul><h2>Lessons for Builders</h2><ol>${r.lessonsForBuilders.map((i:string)=>`<li>${i}</li>`).join("")}</ol><h2>Agent Reports</h2>${r.agentFindings.filter((f)=>f.status==="done").map((f)=>`<div class="agent-section"><div class="agent-name">${f.displayName}</div><div class="agent-analysis">${f.fullAnalysis}</div></div>`).join("")}<div class="footer">Autopsy · 6 AI Agents · autopsy-nine.vercel.app</div></body></html>`;
+    printWindow.document.write(html);
+    printWindow.document.close();
+    printWindow.onload = () => { setTimeout(() => { printWindow.print(); }, 500); };
+  }
+
   const activeExamples = mode === "founder" || mode === "counterfactual" ? [] : mode === "premortem" ? premortemExamples : postmortemExamples;
   const placeholder = mode === "founder" || mode === "counterfactual"
     ? ""
@@ -625,7 +682,7 @@ export function InvestigationRoom() {
       </nav>
 
       <AnimatePresence mode="wait">
-        {!isInvestigating ? (
+        {!isInvestigating && !report && !premortemReport && !founderReport && !cfReport ? (
           <motion.div
             key="input"
             initial={{ opacity: 0 }}
@@ -900,12 +957,20 @@ export function InvestigationRoom() {
                       onClick={() => {
                         setMode(c.mode);
                         setSubject(c.subject);
+                        setReport(null);
+                        setPremortemReport(null);
+                        setFounderReport(null);
+                        setCfReport(null);
+                        setError(null);
                         if (c.mode === "counterfactual" && c.originalDecision) {
                           setCfOriginalDecision(c.originalDecision);
                           setCfAlternateDecision(c.alternateDecision || "");
                         }
+                        setTimeout(() => {
+                          startInvestigation(c.subject, deepMode);
+                        }, 300);
                       }}
-                      className="flex w-full items-center justify-between rounded-md border border-[#2A2A2A] bg-[#161616] px-4 py-2.5 text-xs transition-colors hover:border-[#3F3F3F] hover:text-[#F4F1EA]"
+                      className="flex w-full cursor-pointer items-center justify-between rounded-md border border-[#2A2A2A] bg-[#161616] px-4 py-2.5 text-xs transition-colors hover:border-[#D62828] hover:text-[#F4F1EA]"
                     >
                       <span className="flex items-center gap-3">
                         <span className={`rounded-full px-2 py-0.5 text-[10px] font-medium ${
@@ -957,14 +1022,74 @@ export function InvestigationRoom() {
 
             {report && mode === "postmortem" && (
               <div ref={verdictRef}>
+                {/* Sticky top bar — case complete + PDF */}
+                <div className="sticky top-0 z-40 border-b border-[#2A2A2A] bg-[#0E0E0E]/95 px-4 py-2 backdrop-blur sm:px-6">
+                  <div className="mx-auto flex max-w-5xl items-center justify-between">
+                    <span className="text-xs text-[#5C5852]">
+                      CASE COMPLETE — <span className="text-[#F4F1EA]">{report.subject}</span>
+                    </span>
+                    <button
+                      onClick={() => generatePostmortemPDF(report)}
+                      className="inline-flex items-center gap-1 text-xs text-[#D62828] transition-colors hover:text-[#F4F1EA]"
+                    >
+                      <FileDown className="h-3 w-3" />
+                      Download PDF
+                    </button>
+                  </div>
+                </div>
+
                 <FinalVerdict report={report} />
+
+                {/* Counterfactual CTA */}
+                <div className="mx-auto mt-10 max-w-5xl">
+                  <div className="rounded-lg border-2 border-[#FFD60A] bg-[#FFD60A]/5 p-6 sm:p-8">
+                    <span className="font-mono text-[10px] font-bold uppercase tracking-wider text-[#FFD60A]">
+                      Counterfactual
+                    </span>
+                    <h3
+                      className="mt-4 text-xl sm:text-2xl text-[#F4F1EA]"
+                      style={{ fontFamily: "var(--font-instrument-serif), Georgia, serif" }}
+                    >
+                      What if {report.subject} had made a different decision?
+                    </h3>
+
+                    <div className="mt-6 grid gap-4 sm:grid-cols-2">
+                      <div>
+                        <label className="mb-1.5 block text-[10px] font-medium text-[#71706B]">
+                          Original decision
+                        </label>
+                        <input
+                          type="text"
+                          value={cfOrigFromReport}
+                          onChange={(e) => setCfOrigFromReport(e.target.value)}
+                          className="h-10 w-full rounded-md border border-[#3F3F3F] bg-[#0E0E0E] px-3 text-sm text-[#F4F1EA] placeholder:text-[#5C5852] outline-none focus:border-[#FFD60A]"
+                        />
+                      </div>
+                      <div>
+                        <label className="mb-1.5 block text-[10px] font-medium text-[#71706B]">
+                          Alternate decision
+                        </label>
+                        <input
+                          type="text"
+                          value={cfAltFromReport}
+                          onChange={(e) => setCfAltFromReport(e.target.value)}
+                          placeholder="Loading suggestion..."
+                          className="h-10 w-full rounded-md border border-[#3F3F3F] bg-[#0E0E0E] px-3 text-sm text-[#F4F1EA] placeholder:text-[#5C5852] outline-none focus:border-[#FFD60A]"
+                        />
+                      </div>
+                    </div>
+
+                    <button
+                      onClick={handleRunCF}
+                      disabled={!cfAltFromReport.trim()}
+                      className="mt-6 inline-flex h-12 w-full items-center justify-center gap-2 rounded-md bg-[#FFD60A] px-8 text-sm font-medium text-[#0E0E0E] transition-colors hover:bg-[#E6C000] disabled:cursor-not-allowed disabled:opacity-40"
+                    >
+                      Run counterfactual analysis
+                    </button>
+                  </div>
+                </div>
+
                 <div className="mx-auto mt-8 flex max-w-5xl flex-col items-center gap-4">
-                  <button
-                    onClick={() => handleBridgeToCF(report.primaryCauseOfDeath)}
-                    className="inline-flex h-11 items-center gap-2 rounded-md border border-[#FACC15] px-6 text-sm font-medium text-[#FACC15] transition-colors hover:bg-[#FACC15]/10"
-                  >
-                    Explore counterfactual: What if they had made a different decision?
-                  </button>
                   <div className="flex gap-3">
                     <button
                       onClick={handleShare}
@@ -981,6 +1106,14 @@ export function InvestigationRoom() {
                       New investigation
                     </button>
                   </div>
+                  {/* Full-width PDF download */}
+                  <button
+                    onClick={() => generatePostmortemPDF(report)}
+                    className="mt-2 inline-flex h-12 w-full max-w-5xl items-center justify-center gap-2 rounded-md border border-[#D62828] bg-transparent px-6 text-sm font-medium text-[#D62828] transition-colors hover:bg-[#D62828] hover:text-white"
+                  >
+                    <FileDown className="h-4 w-4" />
+                    Download full report (PDF)
+                  </button>
                 </div>
               </div>
             )}
