@@ -3,6 +3,8 @@
 
 ![Autopsy](https://autopsy-nine.vercel.app/opengraph-image)
 
+**Live Demo: [autopsy-nine.vercel.app](https://autopsy-nine.vercel.app/)**
+
 ### What it is
 
 Autopsy investigates why companies fail — and what could have saved them. Six specialized AI agents per mode research in parallel, debate each other's findings, and produce a forensic verdict in ~22 seconds.
@@ -80,7 +82,7 @@ cp .env.example .env.local
 npm run dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000).
+Open [http://localhost:3000](http://localhost:3000) locally, or visit the live demo at [autopsy-nine.vercel.app](https://autopsy-nine.vercel.app/).
 
 ### License
 
