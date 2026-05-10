@@ -100,124 +100,6 @@ function makeFounderErrorFinding(role: AgentRole): FounderFinding {
   };
 }
 
-export async function runInvestigation(
-  subject: string,
-  deep: boolean,
-  onAgentUpdate: (finding: AgentFinding) => void,
-  onAgentStarted?: (role: AgentRole) => void,
-  onDebateStarted?: () => void,
-  onDebateComplete?: (debate: AgentDebateOutput[]) => void
-): Promise<PostmortemReport> {
-  async function runWithUpdate(
-    runFn: (deep: boolean) => Promise<AgentFinding>,
-    role: AgentRole
-  ): Promise<AgentFinding> {
-    onAgentStarted?.(role);
-    try {
-      const result = await runFn(deep);
-      onAgentUpdate(result);
-      return result;
-    } catch {
-      const errorFinding = makeErrorFinding(role);
-      onAgentUpdate(errorFinding);
-      return errorFinding;
-    }
-  }
-
-  const results = await Promise.allSettled([
-    runWithUpdate(() => runMarketAnalyst(subject, deep), "market-analyst"),
-    runWithUpdate(() => runOperator(subject, deep), "operator"),
-    runWithUpdate(() => runMoneyTrail(subject, deep), "money-trail"),
-    runWithUpdate(() => runCustomerVoice(subject, deep), "customer-voice"),
-    runWithUpdate(() => runEngineer(subject, deep), "engineer"),
-    runWithUpdate(() => runHistorian(subject, deep), "historian"),
-  ]);
-
-  const findings: AgentFinding[] = [];
-  results.forEach((result) => {
-    if (result.status === "fulfilled") findings.push(result.value);
-  });
-
-  // Debate round
-  onDebateStarted?.();
-  const debateOutputs = await runDebateRound(findings);
-  onDebateComplete?.(debateOutputs);
-
-  return runSynthesizer(subject, findings, debateOutputs);
-}
-
-export async function runPremortem(
-  subject: string,
-  deep: boolean,
-  onAgentUpdate: (finding: PremortemFinding) => void,
-  onAgentStarted?: (role: AgentRole) => void
-): Promise<PremortemReport> {
-  async function runWithUpdate(
-    runFn: (deep: boolean) => Promise<PremortemFinding>,
-    role: AgentRole
-  ): Promise<PremortemFinding> {
-    onAgentStarted?.(role);
-    try {
-      const result = await runFn(deep);
-      onAgentUpdate(result);
-      return result;
-    } catch {
-      const errorFinding = makePremortemErrorFinding(role);
-      onAgentUpdate(errorFinding);
-      return errorFinding;
-    }
-  }
-
-  const results = await Promise.allSettled(
-    premortemRunners.map(({ role, run }) =>
-      runWithUpdate(() => run(subject, deep), role)
-    )
-  );
-
-  const findings: PremortemFinding[] = [];
-  results.forEach((result) => {
-    if (result.status === "fulfilled") findings.push(result.value);
-  });
-
-  return runPremortemSynthesizer(subject, findings);
-}
-
-export async function runFounderMode(
-  input: FounderModeInput,
-  deep: boolean,
-  onAgentUpdate: (finding: FounderFinding) => void,
-  onAgentStarted?: (role: AgentRole) => void
-): Promise<FounderReport> {
-  async function runWithUpdate(
-    runFn: (deep: boolean) => Promise<FounderFinding>,
-    role: AgentRole
-  ): Promise<FounderFinding> {
-    onAgentStarted?.(role);
-    try {
-      const result = await runFn(deep);
-      onAgentUpdate(result);
-      return result;
-    } catch {
-      const errorFinding = makeFounderErrorFinding(role);
-      onAgentUpdate(errorFinding);
-      return errorFinding;
-    }
-  }
-
-  const results = await Promise.allSettled(
-    founderRunners.map(({ role, run }) =>
-      runWithUpdate(() => run(input, deep), role)
-    )
-  );
-
-  const findings: FounderFinding[] = [];
-  results.forEach((result) => {
-    if (result.status === "fulfilled") findings.push(result.value);
-  });
-
-  return runFounderSynthesizer(input, findings);
-}
-
 function makeCounterfactualErrorFinding(role: AgentRole): CounterfactualAgentFinding {
   return {
     role,
@@ -233,41 +115,279 @@ function makeCounterfactualErrorFinding(role: AgentRole): CounterfactualAgentFin
   };
 }
 
+export async function runInvestigation(
+  subject: string,
+  deep: boolean,
+  onAgentUpdate: (finding: AgentFinding) => void,
+  onAgentStarted?: (role: AgentRole) => void,
+  onDebateStarted?: () => void,
+  onDebateComplete?: (debate: AgentDebateOutput[]) => void,
+  onBatchComplete?: (batch: number, agents: AgentRole[]) => void
+): Promise<PostmortemReport> {
+  async function runOne(
+    runFn: () => Promise<AgentFinding>,
+    role: AgentRole
+  ): Promise<AgentFinding> {
+    onAgentStarted?.(role);
+    try {
+      const result = await runFn();
+      onAgentUpdate(result);
+      return result;
+    } catch (err: any) {
+      const errorFinding: AgentFinding = {
+        role,
+        displayName: role,
+        status: "error",
+        primaryCause: "Agent encountered an error",
+        evidence: [],
+        confidence: 0,
+        fullAnalysis: err.message || "Unknown error",
+        sources: [],
+      };
+      onAgentUpdate(errorFinding);
+      return errorFinding;
+    }
+  }
+
+  const allFindings: AgentFinding[] = [];
+
+  // BATCH 1: Run 2 agents simultaneously
+  const batch1 = await Promise.all([
+    runOne(() => runMarketAnalyst(subject, deep), "market-analyst"),
+    runOne(() => runOperator(subject, deep), "operator"),
+  ]);
+  allFindings.push(...batch1);
+  onBatchComplete?.(1, ["market-analyst", "operator"]);
+
+  // Small gap between batches (1.5 seconds)
+  await new Promise((r) => setTimeout(r, 1500));
+
+  // BATCH 2: Run 2 more agents simultaneously
+  const batch2 = await Promise.all([
+    runOne(() => runMoneyTrail(subject, deep), "money-trail"),
+    runOne(() => runCustomerVoice(subject, deep), "customer-voice"),
+  ]);
+  allFindings.push(...batch2);
+  onBatchComplete?.(2, ["money-trail", "customer-voice"]);
+
+  // Small gap
+  await new Promise((r) => setTimeout(r, 1500));
+
+  // BATCH 3: Final 2 agents simultaneously
+  const batch3 = await Promise.all([
+    runOne(() => runEngineer(subject, deep), "engineer"),
+    runOne(() => runHistorian(subject, deep), "historian"),
+  ]);
+  allFindings.push(...batch3);
+  onBatchComplete?.(3, ["engineer", "historian"]);
+
+  // Now all 6 have data — run debate
+  // Small gap before debate
+  await new Promise((r) => setTimeout(r, 1000));
+
+  // Run debate round with all findings
+  let debateOutputs: AgentDebateOutput[] = [];
+  try {
+    if (typeof runDebateRound === "function") {
+      debateOutputs = await runDebateRound(allFindings);
+    }
+  } catch (err) {
+    console.error("Debate round failed:", err);
+    debateOutputs = [];
+  }
+
+  onDebateStarted?.();
+  onDebateComplete?.(debateOutputs);
+
+  // Run synthesizer with all findings + debate
+  const successfulFindings = allFindings.filter(
+    (f) => f.status === "done"
+  );
+
+  const report = await runSynthesizer(subject, successfulFindings, debateOutputs);
+  report.agentFindings = allFindings;
+
+  if (debateOutputs.length) {
+    (report as any).debateRound = debateOutputs;
+  }
+
+  return report;
+}
+
+export async function runPremortem(
+  subject: string,
+  deep: boolean,
+  onAgentUpdate: (finding: PremortemFinding) => void,
+  onAgentStarted?: (role: AgentRole) => void
+): Promise<PremortemReport> {
+  async function runOne(
+    runFn: () => Promise<PremortemFinding>,
+    role: AgentRole
+  ): Promise<PremortemFinding> {
+    onAgentStarted?.(role);
+    try {
+      const result = await runFn();
+      onAgentUpdate(result);
+      return result;
+    } catch (err: any) {
+      const errorFinding: PremortemFinding = {
+        role,
+        displayName: role,
+        status: "error",
+        topRisk: "Agent encountered an error",
+        riskLevel: "medium",
+        evidence: [],
+        fullAnalysis: err.message || "Unknown error",
+        earlyWarnings: [],
+        sources: [],
+      };
+      onAgentUpdate(errorFinding);
+      return errorFinding;
+    }
+  }
+
+  const allFindings: PremortemFinding[] = [];
+
+  const batch1 = await Promise.all([
+    runOne(() => runMarketAnalystPremortem(subject, deep), "market-analyst"),
+    runOne(() => runOperatorPremortem(subject, deep), "operator"),
+  ]);
+  allFindings.push(...batch1);
+
+  await new Promise((r) => setTimeout(r, 1500));
+
+  const batch2 = await Promise.all([
+    runOne(() => runMoneyTrailPremortem(subject, deep), "money-trail"),
+    runOne(() => runCustomerVoicePremortem(subject, deep), "customer-voice"),
+  ]);
+  allFindings.push(...batch2);
+
+  await new Promise((r) => setTimeout(r, 1500));
+
+  const batch3 = await Promise.all([
+    runOne(() => runEngineerPremortem(subject, deep), "engineer"),
+    runOne(() => runHistorianPremortem(subject, deep), "historian"),
+  ]);
+  allFindings.push(...batch3);
+
+  return runPremortemSynthesizer(subject, allFindings);
+}
+
+export async function runFounderMode(
+  input: FounderModeInput,
+  deep: boolean,
+  onAgentUpdate: (finding: FounderFinding) => void,
+  onAgentStarted?: (role: AgentRole) => void
+): Promise<FounderReport> {
+  async function runOne(
+    runFn: () => Promise<FounderFinding>,
+    role: AgentRole
+  ): Promise<FounderFinding> {
+    onAgentStarted?.(role);
+    try {
+      const result = await runFn();
+      onAgentUpdate(result);
+      return result;
+    } catch (err: any) {
+      const errorFinding: FounderFinding = {
+        role,
+        displayName: role,
+        status: "error",
+        topFailureMode: "Agent encountered an error",
+        severity: "medium",
+        evidence: [],
+        fullAnalysis: err.message || "Unknown error",
+        mitigations: [],
+        sources: [],
+      };
+      onAgentUpdate(errorFinding);
+      return errorFinding;
+    }
+  }
+
+  const allFindings: FounderFinding[] = [];
+
+  const batch1 = await Promise.all([
+    runOne(() => runFounderMarketAnalyst(input, deep), "market-analyst"),
+    runOne(() => runFounderOperator(input, deep), "operator"),
+  ]);
+  allFindings.push(...batch1);
+
+  await new Promise((r) => setTimeout(r, 1500));
+
+  const batch2 = await Promise.all([
+    runOne(() => runFounderMoneyTrail(input, deep), "money-trail"),
+    runOne(() => runFounderCustomerVoice(input, deep), "customer-voice"),
+  ]);
+  allFindings.push(...batch2);
+
+  await new Promise((r) => setTimeout(r, 1500));
+
+  const batch3 = await Promise.all([
+    runOne(() => runFounderEngineer(input, deep), "engineer"),
+    runOne(() => runFounderHistorian(input, deep), "historian"),
+  ]);
+  allFindings.push(...batch3);
+
+  return runFounderSynthesizer(input, allFindings);
+}
+
 export async function runCounterfactual(
   input: CounterfactualInput,
   deep: boolean,
   onAgentUpdate: (finding: CounterfactualAgentFinding) => void,
   onAgentStarted?: (role: AgentRole) => void
 ): Promise<CounterfactualReport> {
-  async function runWithUpdate(
-    runFn: (deep: boolean) => Promise<CounterfactualAgentFinding>,
+  async function runOne(
+    runFn: () => Promise<CounterfactualAgentFinding>,
     role: AgentRole
   ): Promise<CounterfactualAgentFinding> {
     onAgentStarted?.(role);
     try {
-      const result = await runFn(deep);
+      const result = await runFn();
       onAgentUpdate(result);
       return result;
-    } catch {
-      const errorFinding = makeCounterfactualErrorFinding(role);
+    } catch (err: any) {
+      const errorFinding: CounterfactualAgentFinding = {
+        role,
+        displayName: role,
+        status: "error",
+        actualOutcome: "Agent encountered an error",
+        alternateOutcome: "Agent encountered an error",
+        wouldItHaveHelped: false,
+        confidenceInAlterate: 0,
+        reasoning: err.message || "Unknown error",
+        historicalPrecedents: [],
+        sources: [],
+      };
       onAgentUpdate(errorFinding);
       return errorFinding;
     }
   }
 
-  const results = await Promise.allSettled([
-    runWithUpdate(() => runCFMarketAnalyst(input, deep), "market-analyst"),
-    runWithUpdate(() => runCFOperator(input, deep), "operator"),
-    runWithUpdate(() => runCFMoneyTrail(input, deep), "money-trail"),
-    runWithUpdate(() => runCFCustomerVoice(input, deep), "customer-voice"),
-    runWithUpdate(() => runCFEngineer(input, deep), "engineer"),
-    runWithUpdate(() => runCFHistorian(input, deep), "historian"),
+  const allFindings: CounterfactualAgentFinding[] = [];
+
+  const batch1 = await Promise.all([
+    runOne(() => runCFMarketAnalyst(input, deep), "market-analyst"),
+    runOne(() => runCFOperator(input, deep), "operator"),
   ]);
+  allFindings.push(...batch1);
 
-  const findings: CounterfactualAgentFinding[] = [];
-  results.forEach((result) => {
-    if (result.status === "fulfilled") findings.push(result.value);
-  });
+  await new Promise((r) => setTimeout(r, 1500));
 
-  return runCounterfactualSynthesizer(input, findings);
+  const batch2 = await Promise.all([
+    runOne(() => runCFMoneyTrail(input, deep), "money-trail"),
+    runOne(() => runCFCustomerVoice(input, deep), "customer-voice"),
+  ]);
+  allFindings.push(...batch2);
+
+  await new Promise((r) => setTimeout(r, 1500));
+
+  const batch3 = await Promise.all([
+    runOne(() => runCFEngineer(input, deep), "engineer"),
+    runOne(() => runCFHistorian(input, deep), "historian"),
+  ]);
+  allFindings.push(...batch3);
+
+  return runCounterfactualSynthesizer(input, allFindings);
 }

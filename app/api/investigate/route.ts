@@ -36,6 +36,9 @@ export async function POST(request: Request) {
           },
           (debate: AgentDebateOutput[]) => {
             sendEvent("debate_complete", debate);
+          },
+          (batch: number, agents: AgentRole[]) => {
+            sendEvent("batch_complete", { batch, agents });
           }
         );
 

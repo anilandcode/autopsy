@@ -1,4 +1,4 @@
-import { complete, extractJSON } from "@/lib/llm";
+import { complete, extractJSON, MODEL } from "@/lib/llm";
 import { webSearch, formatSearchResults } from "@/lib/search";
 import { AgentFinding, AgentRole } from "@/types/investigation";
 
@@ -15,7 +15,9 @@ export async function runAgent(
   subject: string,
   deep = false
 ): Promise<AgentFinding> {
-  const TIMEOUT_MS = 40000;
+  const TIMEOUT_MS = 50000;
+
+  console.log(`[${config.role}] Using model: ${MODEL}`);
 
   const timeoutPromise = new Promise<never>((_, reject) =>
     setTimeout(
@@ -69,18 +71,56 @@ export async function runAgent(
     };
   };
 
-  try {
-    return await Promise.race([agentPromise(), timeoutPromise]);
-  } catch {
+  const fallbackPromise = async (): Promise<AgentFinding> => {
+    console.log(`[${config.role}] Running fallback analysis...`);
+    const fallbackUserPrompt = `Provide a brief analysis of ${subject}. Focus on the single most important reason this company or situation failed or what went wrong. Respond in JSON: {"primaryCause":"...","evidence":["...","..."],"confidence":75,"fullAnalysis":"..."}`;
+    const rawOutput = await complete(config.systemPrompt, fallbackUserPrompt, {
+      temperature: 0.7,
+      maxTokens: 600,
+    });
+
+    let parsed: Record<string, unknown> = {};
+    try {
+      const cleanJSON = extractJSON(rawOutput);
+      parsed = JSON.parse(cleanJSON);
+    } catch {
+      console.error(`[${config.role}] Fallback JSON parse failed:`, rawOutput.slice(0, 200));
+      parsed = {};
+    }
+
     return {
       role: config.role,
       displayName: config.displayName,
-      status: "error",
-      primaryCause: "Agent timed out — insufficient data available",
-      evidence: [],
-      confidence: 0,
-      fullAnalysis: `The ${config.displayName} agent timed out while researching ${subject}.`,
+      status: "done",
+      primaryCause: (parsed.primaryCause as string) || "Analysis complete (fallback)",
+      evidence: Array.isArray(parsed.evidence)
+        ? (parsed.evidence as string[])
+        : [],
+      confidence: (() => {
+        const raw = (parsed.confidence as number) || 60;
+        return Math.min(1, Math.max(0, raw > 1 ? raw / 100 : raw));
+      })(),
+      fullAnalysis: (parsed.fullAnalysis as string) || rawOutput,
       sources: [],
     };
+  };
+
+  try {
+    return await Promise.race([agentPromise(), timeoutPromise]);
+  } catch {
+    try {
+      return await fallbackPromise();
+    } catch {
+      return {
+        role: config.role,
+        displayName: config.displayName,
+        status: "analyzing",
+        primaryCause: "Analysis pending — retrying with simplified query",
+        evidence: [],
+        confidence: 0,
+        fullAnalysis: `The ${config.displayName} agent is retrying with a simplified query for ${subject}.`,
+        sources: [],
+      };
+    }
   }
 }

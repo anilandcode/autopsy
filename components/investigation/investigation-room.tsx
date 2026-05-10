@@ -109,6 +109,8 @@ export function InvestigationRoom() {
   const [mode, setMode] = useState<InvestigationMode>("postmortem");
   const [subject, setSubject] = useState("");
   const [isInvestigating, setIsInvestigating] = useState(false);
+  const [hasStartedInvestigation, setHasStartedInvestigation] = useState(false);
+  const [currentBatch, setCurrentBatch] = useState(0);
   const [agentFindings, setAgentFindings] = useState<Record<AgentRole, AgentFinding | null>>(makeEmptyFindings);
   const [premortemFindings, setPremortemFindings] = useState<Record<AgentRole, PremortemFinding | null>>(makeEmptyPremortemFindings);
   const [founderFindings, setFounderFindings] = useState<Record<AgentRole, FounderFinding | null>>(makeEmptyFounderFindings);
@@ -205,6 +207,8 @@ export function InvestigationRoom() {
 
     const currentMode = mode;
     const isDeep = forceDeep || deepMode;
+    setHasStartedInvestigation(true);
+    setCurrentBatch(0);
     setIsInvestigating(true);
     setError(null);
     setReport(null);
@@ -444,6 +448,12 @@ export function InvestigationRoom() {
               if (type === "error") {
                 addLog("ERROR: " + (data.message || "Unknown error"));
                 setError(data.message || "Unknown error");
+                setIsInvestigating(false);
+              }
+
+              if (type === "batch_complete") {
+                addLog(`✓ Batch ${data.batch}/3 complete — ${data.agents.join(", ")}`);
+                setCurrentBatch(data.batch);
               }
 
               if (type === "cf_complete") {
@@ -527,6 +537,8 @@ export function InvestigationRoom() {
     if (origDecision) setCfOriginalDecision(origDecision);
     setCfReport(null);
     setIsInvestigating(false);
+    setHasStartedInvestigation(false);
+    setCurrentBatch(0);
     setLogs([]);
     setDebateOutputs([]);
     setDebateStarted(false);
@@ -549,6 +561,8 @@ export function InvestigationRoom() {
   }, []);
 
   const handleNewInvestigation = useCallback(() => {
+    setHasStartedInvestigation(false);
+    setCurrentBatch(0);
     setReport(null);
     setPremortemReport(null);
     setFounderReport(null);
@@ -563,6 +577,24 @@ export function InvestigationRoom() {
     setFounderFindings(makeEmptyFounderFindings());
     setCfAgentFindings(makeEmptyCFFindings());
     setAgentStatuses(makeEmptyStatuses());
+  }, []);
+
+  const handleTryAgain = useCallback(() => {
+    setHasStartedInvestigation(false);
+    setCurrentBatch(0);
+    setAgentFindings(makeEmptyFindings());
+    setPremortemFindings(makeEmptyPremortemFindings());
+    setFounderFindings(makeEmptyFounderFindings());
+    setCfAgentFindings(makeEmptyCFFindings());
+    setAgentStatuses(makeEmptyStatuses());
+    setError(null);
+    setLogs([]);
+    setReport(null);
+    setPremortemReport(null);
+    setFounderReport(null);
+    setCfReport(null);
+    setDebateOutputs([]);
+    setDebateStarted(false);
   }, []);
 
   const handleShare = useCallback(() => {
@@ -607,6 +639,8 @@ export function InvestigationRoom() {
     setFounderReport(null);
     setCfReport(null);
     setIsInvestigating(false);
+    setHasStartedInvestigation(false);
+    setCurrentBatch(0);
     setLogs([]);
     setDebateOutputs([]);
     setDebateStarted(false);
@@ -650,7 +684,11 @@ export function InvestigationRoom() {
         <div className="relative z-10 border-b border-[rgba(255,255,255,0.1)] bg-[#0F1110] px-6 py-2 sm:px-12">
           <div className="mx-auto flex max-w-5xl items-center justify-between">
             <p className="text-xs text-[#A1A1AA]">
-              {deepMode ? "Deep mode — ~2 minutes" : "Investigating — ~30 seconds"}
+              {currentBatch > 0
+                ? `Investigating: ${subject} — Batch ${currentBatch}/3 in progress`
+                : deepMode
+                  ? "Deep mode — ~2 minutes"
+                  : "Investigating — ~30 seconds"}
             </p>
             <button
               onClick={handleCancel}
@@ -674,7 +712,7 @@ export function InvestigationRoom() {
 
       <div className="relative z-10">
         <AnimatePresence mode="wait">
-        {!isInvestigating && !report && !premortemReport && !founderReport && !cfReport ? (
+        {!hasStartedInvestigation ? (
           <motion.div
             key="input"
             initial={{ opacity: 0 }}
@@ -994,6 +1032,18 @@ export function InvestigationRoom() {
               </div>
             )}
 
+            {!isInvestigating && hasStartedInvestigation && !report && !premortemReport && !founderReport && !cfReport && (
+              <div className="mx-auto mb-6 flex max-w-5xl justify-center">
+                <button
+                  onClick={handleTryAgain}
+                  className="inline-flex h-11 items-center gap-2 rounded-md border border-[#A1A1AA] px-6 text-xs font-medium text-[#A1A1AA] transition-colors hover:border-[white] hover:text-[white]"
+                >
+                  <RotateCcw className="h-4 w-4" />
+                  Try Again
+                </button>
+              </div>
+            )}
+
             <Corkboard
               subject={subject}
               agentRoles={AGENT_ROLES}
@@ -1195,7 +1245,7 @@ export function InvestigationRoom() {
       </div>
 
       {/* Investigation log — collapsible drawer on right side */}
-      {isInvestigating && (
+      {hasStartedInvestigation && (
         <div className="fixed bottom-0 right-0 z-50 w-80 max-w-[90vw]">
           <button
             onClick={() => setLogOpen(!logOpen)}
