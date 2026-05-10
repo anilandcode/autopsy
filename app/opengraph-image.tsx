@@ -17,11 +17,11 @@ export default async function Image() {
           flexDirection: "column",
           justifyContent: "center",
           alignItems: "center",
-          backgroundColor: "#0E0E0E",
+          backgroundColor: "#0F1110",
           padding: "60px",
         }}
       >
-        {/* Red accent bar at top */}
+        {/* Indigo accent bar at top */}
         <div
           style={{
             position: "absolute",
@@ -29,16 +29,16 @@ export default async function Image() {
             left: 0,
             right: 0,
             height: "4px",
-            backgroundColor: "#D62828",
+            backgroundColor: "#4B4BA0",
           }}
         />
-        {/* Yellow stripe */}
+        {/* Indigo stripe */}
         <div
           style={{
             display: "flex",
             width: "100%",
             padding: "8px 16px",
-            backgroundColor: "#FFD60A",
+            backgroundColor: "#4B4BA0",
             marginBottom: "40px",
           }}
         >
@@ -48,7 +48,7 @@ export default async function Image() {
               fontSize: "12px",
               fontWeight: "bold",
               letterSpacing: "0.1em",
-              color: "#000",
+              color: "#fff",
             }}
           >
             AUTOPSY / FORENSIC INTELLIGENCE / 4 MODES / 24 AGENTS
@@ -61,7 +61,7 @@ export default async function Image() {
             fontFamily: "Georgia, serif",
             fontSize: 140,
             fontWeight: 400,
-            color: "#F4F1EA",
+            color: "#FFFFFF",
             letterSpacing: "-0.04em",
             lineHeight: 1,
           }}
@@ -74,7 +74,7 @@ export default async function Image() {
           style={{
             fontFamily: "monospace",
             fontSize: 18,
-            color: "#71706B",
+            color: "#A1A1AA",
             letterSpacing: "0.1em",
             marginTop: "24px",
             textTransform: "uppercase",
@@ -91,10 +91,10 @@ export default async function Image() {
             marginTop: "20px",
           }}
         >
-          <span style={{ fontFamily: "monospace", fontSize: "14px", color: "#D62828", letterSpacing: "0.05em" }}>POSTMORTEM</span>
-          <span style={{ fontFamily: "monospace", fontSize: "14px", color: "#FFD60A", letterSpacing: "0.05em" }}>PRE-MORTEM</span>
-          <span style={{ fontFamily: "monospace", fontSize: "14px", color: "#06D6A0", letterSpacing: "0.05em" }}>FOUNDER</span>
-          <span style={{ fontFamily: "monospace", fontSize: "14px", color: "#FACC15", letterSpacing: "0.05em" }}>COUNTERFACTUAL</span>
+          <span style={{ fontFamily: "monospace", fontSize: "14px", color: "#4B4BA0", letterSpacing: "0.05em" }}>POSTMORTEM</span>
+          <span style={{ fontFamily: "monospace", fontSize: "14px", color: "#8F47AE", letterSpacing: "0.05em" }}>PRE-MORTEM</span>
+          <span style={{ fontFamily: "monospace", fontSize: "14px", color: "#00A67E", letterSpacing: "0.05em" }}>FOUNDER</span>
+          <span style={{ fontFamily: "monospace", fontSize: "14px", color: "#8F47AE", letterSpacing: "0.05em" }}>COUNTERFACTUAL</span>
         </div>
 
         {/* Divider */}
@@ -102,7 +102,7 @@ export default async function Image() {
           style={{
             width: "100%",
             height: "1px",
-            backgroundColor: "#2A2A2A",
+            backgroundColor: "rgba(255,255,255,0.05)",
             marginTop: "32px",
             marginBottom: "24px",
           }}
@@ -120,7 +120,7 @@ export default async function Image() {
             style={{
               fontFamily: "monospace",
               fontSize: 12,
-              color: "#5C5852",
+              color: "#A1A1AA",
               letterSpacing: "0.1em",
             }}
           >
@@ -130,7 +130,7 @@ export default async function Image() {
             style={{
               fontFamily: "monospace",
               fontSize: 12,
-              color: "#5C5852",
+              color: "#A1A1AA",
               letterSpacing: "0.1em",
             }}
           >
