@@ -1,0 +1,43 @@
+[
+  {
+    "id": "auto-01",
+    "company": "Quibi",
+    "findings": [
+      "Spent $1.75B before launch",
+      "No social sharing in a social-first era",
+      "Premium pricing during a free-content boom"
+    ],
+    "verdict": "Quibi burned $1.75B on premium short-form video with no social sharing, mistiming a free-content market.",
+    "consistent": true
+  },
+  {
+    "id": "auto-02",
+    "company": "Theranos",
+    "findings": [
+      "Tech never worked at claimed accuracy",
+      "Leadership hid failures from the board and partners"
+    ],
+    "verdict": "Theranos leadership hid that the tech never met its accuracy claims.",
+    "consistent": true
+  },
+  {
+    "id": "auto-03",
+    "company": "Kodak",
+    "findings": [
+      "Invented the digital camera in 1975",
+      "Protected film revenue and delayed the digital pivot"
+    ],
+    "verdict": "Kodak collapsed primarily because of a massive accounting fraud uncovered in 2011.",
+    "consistent": false
+  },
+  {
+    "id": "auto-04",
+    "company": "Blockbuster",
+    "findings": [
+      "Declined to buy Netflix for $50M",
+      "Relied on late fees customers resented"
+    ],
+    "verdict": "Blockbuster declined to buy Netflix and leaned on resented late fees.",
+    "consistent": true
+  }
+]
